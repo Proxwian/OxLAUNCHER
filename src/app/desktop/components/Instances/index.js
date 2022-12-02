@@ -9,6 +9,9 @@ const Container = styled.div`
   flex-wrap: wrap;
   width: 100%;
   margin-bottom: 2rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  left: 20px;
 `;
 
 const NoInstance = styled.div`
@@ -71,9 +74,9 @@ const Instances = () => {
         memoInstances.map(i => <Instance key={i.name} instanceName={i.name} />)
       ) : (
         <NoInstance>
-          No Instance has been installed
+          Клиенты не установлены
           <SubNoInstance>
-            Click on the icon in the bottom left corner to add new instances
+            Нажмите на значок + в нижнем левом углу, чтобы скачать клиент
           </SubNoInstance>
         </NoInstance>
       )}

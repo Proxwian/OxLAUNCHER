@@ -53,14 +53,14 @@ const InstanceCrashed = ({ code, errorLogs }) => {
         height: 450px;
         width: 500px;
       `}
-      title="The instance could not be launched"
+      title="Не удалось запустить сборку :("
     >
       <Container>
         <InnerContainer>
           <Logo size={100} />
           <h3>
-            OOPSIE WOOPSIE!!
-            <br /> A creeper blew this instance up!
+            ОЙ-ОЙ-ОЙ!
+            <br /> Крипер взорвал ваш клиент снова
           </h3>
         </InnerContainer>
         <Card
@@ -68,9 +68,9 @@ const InstanceCrashed = ({ code, errorLogs }) => {
             margin: 10px 0 20px 0;
           `}
         >
-          <h3>Error: </h3>
+          <h3>Ошибка: </h3>
           <ErrorContainer>{calcError(code)}</ErrorContainer>
-          <h3>code: </h3>
+          <h3>код: </h3>
           <ErrorContainer>{code}</ErrorContainer>
         </Card>
         <Collapse

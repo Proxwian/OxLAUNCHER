@@ -27,6 +27,7 @@ export const VANILLA = 'vanilla';
 export const CURSEFORGE = 'curseforge';
 export const FTB = 'ftb';
 
+export const ACCOUNT_OFFLINE = 'ACCOUNT_OFFLINE';
 export const ACCOUNT_MOJANG = 'ACCOUNT_MOJANG';
 export const ACCOUNT_MICROSOFT = 'ACCOUNT_MICROSOFT';
 export const CURSEFORGE_URL = 'https://www.curseforge.com';

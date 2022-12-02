@@ -64,8 +64,8 @@ if (gotTheLock) {
   app.quit();
 }
 
-if (!app.isDefaultProtocolClient('gdlauncher')) {
-  app.setAsDefaultProtocolClient('gdlauncher');
+if (!app.isDefaultProtocolClient('oxlauncher')) {
+  app.setAsDefaultProtocolClient('oxlauncher');
 }
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -78,36 +78,36 @@ const edit = [
   ...(process.platform === 'darwin'
     ? [
         {
-          label: 'GDLauncher',
+          label: 'OxLAUNCHER',
           submenu: [
             {
-              label: 'About GDLauncher',
+              label: 'Об OxLAUNCHER',
               role: 'about'
             },
             { type: 'separator' },
             {
-              label: 'Services',
+              label: 'Сервисы',
               role: 'services',
               submenu: []
             },
             { type: 'separator' },
             {
-              label: 'Hide GDLauncher',
+              label: 'Спрятать OxLAUNCHER',
               accelerator: 'Command+H',
               role: 'hide'
             },
             {
-              label: 'Hide Others',
+              label: 'Спрятать остальные',
               accelerator: 'Command+Alt+H',
               role: 'hideOthers'
             },
             {
-              label: 'Show All',
+              label: 'Показать все',
               role: 'unhide'
             },
             { type: 'separator' },
             {
-              label: 'Quit GDLauncher',
+              label: 'Выйти из OxLAUNCHER',
               accelerator: 'Command+Q',
               click: () => {
                 app.quit();
@@ -168,7 +168,22 @@ const userAgent = new UserAgent({
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
 
-app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
+let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
+
+// Read config and eventually use new path
+try {
+  const configFile = fss.readFileSync(
+    path.join(app.getPath('userData'), 'config.json')
+  );
+  const config = JSON.parse(configFile);
+  if (config.settings.instancesPath) {
+    oldLauncherUserData = config.settings.instancesPath;
+  }
+} catch {
+  // Do nothing
+}
+
+app.setPath('userData', path.join(app.getPath('appData'), 'oxlauncher'));
 
 let allowUnstableReleases = false;
 const releaseChannelExists = fss.existsSync(
@@ -202,34 +217,6 @@ if (
     );
     app.setPath('userData', override.toString());
   }
-}
-
-// Read config and eventually use new path
-try {
-  const configPath = path.join(app.getPath('userData'), 'config.json');
-  const configFile = fss.readFileSync(configPath);
-  const config = JSON.parse(configFile);
-
-  const requiredArgs = [
-    '-Dfml.ignorePatchDiscrepancies=true',
-    '-Dfml.ignoreInvalidMinecraftCertificates=true'
-  ];
-
-  const javaArgs = config.settings.java.args;
-
-  if (config.settings.java.args) {
-    const cleanedJavaArgs = javaArgs
-      .split(' ')
-      .filter(arg => !requiredArgs.includes(arg))
-      .join(' ');
-
-    if (cleanedJavaArgs.split(' ').length !== javaArgs.split(' ').length) {
-      config.settings.java.args = cleanedJavaArgs;
-      fss.writeFileSync(configPath, JSON.stringify(config));
-    }
-  }
-} catch {
-  // Do nothing
 }
 
 log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
@@ -271,13 +258,13 @@ patchSevenZip();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 700,
-    minWidth: 1100,
-    minHeight: 700,
+    width: 900,
+    height: 600,
+    minWidth: 700,
+    minHeight: 450,
     show: true,
     frame: false,
-    backgroundColor: '#1B2533',
+    backgroundColor: '#1b3133',
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
@@ -348,18 +335,18 @@ function createWindow() {
   tray = new Tray(nimage);
   const trayMenuTemplate = [
     {
-      label: 'GDLauncher',
+      label: 'OxLAUNCHER',
       enabled: false
     },
     {
-      label: 'Show Dev Tools',
+      label: 'Консоль разработчика',
       click: () => mainWindow.webContents.openDevTools()
     }
   ];
 
   const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
   tray.setContextMenu(trayMenu);
-  tray.setToolTip('GDLauncher');
+  tray.setToolTip('OxLAUNCHER');
   tray.on('double-click', () => mainWindow.show());
 
   mainWindow.loadURL(
@@ -367,7 +354,7 @@ function createWindow() {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`,
     {
-      userAgent: 'GDLauncher'
+      userAgent: 'OxLAUNCHER'
     }
   );
   if (isDev) {
@@ -566,6 +553,10 @@ ipcMain.handle('getSentryDsn', () => {
   return process.env.SENTRY_DSN;
 });
 
+ipcMain.handle('getOldLauncherUserData', () => {
+  return oldLauncherUserData;
+});
+
 ipcMain.handle('getExecutablePath', () => {
   return path.dirname(app.getPath('exe'));
 });
@@ -646,7 +637,7 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
   let win = new BrowserWindow();
 
   await win.webContents.session.clearCache();
-  // await win.webContents.session.clearStorageData();
+  await win.webContents.session.clearStorageData();
 
   win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 
@@ -742,7 +733,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
   let win = new BrowserWindow();
 
   await win.webContents.session.clearCache();
-  // await win.webContents.session.clearStorageData();
+  await win.webContents.session.clearStorageData();
 
   win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 

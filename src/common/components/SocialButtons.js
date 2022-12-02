@@ -38,36 +38,7 @@ const SocialButtons = () => {
         }
       `}
     >
-      <a href="https://discord.gdlauncher.com">
-        <div>
-          <FontAwesomeIcon icon={faDiscord} size="lg" />
-        </div>
-      </a>
-      <a href="https://github.com/gorilla-devs/GDLauncher">
-        <div>
-          <FontAwesomeIcon icon={faGithub} size="lg" />
-        </div>
-      </a>
-      <a href="https://twitter.com/gdlauncher">
-        <div>
-          <FontAwesomeIcon icon={faTwitter} size="lg" />
-        </div>
-      </a>
-      <a href="https://facebook.com/gorilladevs">
-        <div>
-          <FontAwesomeIcon icon={faFacebook} size="lg" />
-        </div>
-      </a>
-      <a href="https://instagram.com/gdlauncher">
-        <div>
-          <FontAwesomeIcon icon={faInstagram} size="lg" />
-        </div>
-      </a>
-      <a href="https://gdevs.io">
-        <div>
-          <FontAwesomeIcon icon={faGlobe} size="lg" />
-        </div>
-      </a>
+      
     </div>
   );
 };

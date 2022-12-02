@@ -46,7 +46,7 @@ const InstanceExportCurseForge = ({ instanceName }) => {
         overflow: hidden;
         vertial-align: middle;
       `}
-      title="Export Instance"
+      title="Экспорт"
     >
       <FirstStep
         setPackZipName={setPackZipName}

@@ -94,7 +94,7 @@ const ModpacksListWrapper = ({
               setStep(1);
             }}
           >
-            Download Latest
+            Загрузить
           </div>
           <div
             onClick={() => {
@@ -109,7 +109,7 @@ const ModpacksListWrapper = ({
               );
             }}
           >
-            Explore / Versions
+            Подробнее / Версии
           </div>
         </ModpackHover>
       </div>

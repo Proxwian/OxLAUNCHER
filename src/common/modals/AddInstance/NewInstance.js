@@ -39,7 +39,7 @@ const NewInstance = ({ setVersion, setModpack }) => {
           }
           setModpack(null);
         }}
-        placeholder="Select a version"
+        placeholder="Выберите версию"
         size="large"
         css={`
           width: 400px !important;

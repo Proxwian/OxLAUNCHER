@@ -82,12 +82,12 @@ const openFolder = screenshotsPath => {
 
 const getTitle = days => {
   const parsedDays = Number.parseInt(days, 10);
-  if (parsedDays === 0) return 'Today';
-  else if (parsedDays === 1) return 'Yesterday';
-  else if (parsedDays > 1 && parsedDays < 30) return `${days} days ago`;
+  if (parsedDays === 0) return 'Сегодня';
+  else if (parsedDays === 1) return 'Вчера';
+  else if (parsedDays > 1 && parsedDays < 30) return `${days} дней назад`;
   else if (parsedDays >= 30 && parsedDays < 365)
-    return `${Math.floor(days / 30)} months ago`;
-  else if (parsedDays >= 365) return `${Math.floor(days / 365)} years ago`;
+    return `${Math.floor(days / 30)} мес. назад`;
+  else if (parsedDays >= 365) return `${Math.floor(days / 365)} лет назад`;
 };
 
 const getScreenshotsCount = groups =>
@@ -114,13 +114,13 @@ const Screenshots = ({ instanceName }) => {
       uploadingFileName !== null &&
       selectedItems.includes(uploadingFileName)
     ) {
-      return 'Image copied to clipboard!';
+      return 'Изображение скопировано в буфер обмена!';
     } else if (
       uploadingFileName != null &&
       selectedItems[0] != uploadingFileName
     ) {
-      return 'Busy! Wait before uploading another image';
-    } else return 'Share the image via url';
+      return 'Занято! Подождите загрузки предыдущего изображения';
+    } else return 'Поделиться ссылкой на изображение';
   };
 
   const containerRef = useRef(null);
@@ -208,17 +208,17 @@ const Screenshots = ({ instanceName }) => {
             getScreenshotsCount(dateGroups) === selectedItems.length
           }
         >
-          {`${selectedItems.length} selected`}
+          {`${selectedItems.length} выбрано`}
         </GlobalCheckbox>
 
         <DeleteButton
           onClick={() => {
             if (selectedItems.length) {
               dispatch(
-                openModal('ActionConfirmation', {
-                  message: 'Are you sure you want to delete this image(s)?',
+                openModal('Подтверждение удаления', {
+                  message: 'Вы уверены, что хотите удалить эти изображения?',
                   confirmCallback: deleteFile,
-                  title: 'Confirm'
+                  title: 'Подтвердить'
                 })
               );
             }
@@ -261,7 +261,7 @@ const Screenshots = ({ instanceName }) => {
                           <Photo
                             onClick={() =>
                               dispatch(
-                                openModal('Screenshot', {
+                                openModal('Скриншот', {
                                   screenshotsPath,
                                   file
                                 })
@@ -304,18 +304,18 @@ const Screenshots = ({ instanceName }) => {
                           <MenuItem
                             onClick={() => {
                               dispatch(
-                                openModal('ActionConfirmation', {
+                                openModal('Удаление изображения', {
                                   message:
-                                    'Are you sure you want to delete this image?',
+                                    'Вы уверены, что хотите удалить этот скриншот?',
                                   fileName: file.name,
                                   confirmCallback: deleteFile,
-                                  title: 'Confirm'
+                                  title: 'Подтвердить'
                                 })
                               );
                             }}
                           >
                             <FontAwesomeIcon icon={faTrash} />
-                            {`Delete ${selectedItems.length} items`}
+                            {`Удалить ${selectedItems.length} изобр.`}
                           </MenuItem>
                         ) : (
                           selectedItems.length ===
@@ -324,18 +324,18 @@ const Screenshots = ({ instanceName }) => {
                             <MenuItem
                               onClick={() => {
                                 dispatch(
-                                  openModal('ActionConfirmation', {
+                                  openModal('Удаление изображения', {
                                     message:
-                                      'Are you sure you want to delete this image?',
+                                      'Вы уверены, что хотите удалить этот скриншот?',
                                     fileName: file.name,
                                     confirmCallback: deleteFile,
-                                    title: 'Confirm'
+                                    title: 'Подтвердить'
                                   })
                                 );
                               }}
                             >
                               <FontAwesomeIcon icon={faTrash} />
-                              Delete all
+                              Удалить все
                             </MenuItem>
                           )
                         )}
@@ -345,7 +345,7 @@ const Screenshots = ({ instanceName }) => {
                             <MenuItem
                               onClick={() =>
                                 dispatch(
-                                  openModal('Screenshot', {
+                                  openModal('Скриншот', {
                                     screenshotsPath,
                                     file
                                   })
@@ -353,7 +353,7 @@ const Screenshots = ({ instanceName }) => {
                               }
                             >
                               <FontAwesomeIcon icon={faImage} />
-                              Preview
+                              Просмотр
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
@@ -363,7 +363,7 @@ const Screenshots = ({ instanceName }) => {
                               }}
                             >
                               <FontAwesomeIcon icon={faCopy} />
-                              Copy the image
+                              Копировать картинку
                             </MenuItem>
                             <ImgurShareMenuItem
                               disabled={
@@ -397,9 +397,9 @@ const Screenshots = ({ instanceName }) => {
                                       uploadingFileName,
                                       selectedItems
                                     )
-                                  : `Image too big... ${Math.floor(
+                                  : `Изображение слишком большое... ${Math.floor(
                                       file.size / 1024 / 1024
-                                    )}MB`}
+                                    )}МБ`}
                               </MenuShareLink>
                               <LoadingSlider
                                 selectedItems={selectedItems}
@@ -415,18 +415,18 @@ const Screenshots = ({ instanceName }) => {
                             <MenuItem
                               onClick={() => {
                                 dispatch(
-                                  openModal('ActionConfirmation', {
+                                  openModal('Удаление скриншота', {
                                     message:
-                                      'Are you sure you want to delete this image?',
+                                      'Вы уверены, что хотите удалить это изображение?',
                                     fileName: file.name,
                                     confirmCallback: deleteFile,
-                                    title: 'Confirm'
+                                    title: 'Подтвердить'
                                   })
                                 );
                               }}
                             >
                               <FontAwesomeIcon icon={faTrash} />
-                              Delete
+                              Удалить
                             </MenuItem>
                           </>
                         )}
@@ -438,7 +438,7 @@ const Screenshots = ({ instanceName }) => {
             );
           })
         ) : (
-          <NoScreenAvailable>No Screenshot Available</NoScreenAvailable>
+          <NoScreenAvailable>Скриншоты не найдены</NoScreenAvailable>
         )}
       </Container>
     </ExternalContainer>

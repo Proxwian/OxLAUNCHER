@@ -698,7 +698,7 @@ const Mods = ({ instanceName }) => {
                 setIsMenuOpen(false);
               }}
             >
-              Update All Mods
+              Обновить все модификации
             </div>
           )
         }
@@ -736,7 +736,7 @@ const Mods = ({ instanceName }) => {
                 : setSelectedMods([])
             }
           >
-            Select All
+            Выбрать все
           </Checkbox>
           <DeleteSelectedMods
             onClick={async () => {
@@ -773,7 +773,7 @@ const Mods = ({ instanceName }) => {
             }}
             loading={loadingModUpdates}
           >
-            Check for Updates
+            Проверить обновления
           </Button>
           <span
             onClick={e => {
@@ -812,7 +812,7 @@ const Mods = ({ instanceName }) => {
             );
           }}
         >
-          Add Mod
+          Добавить мод
         </Button>
         <Input
           allowClear
@@ -822,7 +822,7 @@ const Mods = ({ instanceName }) => {
           css={`
             width: 200px !important;
           `}
-          placeholder={`Search ${mods.length} mods`}
+          placeholder={`Поиск среди ${mods.length} модов`}
         />
       </Header>
       <div
@@ -859,7 +859,7 @@ const Mods = ({ instanceName }) => {
                   `}
                   onDragLeave={e => e.stopPropagation()}
                 >
-                  <CopyTitle>Copy</CopyTitle>
+                  <CopyTitle>Копировать</CopyTitle>
                   <DragArrow icon={faArrowDown} size="3x" />
                 </div>
               )}
@@ -867,7 +867,7 @@ const Mods = ({ instanceName }) => {
           )}
         </Transition>
         {mods.length === 0 && (
-          <NotItemsAvailable>No Mods Available</NotItemsAvailable>
+          <NotItemsAvailable>Модификации не найдены :с</NotItemsAvailable>
         )}
         <AutoSizer>
           {({ height, width }) => (

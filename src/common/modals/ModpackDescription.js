@@ -69,7 +69,7 @@ const ModpackDescription = ({
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            [Stable]
+            [Релиз]
           </span>
         );
       case 2:
@@ -80,7 +80,7 @@ const ModpackDescription = ({
               color: ${props => props.theme.palette.colors.yellow};
             `}
           >
-            [Beta]
+            [Бета]
           </span>
         );
       case 3:
@@ -92,7 +92,7 @@ const ModpackDescription = ({
               color: ${props => props.theme.palette.colors.red};
             `}
           >
-            [Alpha]
+            [Альфа]
           </span>
         );
     }
@@ -139,23 +139,23 @@ const ModpackDescription = ({
                 {modpack.name}
                 <ParallaxContentInfos>
                   <div>
-                    <label>Author: </label>
+                    <label>Автор: </label>
                     {modpack.authors[0].name}
                   </div>
                   <div>
-                    <label>Downloads: </label>
+                    <label>Загрузки: </label>
                     {type === 'ftb'
                       ? formatNumber(modpack.installs)
                       : formatNumber(modpack.downloadCount)}
                   </div>
                   <div>
-                    <label>Last Update: </label>
+                    <label>Обновлено: </label>
                     {type === 'ftb'
                       ? formatDate(modpack.refreshed * 1000)
                       : formatDate(modpack.dateModified)}
                   </div>
                   <div>
-                    <label>MC version: </label>
+                    <label>Версия Minecraft: </label>
                     {type === 'ftb'
                       ? modpack.tags[0]?.name || '-'
                       : modpack.latestFilesIndexes[0].gameVersion}
@@ -225,7 +225,7 @@ const ModpackDescription = ({
             `}
           >
             <StyledSelect
-              placeholder={loading ? 'Loading Versions' : 'Select a version'}
+              placeholder={loading ? 'Загружаем обновления...' : 'Выберите версию'}
               onChange={handleChange}
               listItemHeight={50}
               listHeight={400}
@@ -317,7 +317,7 @@ const ModpackDescription = ({
               dispatch(closeModal());
             }}
           >
-            Download
+            Загрузить
           </Button>
         </Footer>
       </>

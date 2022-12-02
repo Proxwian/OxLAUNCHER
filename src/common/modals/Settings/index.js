@@ -90,10 +90,12 @@ const SettingsTitle = styled.div`
 const pages = {
   General: {
     name: 'General',
+    display: 'Общие',
     component: AsyncComponent(lazy(() => import('./components/General')))
   },
   Java: {
     name: 'Java',
+    display: 'Настройки Java',
     component: AsyncComponent(lazy(() => import('./components/Java')))
   }
 };
@@ -121,14 +123,14 @@ export default function Settings() {
           onClick={() => dispatch(closeModal())}
         />
         <SideMenu>
-          <SettingsTitle>General</SettingsTitle>
+          <SettingsTitle>Параметры</SettingsTitle>
           {Object.values(pages).map(val => (
             <SettingsButton
-              key={val.name}
+              key={val.link}
               active={page === val.name}
               onClick={() => setPage(val.name)}
             >
-              {val.name}
+              {val.display}
             </SettingsButton>
           ))}
           {/* <SettingsButton onClick={() => setPage("User Interface")}>
@@ -154,32 +156,9 @@ export default function Settings() {
                 font-size: 16px;
               `}
             >
-              Support GDLauncher
+              OxLAUNCHER 1.2.1
             </span>
-            <div
-              css={`
-                img {
-                  border-radius: 30px;
-                  height: 40px;
-                  cursor: pointer;
-                  transition: transform 0.2s ease-in-out;
-                  &:hover {
-                    transform: scale(1.05);
-                  }
-                }
-              `}
-            >
-              <a href="https://ko-fi.com/gdlauncher">
-                <img
-                  src={KoFiButton}
-                  alt="Ko-Fi"
-                  css={`
-                    margin-bottom: 0px;
-                    margin-top: 20px;
-                  `}
-                />
-              </a>
-            </div>
+			<p>by Proxwian</p>
             <div
               css={`
                 margin-top: 20px;
@@ -199,29 +178,7 @@ export default function Settings() {
                 }
               `}
             >
-              <span
-                onClick={() =>
-                  dispatch(openModal('PolicyModal', { policy: 'privacy' }))
-                }
-              >
-                Privacy Policy
-              </span>
-              <span
-                onClick={() =>
-                  dispatch(openModal('PolicyModal', { policy: 'tos' }))
-                }
-              >
-                Terms and Conditions
-              </span>
-              <span
-                onClick={() =>
-                  dispatch(
-                    openModal('PolicyModal', { policy: 'acceptableuse' })
-                  )
-                }
-              >
-                Acceptable Use Policy
-              </span>
+
             </div>
           </div>
         </SideMenu>

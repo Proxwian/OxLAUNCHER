@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlay,
   faClock,
+  faSpinner,
   faWrench,
   faFolder,
   faTrash,
@@ -30,12 +31,14 @@ import {
 import {
   addStartedInstance,
   addToQueue,
-  launchInstance
+  launchInstance,
+  changeModpackVersion
 } from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
+import { getAddonFileChangelog, getAddonFiles, getAddon } from '../../../../common/api';
 
 const Container = styled.div`
   position: relative;
@@ -164,6 +167,8 @@ const MenuInstanceName = styled.div`
 const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const [filesCache, setFilesCache] = useState(false);
+  const [needUpdate, setNeedUpdate] = useState(false);
   const [background, setBackground] = useState(`${instanceDefaultBackground}`);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
@@ -173,6 +178,25 @@ const Instance = ({ instanceName }) => {
   const isInQueue = downloadQueue[instanceName];
 
   const isPlaying = startedInstances[instanceName];
+
+  const loadFilesCache = async() => {
+    const data = await getAddonFiles(instance?.loader?.projectID);
+    const mappedFiles = await Promise.all(
+        data.map(async v => {
+          const changelog = await getAddonFileChangelog(instance?.loader?.projectID, v.id);
+          return {
+            ...v,
+            changelog
+          };
+        })
+      );
+    setFilesCache(mappedFiles);
+    if (mappedFiles[0]?.id != null && instance?.loader?.fileID != null && mappedFiles[0]?.id != instance?.loader?.fileID) {
+      setNeedUpdate(true);
+    } else {
+      setNeedUpdate(false);
+    }
+  }
 
   useEffect(() => {
     if (instance.background) {
@@ -184,7 +208,10 @@ const Instance = ({ instanceName }) => {
     } else {
       setBackground(`${instanceDefaultBackground}`);
     }
+    loadFilesCache();
   }, [instance.background, instancesPath, instanceName]);
+
+  
 
   const startInstance = () => {
     if (isInQueue || isPlaying) return;
@@ -200,6 +227,25 @@ const Instance = ({ instanceName }) => {
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
+  const updateDatapack = async() => {
+    const data = await getAddonFiles(instance?.loader?.projectID);
+    const mappedFiles = await Promise.all(
+        data.map(async v => {
+          const changelog = await getAddonFileChangelog(instance?.loader?.projectID, v.id);
+          return {
+            ...v,
+            changelog
+          };
+        })
+      );
+    const finallyUpdate = await dispatch(
+        changeModpackVersion(instanceName, mappedFiles[0])
+      );
+    finallyUpdate;    
+  }
+  const updatePack = () => {
+    dispatch(openModal('InstanceManager', { instanceName: instanceName, openUpdater: true }));
+  };
   const openBisectModal = () => {
     dispatch(openModal('BisectHosting'));
   };
@@ -210,18 +256,13 @@ const Instance = ({ instanceName }) => {
     dispatch(openModal('InstanceDuplicateName', { instanceName }));
   };
   const killProcess = () => {
+    console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
-      process.kill(isPlaying.pid);
       if (children?.length) {
         children.forEach(el => {
           if (el) {
             try {
               process.kill(el.PID);
-            } catch {
-              // No-op
-            }
-            try {
-              process.kill(el.PPID);
             } catch {
               // No-op
             }
@@ -241,6 +282,10 @@ const Instance = ({ instanceName }) => {
     <>
       <ContextMenuTrigger id={instanceName}>
         <Container
+          css={`
+          filter: drop-shadow(0px ${needUpdate ? 8 : 0}px ${needUpdate ? 8 : 0}px aqua);
+          `}
+          
           installing={isInQueue}
           onClick={startInstance}
           isHovered={isHovered || isPlaying}
@@ -308,8 +353,8 @@ const Instance = ({ instanceName }) => {
                     {!isPlaying.initialized && <div className="spinner" />}
                   </div>
                 )}
-                {isInQueue && 'In Queue'}
-                {!isInQueue && !isPlaying && <span>PLAY</span>}
+                {isInQueue && 'В очереди'}
+                {!isInQueue && !isPlaying && <span>ИГРАТЬ</span>}
               </>
             )}
           </HoverContainer>
@@ -331,8 +376,25 @@ const Instance = ({ instanceName }) => {
                   width: 25px !important;
                 `}
               />
-              Kill
+              Остановить
             </MenuItem>
+          )}
+          {Boolean(needUpdate) && (
+          <MenuItem disabled={Boolean(isInQueue)}
+            css={`
+                  color: aqua;
+                  `}
+            onClick={updateDatapack}>
+            <FontAwesomeIcon
+              icon={faSpinner}
+              css={`
+                color: aqua;
+                margin-right: 10px;
+                width: 25px !important;
+              `}
+            />
+            Обновить
+          </MenuItem>
           )}
           <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
             <FontAwesomeIcon
@@ -342,7 +404,7 @@ const Instance = ({ instanceName }) => {
                 width: 25px !important;
               `}
             />
-            Manage
+            Настройки
           </MenuItem>
           <MenuItem onClick={openFolder}>
             <FontAwesomeIcon
@@ -352,7 +414,7 @@ const Instance = ({ instanceName }) => {
                 width: 25px !important;
               `}
             />
-            Open Folder
+            Открыть папку
           </MenuItem>
 
           {/* // TODO - Support other export options besides curseforge forge. */}
@@ -374,7 +436,7 @@ const Instance = ({ instanceName }) => {
                 width: 25px !important;
               `}
             />
-            Export Pack
+            Экспорт
           </MenuItem>
           <MenuItem
             disabled={Boolean(isInQueue)}
@@ -387,7 +449,7 @@ const Instance = ({ instanceName }) => {
                 width: 25px !important;
               `}
             />
-            Duplicate
+            Дублировать
           </MenuItem>
           <MenuItem divider />
           <MenuItem
@@ -424,7 +486,7 @@ const Instance = ({ instanceName }) => {
                 width: 25px !important;
               `}
             />
-            Repair
+            Починить
           </MenuItem>
           <MenuItem
             disabled={Boolean(isInQueue) || Boolean(isPlaying)}
@@ -437,25 +499,7 @@ const Instance = ({ instanceName }) => {
                 width: 25px !important;
               `}
             />
-            Delete
-          </MenuItem>
-          <MenuItem divider />
-          <MenuItem
-            onClick={openBisectModal}
-            preventClose
-            css={`
-              border: 2px solid #04cbeb;
-              border-radius: 5px;
-            `}
-          >
-            <FontAwesomeIcon
-              icon={faServer}
-              css={`
-                margin-right: 10px;
-                width: 25px !important;
-              `}
-            />
-            Create Server
+            Удалить
           </MenuItem>
         </ContextMenu>
       </Portal>

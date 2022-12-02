@@ -39,7 +39,7 @@ import {
 import { CURSEFORGE } from '../../utils/constants';
 
 const Container = styled.div`
-  padding: 0 50px;
+  padding: 0 0px;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
@@ -79,14 +79,14 @@ const OverviewCard = styled.div`
   margin-bottom: 30px;
   padding: 0;
   ${CardBox} {
-    margin: 0 20px;
+    margin: 0 10px;
   }
   ${CardBox}:first-child {
-    margin-right: 20px;
+    margin-right: 0px;
     margin-left: 0;
   }
   ${CardBox}:last-child {
-    margin-left: 20px;
+    margin-left: 0px;
     margin-right: 0;
   }
 `;
@@ -96,7 +96,7 @@ const JavaManagerRow = styled.div`
   flex-direction: row;
   justify-content: space-between;
   color: ${props => props.theme.palette.text.primary};
-  margin: 0 500px 20px 0;
+  margin: 0 300px 20px 0;
   width: 100%;
 `;
 
@@ -277,9 +277,9 @@ const Overview = ({ instanceName, background, manifest }) => {
     const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
     switch (diffDays) {
       case 0:
-        return 'Today';
+        return 'Сегодня';
       case -1:
-        return 'Yesterday';
+        return 'Вчера';
       default:
         return lastPlayed.toLocaleDateString(undefined, {
           year: 'numeric',
@@ -301,7 +301,7 @@ const Overview = ({ instanceName, background, manifest }) => {
           `}
         >
           <Card
-            title="Minecraft Version"
+            title="Версия Minecraft"
             color={props => props.theme.palette.colors.jungleGreen}
             instanceName={instanceName}
             defaultValue={config?.loader}
@@ -310,7 +310,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.loader?.mcVersion}
           </Card>
           <Card
-            title="Modloader"
+            title="Загрузчик"
             color={props => props.theme.palette.colors.darkYellow}
             instanceName={instanceName}
             defaultValue={config?.loader}
@@ -319,7 +319,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.loader?.loaderType}
           </Card>
           <Card
-            title="Modloader Version"
+            title="Версия загрузчика"
             color={props => props.theme.palette.colors.lightBlue}
             instanceName={instanceName}
             defaultValue={config?.loader}
@@ -343,19 +343,19 @@ const Overview = ({ instanceName, background, manifest }) => {
           `}
         >
           <Card
-            title="Mods"
+            title="Модификации"
             color={props => props.theme.palette.colors.maximumRed}
           >
             {config?.mods?.length || '-'}
           </Card>
           <Card
-            title="Played Time"
+            title="Наиграно"
             color={props => props.theme.palette.colors.liberty}
           >
             {convertMinutesToHumanTime(config?.timePlayed)}
           </Card>
           <Card
-            title="Last Played"
+            title="Последний запуск"
             color={props => props.theme.palette.colors.orange}
           >
             {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
@@ -363,7 +363,7 @@ const Overview = ({ instanceName, background, manifest }) => {
         </OverviewCard>
         {config?.loader.source === CURSEFORGE && manifest && (
           <Card
-            title="Curse Modpack"
+            title="Модпак CurseForge"
             color={`linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), ${
               background
                 ? `url(${background})`
@@ -376,13 +376,13 @@ const Overview = ({ instanceName, background, manifest }) => {
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
           <RenameButton onClick={() => renameInstance()} type="primary">
-            Rename&nbsp;
+            Переименовать&nbsp;
             <FontAwesomeIcon icon={faSave} />
           </RenameButton>
         </RenameRow>
         <OverviewCard>
           <JavaManagerRow>
-            <div>Override Game Resolution</div>
+            <div>Настроить разрешение экрана</div>
             <Switch
               checked={height && width}
               onChange={v => {
@@ -406,7 +406,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             <ResolutionInputContainer>
               <div>
                 <Input
-                  placeholder="Width"
+                  placeholder="Ширина"
                   value={width}
                   onChange={e => {
                     const w = parseInt(e.target.value, 10) || 854;
@@ -424,7 +424,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 />
                 &nbsp;X&nbsp;
                 <Input
-                  placeholder="Height"
+                  placeholder="Высота"
                   value={height}
                   onChange={e => {
                     const h = parseInt(e.target.value, 10) || 480;
@@ -442,7 +442,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 />
               </div>
               <Select
-                placeholder="Presets"
+                placeholder="Пресеты"
                 onChange={v => {
                   const w = parseInt(v.split('x')[0], 10);
                   const h = parseInt(v.split('x')[1], 10);
@@ -476,7 +476,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             </ResolutionInputContainer>
           )}
           <JavaManagerRow>
-            <div>Override Java Memory</div>
+            <div>Настроить выделяемую Java память</div>
             <Switch
               checked={javaLocalMemory}
               onChange={v => {
@@ -517,12 +517,12 @@ const Overview = ({ instanceName, background, manifest }) => {
                   width: 100px;
                 `}
               >
-                {javaLocalMemory} MB
+                {javaLocalMemory} МБ
               </div>
             </div>
           )}
           <JavaManagerRow>
-            <div>Override Java Arguments</div>
+            <div>Указать аргументы JVM</div>
             <Switch
               checked={javaLocalArguments}
               onChange={v => {
@@ -554,7 +554,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             </JavaManagerRow>
           )}
           <JavaManagerRow>
-            <div>Custom Java Path {`<Java ${javaVersion}>`} </div>
+            <div>Настроить путь до Java {`<Java ${javaVersion}>`} </div>
             <Switch
               checked={customJavaPath}
               onChange={v => {

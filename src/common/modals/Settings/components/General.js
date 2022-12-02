@@ -200,7 +200,7 @@ const General = () => {
       .invoke('getAppdataPath')
       .then(appData =>
         fsa
-          .readFile(path.join(appData, 'gdlauncher_next', 'rChannel'))
+          .readFile(path.join(appData, 'oxlauncher', 'rChannel'))
           .then(v => setReleaseChannel(parseInt(v.toString(), 10)))
           .catch(() => setReleaseChannel(0))
       )
@@ -222,7 +222,7 @@ const General = () => {
   const changeDataPath = async () => {
     setLoadingMoveUserData(true);
     const appData = await ipcRenderer.invoke('getAppdataPath');
-    const appDataPath = path.join(appData, 'gdlauncher_next');
+    const appDataPath = path.join(appData, 'oxlauncher');
 
     const notCopiedFiles = [
       'Cache',
@@ -270,7 +270,7 @@ const General = () => {
   return (
     <>
       <PersonalData>
-        <MainTitle>General</MainTitle>
+        <MainTitle>Общие</MainTitle>
         <PersonalDataContainer>
           <ProfileImage
             src={profileImage ? `data:image/jpeg;base64,${profileImage}` : null}
@@ -285,7 +285,7 @@ const General = () => {
             `}
           >
             <div>
-              Username <br />
+              Никнейм <br />
               <Username>{currentAccount.selectedProfile.name}</Username>
             </div>
             <div>
@@ -317,38 +317,13 @@ const General = () => {
           </div>
         </PersonalDataContainer>
       </PersonalData>
-      <Title>Release Channel</Title>
-      <Content>
-        <p>
-          Stable updates once a month. Beta updates more often, but it may have
-          more bugs.
-        </p>
-        <Select
-          css={`
-            width: 100px;
-          `}
-          onChange={async e => {
-            const appData = await ipcRenderer.invoke('getAppdataPath');
-            setReleaseChannel(e);
-            await fsa.writeFile(
-              path.join(appData, 'gdlauncher_next', 'rChannel'),
-              e.toString()
-            );
-          }}
-          value={releaseChannel}
-          virtual={false}
-        >
-          <Select.Option value={0}>Stable</Select.Option>
-          <Select.Option value={1}>Beta</Select.Option>
-        </Select>
-      </Content>
       <Title>
-        Concurrent Downloads &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
+        Одновременные загрузки &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
       </Title>
       <Content>
         <p>
-          Select the number of concurrent downloads. If you have a slow
-          connection, select at most 3.
+          Выберите количество одновременных загрузок в лаунчере. Если у вас
+          медленное подключение, выберите не больше 3-х.
         </p>
         <Select
           onChange={v => dispatch(updateConcurrentDownloads(v))}
@@ -369,7 +344,7 @@ const General = () => {
         </Select>
       </Content>
       <Title>
-        Instance Sorting &nbsp; <FontAwesomeIcon icon={faSort} />
+        Сортировка сборок &nbsp; <FontAwesomeIcon icon={faSort} />
       </Title>
       <Content>
         <p
@@ -378,7 +353,7 @@ const General = () => {
             width: 400px;
           `}
         >
-          Select the method in which instances should be sorted.
+          Выберите, каким образом будут отсортированы сборки на главном экране.
         </p>
 
         <Select
@@ -389,18 +364,18 @@ const General = () => {
             text-align: start;
           `}
         >
-          <Select.Option value={0}>Alphabetical</Select.Option>
-          <Select.Option value={1}>Last Played</Select.Option>
-          <Select.Option value={2}>Most Played</Select.Option>
+          <Select.Option value={0}>По Алфавиту</Select.Option>
+          <Select.Option value={1}>Последние</Select.Option>
+          <Select.Option value={2}>Часто запускаемые</Select.Option>
         </Select>
       </Content>
       <Title>
-        Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
+        Предпочитаемый канал релизов &nbsp; <FontAwesomeIcon icon={faFire} />
       </Title>
       <Content>
         <p>
-          Select the preferred release channel for downloading Curse projects.
-          This also applies for mod updates.
+          Выберите предпочитаемые версии загрузок для модпаков CurseForge.
+          Это также касается и обновлений модификаций.
         </p>
         <Select
           css={`
@@ -411,50 +386,18 @@ const General = () => {
           value={curseReleaseChannel}
           virtual={false}
         >
-          <Select.Option value={1}>Stable</Select.Option>
-          <Select.Option value={2}>Beta</Select.Option>
-          <Select.Option value={3}>Alpha</Select.Option>
+          <Select.Option value={1}>Релиз</Select.Option>
+          <Select.Option value={2}>Бета</Select.Option>
+          <Select.Option value={3}>Альфа</Select.Option>
         </Select>
       </Content>
       <Title>
-        Discord Integration &nbsp; <FontAwesomeIcon icon={faDiscord} />
+        Спрятать лаунчер во время игры &nbsp; <FontAwesomeIcon icon={faPlay} />
       </Title>
       <Content>
         <p>
-          Enable / disable Discord Integration. This displays what you are
-          playing in Discord.
-        </p>
-        <Switch
-          onChange={e => {
-            dispatch(updateDiscordRPC(e));
-            if (e) {
-              ipcRenderer.invoke('init-discord-rpc');
-            } else {
-              ipcRenderer.invoke('shutdown-discord-rpc');
-            }
-          }}
-          checked={DiscordRPC}
-        />
-      </Content>
-      <Title>
-        Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
-      </Title>
-      <Content>
-        <p>Enable / disable Minecraft news.</p>
-        <Switch
-          onChange={e => {
-            dispatch(updateShowNews(e));
-          }}
-          checked={showNews}
-        />
-      </Content>
-      <Title>
-        Hide Launcher While Playing &nbsp; <FontAwesomeIcon icon={faPlay} />
-      </Title>
-      <Content>
-        <p>
-          Automatically hide the launcher when launching an instance. You will
-          still be able to open it from the icon tray.
+          Автоматически скрывать окно лаунчера во время игры. Вы всё
+          ещё сможете его открыть из системного трея.
         </p>
         <Switch
           onChange={e => {
@@ -464,12 +407,11 @@ const General = () => {
         />
       </Content>
       <Title>
-        Potato PC Mode &nbsp; <FontAwesomeIcon icon={faToilet} />
+        Режим "Картошка" &nbsp; <FontAwesomeIcon icon={faToilet} />
       </Title>
       <Content>
         <p>
-          You got a potato PC? Don&apos;t worry! We got you covered. Enable this
-          and all animations and special effects will be disabled.
+          Слабый пк? Включите эту настройку, и мы уберем все тяжелые анимации для Вас.
         </p>
         <Switch
           onChange={e => {
@@ -479,42 +421,42 @@ const General = () => {
         />
       </Content>
       <Title>
-        Clear Shared Data&nbsp; <FontAwesomeIcon icon={faTrash} />
+        Очистить данные сборок&nbsp; <FontAwesomeIcon icon={faTrash} />
       </Title>
       <Content>
         <p>
-          Deletes all the shared files between instances. Doing this will remove
-          ALL instance data.
+          Удалить все сохранённые данные сборок. Внимание! Эта кнопка удалит
+          ВСЕ сохранённые параметры.
         </p>
         <Button
           onClick={() => {
             dispatch(
-              openModal('ActionConfirmation', {
-                message: 'Are you sure you want to delete shared data?',
+              openModal('Подтверждение', {
+                message: 'Вы уверены, что хотите удалить сохранённые?',
                 confirmCallback: clearSharedData,
-                title: 'Confirm'
+                title: 'Подтвердить'
               })
             );
           }}
           disabled={disableInstancesActions}
           loading={deletingInstances}
         >
-          Clear
+          Очистить
         </Button>
       </Content>
       <Title>
-        User Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+        Папка с пользовательскими данными&nbsp; <FontAwesomeIcon icon={faFolder} />
         <a
           css={`
             margin-left: 30px;
           `}
           onClick={async () => {
             const appData = await ipcRenderer.invoke('getAppdataPath');
-            const appDataPath = path.join(appData, 'gdlauncher_next');
+            const appDataPath = path.join(appData, 'oxlauncher');
             setDataPath(appDataPath);
           }}
         >
-          Reset Path
+          Сбросить путь
         </a>
       </Title>
       <CustomDataPathContainer>
@@ -564,7 +506,7 @@ const General = () => {
             }
             loading={loadingMoveUserData}
           >
-            Apply & Restart
+            Применить и перезапустить
           </Button>
         </div>
         <div
@@ -579,7 +521,7 @@ const General = () => {
               setMoveUserData(e.target.checked);
             }}
           >
-            Copy current data to the new directory
+            Копировать текущие данные в новую папку
           </Checkbox>
         </div>
       </CustomDataPathContainer>
@@ -603,44 +545,6 @@ const General = () => {
           >
             v {version}
           </div>
-        </div>
-        <p>
-          {updateAvailable
-            ? 'There is an update available to be installed. Click on update to install it and restart the launcher.'
-            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available.'}
-        </p>
-        <div
-          css={`
-            margin-top: 20px;
-            height: 36px;
-            display: flex;
-            flex-direction: row;
-          `}
-        >
-          {updateAvailable ? (
-            <Button
-              onClick={() =>
-                ipcRenderer.invoke('installUpdateAndQuitOrRestart')
-              }
-              css={`
-                margin-right: 10px;
-              `}
-              type="primary"
-            >
-              Update &nbsp;
-              <FontAwesomeIcon icon={faDownload} />
-            </Button>
-          ) : (
-            <div
-              css={`
-                width: 96px;
-                height: 36px;
-                padding: 6px 8px;
-              `}
-            >
-              Up to date
-            </div>
-          )}
         </div>
       </LauncherVersion>
     </>

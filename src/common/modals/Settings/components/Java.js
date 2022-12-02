@@ -151,7 +151,8 @@ export default function MyAccountPreferences() {
           text-align: left;
         `}
       >
-        Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faJava} />
+        Автоопределение установки Java <FontAwesomeIcon icon={faJava} />
+        <br/>
         <a
           css={`
             margin-left: 30px;
@@ -160,7 +161,7 @@ export default function MyAccountPreferences() {
             dispatch(openModal('JavaSetup'));
           }}
         >
-          Run Java Setup again
+          Запустить установку Java заново
         </a>
       </Title>
       <AutodetectPath>
@@ -169,9 +170,8 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          Disable this to specify a custom java path to use instead of using
-          OpenJDK shipped with GDLauncher. If that is the case, select the path
-          to your Java executable.
+          Отключите это, чтобы указать путь к Java вручную. Это отключит
+          используемую OxLAUNCHER версию OpenJDK по умолчанию.
         </Paragraph>
         <Switch
           color="primary"
@@ -306,7 +306,7 @@ export default function MyAccountPreferences() {
             margin-bottom: 20px;
           `}
         >
-          Game Resolution&nbsp; <FontAwesomeIcon icon={faDesktop} />
+          Разрешение экрана&nbsp; <FontAwesomeIcon icon={faDesktop} />
         </Title>
         <Paragraph
           css={`
@@ -315,12 +315,12 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the initial game resolution in pixels (width x height).
+          Выберите базовое разрешение экрана для игры (ширина х высота).
         </Paragraph>
         <ResolutionInputContainer>
           <div>
             <Input
-              placeholder="width"
+              placeholder="Ширина"
               value={mcResolution.width}
               onChange={e => {
                 const w = parseInt(e.target.value, 10);
@@ -329,7 +329,7 @@ export default function MyAccountPreferences() {
             />
             &nbsp;X&nbsp;
             <Input
-              placeholder="Height"
+              placeholder="Высота"
               value={mcResolution.height}
               onChange={e => {
                 const h = parseInt(e.target.value, 10);
@@ -338,7 +338,7 @@ export default function MyAccountPreferences() {
             />
           </div>
           <Select
-            placeholder="Presets"
+            placeholder="Пресеты"
             onChange={v => {
               const w = parseInt(v.split('x')[0], 10);
               const h = parseInt(v.split('x')[1], 10);
@@ -376,7 +376,7 @@ export default function MyAccountPreferences() {
             margin-bottom: 20px;
           `}
         >
-          Java Memory&nbsp; <FontAwesomeIcon icon={faMemory} />
+          Память Java&nbsp; <FontAwesomeIcon icon={faMemory} />
         </Title>
         <Paragraph
           css={`
@@ -385,7 +385,7 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the preferred amount of memory to use when launching the game.
+          Выберите выделяемую Java память для запуска игры.
         </Paragraph>
         <div
           css={`
@@ -415,7 +415,7 @@ export default function MyAccountPreferences() {
               width: 100px;
             `}
           >
-            {javaMemory} MB
+            {javaMemory} МБ
           </div>
         </div>
       </SelectMemory>
@@ -427,14 +427,14 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          Java Custom Arguments &nbsp; <FontAwesomeIcon icon={faList} />
+          Параметры запуска JVM &nbsp; <FontAwesomeIcon icon={faList} />
         </Title>
         <Paragraph
           css={`
             text-align: left;
           `}
         >
-          Select the preferred custom arguments to use when launching the game.
+          Укажите собственные параметры запуска виртуальной машины Java.
         </Paragraph>
         <div
           css={`
@@ -467,7 +467,7 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          Minecraft Startup Method &nbsp; <FontAwesomeIcon icon={faPlay} />
+          Способ запуска Minecraft &nbsp; <FontAwesomeIcon icon={faPlay} />
         </Title>
         <McStartupMethodRow>
           <Paragraph
@@ -475,8 +475,8 @@ export default function MyAccountPreferences() {
               text-align: left;
             `}
           >
-            Select the preferred Minecraft startup method. Only change this if
-            you&apos;re experiencing issues with the default one.
+            Выберите основной или альтернативный способ запуска игры. Используйте в случае,
+            когда предыдущий метод не сработал.
           </Paragraph>
           <Select
             value={mcStartupMethod}

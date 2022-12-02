@@ -9,13 +9,13 @@ import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
 import { login, loginOAuth } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
-import { ACCOUNT_MICROSOFT, ACCOUNT_MOJANG } from '../utils/constants';
+import { ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE } from '../utils/constants';
 
 const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState(username || '');
   const [password, setPassword] = useState('');
-  const [accountType, setAccountType] = useState(ACCOUNT_MOJANG);
+  const [accountType, setAccountType] = useState(ACCOUNT_OFFLINE);
   const [loginFailed, setloginFailed] = useState();
 
   const addAccount = () => {
@@ -43,23 +43,17 @@ const AddAccount = ({ username }) => {
             height: 80px;
           `}
         >
-          Mojang Login
+          Без пароля
         </h1>
         <StyledInput
           disabled={!!username}
-          placeholder="Email"
+          placeholder="Никнейм"
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
-        <StyledInput
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
       </FormContainer>
       <FormContainer>
-        <StyledButton onClick={addAccount}>Add Account</StyledButton>
+        <StyledButton onClick={addAccount}>Добавить</StyledButton>
       </FormContainer>
     </Container>
   );
@@ -72,10 +66,10 @@ const AddAccount = ({ username }) => {
             height: 80px;
           `}
         >
-          Microsoft Login
+          Вход через Microsoft
         </h1>
         <FormContainer>
-          <h2>External Login</h2>
+          <h2>Внешняя авторизация</h2>
           {loginFailed ? (
             <>
               <LoginFailMessage>{loginFailed?.message}</LoginFailMessage>
@@ -85,7 +79,7 @@ const AddAccount = ({ username }) => {
                 `}
                 onClick={addMicrosoftAccount}
               >
-                Retry
+                Повторить
               </StyledButton>
             </>
           ) : (
@@ -111,10 +105,10 @@ const AddAccount = ({ username }) => {
           overflowedIndicator={null}
         >
           <StyledAccountMenuItem
-            key={ACCOUNT_MOJANG}
-            onClick={() => setAccountType(ACCOUNT_MOJANG)}
+            key={ACCOUNT_OFFLINE}
+            onClick={() => setAccountType(ACCOUNT_OFFLINE)}
           >
-            Mojang Account
+            Без пароля
           </StyledAccountMenuItem>
           <StyledAccountMenuItem
             key={ACCOUNT_MICROSOFT}
@@ -123,10 +117,10 @@ const AddAccount = ({ username }) => {
               addMicrosoftAccount();
             }}
           >
-            Microsoft Account
+            Microsoft
           </StyledAccountMenuItem>
         </Menu>
-        {accountType === ACCOUNT_MOJANG ? renderAddMojangAccount() : null}
+        {accountType === ACCOUNT_OFFLINE ? renderAddMojangAccount() : null}
         {accountType === ACCOUNT_MICROSOFT ? renderAddMicrosoftAccount() : null}
       </Container>
     </Modal>

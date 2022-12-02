@@ -138,6 +138,7 @@ const SystemNavbar = () => {
   }, []);
 
   useEffect(() => {
+    return;
     if (process.env.NODE_ENV === 'development') return;
     setTimeout(() => {
       checkForUpdates();
@@ -179,50 +180,17 @@ const SystemNavbar = () => {
               margin-left: 10px;
             `}
           >
-            <a
-              href="https://gdevs.io/"
-              rel="noopener noreferrer"
-              css={`
-                margin-top: 5px;
-                margin-right: 5px;
-                -webkit-app-region: no-drag;
-              `}
-            >
-              <Logo size={35} pointerCursor />
-            </a>
-            <DevtoolButton />
-          </div>
-          <div
-            css={`
-              display: flex;
-              height: 100%;
-            `}
-          >
-            <div
-              css={`
-                white-space: nowrap;
-              `}
-            >
-              Partnered with &nbsp;&nbsp;
-            </div>
-            <BisectHosting
-              showPointerCursor
-              onClick={() => {
-                ga.sendCustomEvent('BHAdViewNavbar');
-                dispatch(openModal('BisectHosting'));
-              }}
-            />
-            {/* <PulsatingCircle /> */}
+            {!isLocation('/') && !isLocation('/onboarding') && (
+              <SettingsButton />
+            )}
+            
           </div>
         </>
       )}
       <Container os={isOsx}>
         {!isOsx ? (
           <>
-            {isUpdateAvailable && <UpdateButton isAppImage={isAppImage} />}
-            {!isLocation('/') && !isLocation('/onboarding') && (
-              <SettingsButton />
-            )}
+            
             <div
               onClick={() => ipcRenderer.invoke('minimize-window')}
               css={`
@@ -230,16 +198,6 @@ const SystemNavbar = () => {
               `}
             >
               <FontAwesomeIcon icon={faWindowMinimize} />
-            </div>
-            <div
-              onClick={() => ipcRenderer.invoke('min-max-window')}
-              css={`
-                -webkit-app-region: no-drag;
-              `}
-            >
-              <FontAwesomeIcon
-                icon={isMaximized ? faWindowRestore : faWindowMaximize}
-              />
             </div>
             <div
               css={`
@@ -283,39 +241,13 @@ const SystemNavbar = () => {
             {!isLocation('/') && !isLocation('/onboarding') && (
               <SettingsButton />
             )}
-            {isUpdateAvailable && <UpdateButton isAppImage={isAppImage} />}
+            
           </>
         )}
       </Container>
       {isOsx && (
         <>
-          <div
-            css={`
-              display: flex;
-              height: 100%;
-            `}
-          >
-            Partnered with &nbsp;&nbsp;
-            <BisectHosting
-              showPointerCursor
-              onClick={() => dispatch(openModal('BisectHosting'))}
-            />
-            {/* <PulsatingCircle /> */}
-          </div>
-          <div>
-            <DevtoolButton />
-            <a
-              href="https://gdevs.io/"
-              rel="noopener noreferrer"
-              css={`
-                margin-top: 5px;
-                margin-right: 5px;
-                -webkit-app-region: no-drag;
-              `}
-            >
-              <Logo size={35} pointerCursor />
-            </a>
-          </div>
+          
         </>
       )}
     </MainContainer>

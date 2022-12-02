@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { getSearch } from '../../../api';
 import ModpacksListWrapper from './ModpacksListWrapper';
+import Oxfortpacks from '../Oxfortpacks';
 
 let lastRequest;
 const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
@@ -76,12 +77,12 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
     <Container>
       <HeaderContainer>
         <StyledSelect
-          placeholder="Minecraft Version"
+          placeholder="Версия Minecraft"
           onChange={setMinecraftVersion}
           defaultValue={null}
           virtual={false}
         >
-          <Select.Option value={null}>All Versions</Select.Option>
+          <Select.Option value={null}>Все версии</Select.Option>
           {(mcVersions || [])
             .filter(v => v?.type === 'release')
             .map(v => (
@@ -91,13 +92,13 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
             ))}
         </StyledSelect>
         <StyledSelect
-          placeholder="Minecraft Category"
+          placeholder="Категория"
           onChange={setCategoryId}
           defaultValue={null}
           virtual={false}
         >
           <Select.Option key="allcategories" value={null}>
-            All Categories
+            Все категории
           </Select.Option>
           {(categories || [])
             .filter(v => v?.classId === 4471)
@@ -127,32 +128,32 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
             ))}
         </StyledSelect>
         <StyledSelect
-          placeholder="Sort by"
-          defaultValue="Featured"
+          placeholder="Сортировать"
+          defaultValue="Популярные"
           onChange={setSortBy}
           virtual={false}
         >
           <Select.Option key="Featured" value="Featured">
-            Featured
+            Рекомендуемые
           </Select.Option>
           <Select.Option key="Popularity" value="Popularity">
-            Popularity
+            Популярные
           </Select.Option>
           <Select.Option key="LastUpdated" value="LastUpdated">
-            Last Updated
+            Обновлённые
           </Select.Option>
           <Select.Option key="Name" value="Name">
-            Name
+            Название
           </Select.Option>
           <Select.Option key="Author" value="Author">
-            Author
+            Автор
           </Select.Option>
           <Select.Option key="TotalDownloads" value="TotalDownloads">
-            Total Downloads
+            Загрузок
           </Select.Option>
         </StyledSelect>
         <StyledInput
-          placeholder="Search..."
+          placeholder="Поиск..."
           onSearch={setSearchText}
           onChange={e => setSearchText(e.target.value)}
           style={{ width: 200 }}
@@ -177,7 +178,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                   margin-top: 70px;
                 `}
               >
-                No modpack has been found with the current filters.
+                Мы ничего не нашли по заданным фильтрам...
               </div>
             </div>
           ) : (
@@ -215,7 +216,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                 margin-top: 70px;
               `}
             >
-              An error occurred while loading the modpacks list...
+              Произошла ошибка при загрузке списка модов...
             </div>
           </div>
         )}

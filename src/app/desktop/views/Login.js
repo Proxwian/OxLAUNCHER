@@ -13,7 +13,7 @@ import { useKey } from 'rooks';
 import { login, loginOAuth } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
-import backgroundVideo from '../../../common/assets/background.webm';
+import backgroundVideo from '../../../common/assets/background.mp4';
 import HorizontalLogo from '../../../ui/HorizontalLogo';
 import { openModal } from '../../../common/reducers/modals/actions';
 
@@ -153,11 +153,11 @@ const Login = () => {
   );
 
   const authenticate = () => {
-    if (!email || !password) return;
+    if (!email) return;
     dispatch(requesting('accountAuthentication'));
     setTimeout(() => {
       dispatch(
-        load(features.mcAuthentication, dispatch(login(email, password)))
+        load(features.mcAuthentication, dispatch(login(email)))
       ).catch(e => {
         console.error(e);
         setLoginFailed(e);
@@ -191,29 +191,21 @@ const Login = () => {
         <Container>
           <LeftSide transitionState={transitionState}>
             <Header>
-              <HorizontalLogo size={200} />
+              <a href="https://oxlauncher.ru"><HorizontalLogo size={200} /></a>
             </Header>
             <Form>
               <div>
                 <Input
-                  placeholder="Email"
+                  placeholder="Никнейм"
                   value={email}
                   onChange={({ target: { value } }) => setEmail(value)}
-                />
-              </div>
-              <div>
-                <Input
-                  placeholder="Password"
-                  type="password"
-                  value={password}
-                  onChange={({ target: { value } }) => setPassword(value)}
                 />
               </div>
               {loginFailed && (
                 <LoginFailMessage>{loginFailed?.message}</LoginFailMessage>
               )}
               <LoginButton color="primary" onClick={authenticate}>
-                Sign In
+                Войти
                 <FontAwesomeIcon
                   css={`
                     margin-left: 6px;
@@ -225,7 +217,7 @@ const Login = () => {
                 color="primary"
                 onClick={authenticateMicrosoft}
               >
-                Sign in with Microsoft
+                Microsoft
                 <FontAwesomeIcon
                   css={`
                     margin-left: 6px;
@@ -243,30 +235,10 @@ const Login = () => {
                   width: 100%;
                 `}
               >
-                <FooterLinks>
-                  <div>
-                    <a href="https://www.minecraft.net/it-it/password/forgot">
-                      FORGOT PASSWORD
-                    </a>
-                  </div>
-                </FooterLinks>
-                <div
-                  css={`
-                    cursor: pointer;
-                  `}
-                  onClick={() => dispatch(openModal('ChangeLogs'))}
-                >
-                  v{version}
-                </div>
+                <center>
+                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.2.1</a>
+                </center>
               </div>
-              <p
-                css={`
-                  font-size: 10px;
-                `}
-              >
-                Sign in with your Mojang Account. By doing so, you accept all
-                our policies and terms stated below.
-              </p>
               <div
                 css={`
                   margin-top: 20px;
@@ -281,38 +253,16 @@ const Login = () => {
                   }
                 `}
               >
-                <span
-                  onClick={() =>
-                    dispatch(openModal('PolicyModal', { policy: 'privacy' }))
-                  }
-                >
-                  Privacy Policy
-                </span>
-                <span
-                  onClick={() =>
-                    dispatch(openModal('PolicyModal', { policy: 'tos' }))
-                  }
-                >
-                  Terms and Conditions
-                </span>
-                <span
-                  onClick={() =>
-                    dispatch(
-                      openModal('PolicyModal', { policy: 'acceptableuse' })
-                    )
-                  }
-                >
-                  Acceptable Use Policy
-                </span>
+                
               </div>
             </Footer>
           </LeftSide>
           <Background transitionState={transitionState}>
             <video autoPlay muted loop>
-              <source src={backgroundVideo} type="video/webm" />
+              <source src={backgroundVideo} type="video/mp4" />
             </video>
           </Background>
-          <Loading transitionState={transitionState}>Loading...</Loading>
+          <Loading transitionState={transitionState}>Загрузка...</Loading>
         </Container>
       )}
     </Transition>

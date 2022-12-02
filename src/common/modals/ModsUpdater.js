@@ -85,7 +85,7 @@ const ModsUpdater = ({ instanceName }) => {
         height: 160px;
         width: 350px;
       `}
-      title="Mods Updater"
+      title="Обновление модов"
     >
       <Container>
         Updating mod {computedMods} / {totalMods.length}

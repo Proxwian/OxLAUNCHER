@@ -15,6 +15,7 @@ import { pipeline } from 'stream';
 import he from 'he';
 import zlib from 'zlib';
 import lockfile from 'lockfile';
+import crypto from 'crypto';
 import omit from 'lodash/omit';
 import Seven from 'node-7z';
 import { push } from 'connected-react-router';
@@ -31,6 +32,7 @@ import * as ActionTypes from './actionTypes';
 import {
   ACCOUNT_MICROSOFT,
   ACCOUNT_MOJANG,
+  ACCOUNT_OFFLINE,
   CURSEFORGE,
   FABRIC,
   FMLLIBS_FORGE_BASE_URL,
@@ -302,7 +304,41 @@ export function switchToFirstValidAccount(id) {
         await dispatch(
           accounts[i].accountType === ACCOUNT_MICROSOFT
             ? loginWithOAuthAccessToken()
-            : loginWithAccessToken()
+            : login(accounts[i].selectedProfile.name, true, true)
+        );
+        found = accounts[i].selectedProfile.id;
+      } catch {
+        dispatch(
+          updateAccount(accounts[i].selectedProfile.id, {
+            ...accounts[i],
+            accessToken: accounts[i].accessToken
+          })
+        );
+        console.error(`Failed to validate ${accounts[i].selectedProfile.id}`);
+      }
+    }
+    if (!found) {
+      dispatch(updateCurrentAccountId(null));
+    }
+    return found;
+  };
+}
+
+export function selectFirstValidAccount(id) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const accounts = _getAccounts(state);
+    let found = null;
+    for (let i = 0; i < accounts.length; i += 1) {
+      if (found)
+        continue; //eslint-disable-line
+      try {
+        dispatch(updateCurrentAccountId(accounts[i].selectedProfile.id));
+        // eslint-disable-next-line no-await-in-loop
+        await dispatch(
+          accounts[i].accountType === ACCOUNT_MICROSOFT
+            ? loginWithOAuthAccessToken()
+            : login(accounts[i].selectedProfile.name, true, true)
         );
         found = accounts[i].selectedProfile.id;
       } catch {
@@ -415,17 +451,24 @@ export function downloadJavaLegacyFixer() {
   };
 }
 
-export function login(username, password, redirect = true) {
+function lettersNumbersDashes(str) {
+  return /^[A-Za-z0-9-]*$/.test(str);
+}
+
+export function login(username, redirect = true, pushHome = false) {
   return async (dispatch, getState) => {
     const {
       app: { isNewUser, clientToken }
     } = getState();
-    if (!username || !password) {
-      throw new Error('No username or password provided');
+    if (!username) {
+      throw new Error('Укажите никнейм для входа!');
+    }
+    if (!lettersNumbersDashes(username)) {
+      throw new Error('В нике содержатся недопустимые символы');
     }
     try {
       let data = null;
-      try {
+      /*try {
         ({ data } = await mcAuthenticate(username, password, clientToken));
         data.accountType = ACCOUNT_MOJANG;
       } catch (err) {
@@ -439,20 +482,37 @@ export function login(username, password, redirect = true) {
       const skinUrl = await getPlayerSkin(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
-      }
+      }*/
+	  
+	  // how does minecraft generate offline UUIDs:
+        // https://forums.spongepowered.org/t/why-are-the-uuids-changing-in-offline-mode/20237/2
+        // how to do it in javascript:
+        // https://stackoverflow.com/questions/47505620/javas-uuid-nameuuidfrombytes-to-written-in-javascript
+        const md5Bytes = crypto.createHash('md5').update("OfflinePlayer:" + username).digest();
+        md5Bytes[6] &= 0x0f;  /* clear version        */
+        md5Bytes[6] |= 0x30;  /* set to version 3     */
+        md5Bytes[8] &= 0x3f;  /* clear variant        */
+        md5Bytes[8] |= 0x80;  /* set to IETF variant  */
+        let generatedID = md5Bytes.toString('hex');
+        data = {
+          selectedProfile: {
+            id: generatedID,
+            name: username
+          },
+          accountType: ACCOUNT_OFFLINE,
+          skin: `https://s.namemc.com/i/12b92a9206470fe2.png`
+        };
+	  
       dispatch(updateAccount(data.selectedProfile.id, data));
       dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
-      if (!isNewUser) {
-        if (redirect) {
-          dispatch(push('/home'));
-        }
-      } else {
-        dispatch(updateIsNewUser(false));
-        if (redirect) {
-          dispatch(push('/onboarding'));
-        }
-      }
+      if (pushHome) {
+        dispatch(push('/home'));
+      } else if (redirect) {
+        dispatch(push('/onboarding'));
+      }  
+
+
     } catch (err) {
       console.error(err);
       throw new Error(err);
@@ -493,7 +553,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
           msRefreshedExpiresAt = Date.now() + 1000 * msRefreshedExpiresIn;
         } catch (error) {
           console.error(error);
-          throw new Error('Error occurred while refreshing Microsoft token.');
+          throw new Error('Произошла ошибка получения нового токена Minecraft.');
         }
 
         let xblToken = null;
@@ -509,7 +569,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
           } = await msAuthenticateXBL(msRefreshedAccessToken));
         } catch (error) {
           console.error(error);
-          throw new Error('Error occurred while logging in Xbox Live .');
+          throw new Error('Произошла ошибка авторизации Xbox Live.');
         }
 
         let xstsToken = null;
@@ -520,7 +580,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
         } catch (error) {
           console.error(error);
           throw new Error(
-            'Error occurred while fetching token from Xbox Secure Token Service.'
+            'Произошла ошибка получения токена авторизации Xbox Live.'
           );
         }
 
@@ -537,7 +597,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
           mcRefreshedExpiresAt = Date.now() + 1000 * mcRefreshedExpiresIn;
         } catch (error) {
           console.error(error);
-          throw new Error('Error occurred while logging in Minecraft.');
+          throw new Error('Произошла ошибка авторизации Minecraft.');
         }
 
         const skinUrl = await getPlayerSkin(selectedProfile.id);
@@ -720,7 +780,7 @@ export function loginOAuth(redirect = true) {
         );
       } catch (error) {
         console.error(error);
-        throw new Error('Error occurred while logging in Microsoft.');
+        throw new Error('Произошла ошибка при попытке авторизации через Microsoft.');
       }
 
       let msAccessToken = null;
@@ -743,7 +803,7 @@ export function loginOAuth(redirect = true) {
         msExpiresAt = Date.now() + 1000 * msExpiresIn;
       } catch (error) {
         console.error(error);
-        throw new Error('Error occurred while making logging in Microsoft .');
+        throw new Error('Произошла ошибка при попытке авторизации через Microsoft.');
       }
 
       let xblToken = null;
@@ -759,7 +819,7 @@ export function loginOAuth(redirect = true) {
         } = await msAuthenticateXBL(msAccessToken));
       } catch (error) {
         console.error(error);
-        throw new Error('Error occurred while logging in Xbox Live .');
+        throw new Error('Произошла ошибка при попытке авторизации через Xbox Live.');
       }
 
       let xstsToken = null;
@@ -770,7 +830,7 @@ export function loginOAuth(redirect = true) {
       } catch (error) {
         console.error(error);
         throw new Error(
-          'Error occurred while fetching token from Xbox Secure Token Service.'
+          'Произошла ошибка при попытке авторизации через Microsoft Xbox Token Service.'
         );
       }
 
@@ -784,7 +844,7 @@ export function loginOAuth(redirect = true) {
         mcExpiresAt = Date.now() + 1000 * mcExpiresIn;
       } catch (error) {
         console.error(error);
-        throw new Error('Error occurred while logging in Minecraft.');
+        throw new Error('Произошла ошибка при попытке авторизации через Microsoft.');
       }
 
       let mcUserId = null;
@@ -796,9 +856,9 @@ export function loginOAuth(redirect = true) {
       } catch (error) {
         console.error(error);
         if (error?.response?.status === 404) {
-          throw new Error("It looks like you didn't buy the game.");
+          throw new Error("Похоже, что вы еще не купили игру...");
         }
-        throw new Error('Error occurred while fetching Minecraft profile.');
+        throw new Error('Произошла ошибка при попытке подключения аккаунта Minecraft.');
       }
 
       const skinUrl = await getPlayerSkin(mcUserId);
@@ -1173,7 +1233,7 @@ export function downloadFabric(instanceName) {
     const state = getState();
     const { loader } = _getCurrentDownloadItem(state);
 
-    dispatch(updateDownloadStatus(instanceName, 'Downloading fabric files...'));
+    dispatch(updateDownloadStatus(instanceName, 'Скачиваю файлы Fabric...'));
 
     let fabricJson;
     const fabricJsonPath = path.join(
@@ -1278,7 +1338,7 @@ export function downloadForge(instanceName) {
         'No installer found in temp or hash mismatch. Need to download it.'
       );
       dispatch(
-        updateDownloadStatus(instanceName, 'Downloading forge installer...')
+        updateDownloadStatus(instanceName, 'Загружаю установщик Forge...')
       );
 
       let urlTerminal = 'installer.jar';
@@ -1377,7 +1437,7 @@ export function downloadForge(instanceName) {
       }
 
       dispatch(
-        updateDownloadStatus(instanceName, 'Downloading forge libraries...')
+        updateDownloadStatus(instanceName, 'Загружаю библиотеки Forge...')
       );
 
       let { libraries } = forgeJson.version;
@@ -1414,7 +1474,7 @@ export function downloadForge(instanceName) {
 
       // Patching
       if (forgeJson.install?.processors?.length) {
-        dispatch(updateDownloadStatus(instanceName, 'Patching forge...'));
+        dispatch(updateDownloadStatus(instanceName, 'Патчим Forge...'));
 
         // Extract client.lzma from installer
 
@@ -1494,7 +1554,7 @@ export function downloadForge(instanceName) {
         { concurrency: state.settings.concurrentDownloads }
       );
 
-      dispatch(updateDownloadStatus(instanceName, 'Injecting forge...'));
+      dispatch(updateDownloadStatus(instanceName, 'Инжектим Forge...'));
       dispatch(updateDownloadProgress(0));
 
       // Perform forge injection
@@ -1571,7 +1631,7 @@ export function processFTBManifest(instanceName) {
     const files = allFiles.filter(v => v.url && v.url !== '');
     const CFFiles = allFiles.filter(v => !v.url || v.url === '');
 
-    dispatch(updateDownloadStatus(instanceName, 'Downloading CF files...'));
+    dispatch(updateDownloadStatus(instanceName, 'Загружаем CF файлы...'));
     const addonsHashmap = {};
     const addonsFilesHashmap = {};
 
@@ -1672,7 +1732,7 @@ export function processFTBManifest(instanceName) {
             reject,
             abortCallback: () => {
               setTimeout(
-                () => reject(new Error('Download Aborted by the user')),
+                () => reject(new Error('Загрузка прервана пользователем')),
                 300
               );
             }
@@ -1819,7 +1879,7 @@ export function processForgeManifest(instanceName) {
     const { manifest, loader } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
 
-    dispatch(updateDownloadStatus(instanceName, 'Downloading mods...'));
+    dispatch(updateDownloadStatus(instanceName, 'Загружаю модификации...'));
 
     const addonsHashmap = {};
     const addonsFilesHashmap = {};
@@ -1912,7 +1972,7 @@ export function processForgeManifest(instanceName) {
             reject,
             abortCallback: () => {
               setTimeout(
-                () => reject(new Error('Download Aborted by the user')),
+                () => reject(new Error('Загрузка прервана пользователем')),
                 300
               );
             }
@@ -1951,7 +2011,7 @@ export function processForgeManifest(instanceName) {
     }
 
     if (validAddon) {
-      dispatch(updateDownloadStatus(instanceName, 'Copying overrides...'));
+      dispatch(updateDownloadStatus(instanceName, 'Копируем overrides...'));
       let progress = 0;
       await extractAll(
         addonPathZip,
@@ -1971,7 +2031,7 @@ export function processForgeManifest(instanceName) {
         }
       );
 
-      dispatch(updateDownloadStatus(instanceName, 'Finalizing overrides...'));
+      dispatch(updateDownloadStatus(instanceName, 'Заканчиваю с импортами...'));
 
       const overrideFiles = await getFilesRecursive(
         path.join(_getTempPath(state), instanceName, 'overrides')
@@ -2062,7 +2122,7 @@ export function downloadInstance(instanceName) {
 
       if (isUpdate && !bypassCopy) {
         dispatch(
-          updateDownloadStatus(instanceName, 'Creating restore point...')
+          updateDownloadStatus(instanceName, 'Создаю точку восстановления...')
         );
 
         const oldInstancePath = path.join(instancesPath, instanceName);
@@ -2092,7 +2152,7 @@ export function downloadInstance(instanceName) {
         }
       }
 
-      dispatch(updateDownloadStatus(instanceName, 'Downloading game files...'));
+      dispatch(updateDownloadStatus(instanceName, 'Скачиваем файлы игры...'));
 
       const mcVersion = loader?.mcVersion;
 
@@ -2414,7 +2474,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Synchronizing mods. ${queueLength} left.`,
+            content: `Синхронизируем модификации. ${queueLength} осталось.`,
             duration: 0
           })
         );
@@ -2425,7 +2485,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Synchronizing mods. ${queueLength} left.`,
+            content: `Синхронизируем модификации. ${queueLength} осталось.`,
             duration: 0
           })
         );
@@ -3243,8 +3303,7 @@ export function launchInstance(instanceName, forceQuit = false) {
       ),
       {
         cwd: instancePath,
-        shell: process.platform !== 'win32',
-        detached: true
+        shell: process.platform !== 'win32'
       }
     );
 

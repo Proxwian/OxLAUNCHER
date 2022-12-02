@@ -360,7 +360,7 @@ const ResourcePacks = ({ instanceName }) => {
                 : setSelectedItems([])
             }
           >
-            Select All
+            Выбрать все
           </Checkbox>
           <TrashIcon
             selectedMods={selectedItems.length}
@@ -396,7 +396,7 @@ const ResourcePacks = ({ instanceName }) => {
             openFolderDialog();
           }}
         >
-          Add ResourcePack
+          Добавить ресурспак
         </Button>
       </Header>
 
@@ -406,7 +406,7 @@ const ResourcePacks = ({ instanceName }) => {
         fileList={resourcePacks}
       >
         {resourcePacks.length === 0 && (
-          <NotItemsAvailable>No ResourcePacks Available</NotItemsAvailable>
+          <NotItemsAvailable>Ресурспаки не найдены :с</NotItemsAvailable>
         )}
         <AutoSizer>
           {({ height, width }) => (

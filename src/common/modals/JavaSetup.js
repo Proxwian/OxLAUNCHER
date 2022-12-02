@@ -81,7 +81,7 @@ const JavaSetup = () => {
                 margin-bottom: 20px;
               `}
             >
-              Java Setup
+              Установка Java
             </div>
             <div
               css={`
@@ -90,9 +90,8 @@ const JavaSetup = () => {
                 text-align: justify;
               `}
             >
-              For an optimal experience, we suggest letting us take care of java
-              for you. Only manually manage java if you know what you&apos;re
-              doing, it may result in GDLauncher not working!
+              Для наилучшей производительности, рекомендуем разрешить лаунчеру
+              автоматически установить нужные версии Java для вас.
             </div>
 
             <div
@@ -113,7 +112,7 @@ const JavaSetup = () => {
                 }
               `}
             >
-              <h3>Missing Versions:</h3>
+              <h3>Отсутствуют версии:</h3>
               <div
                 css={`
                   display: flex;
@@ -164,7 +163,7 @@ const JavaSetup = () => {
                     setChoice(0);
                   }}
                 >
-                  Automatic Setup
+                  Авто установка
                 </Button>
               </div>
               <div>
@@ -178,7 +177,7 @@ const JavaSetup = () => {
                     setChoice(1);
                   }}
                 >
-                  Manual Setup
+                  Ручная установка
                 </Button>
               </div>
             </div>
@@ -195,7 +194,7 @@ const JavaSetup = () => {
                 margin-bottom: 20px;
               `}
             >
-              {choice === 0 ? 'Automatic' : 'Manual'} Setup
+              {choice === 0 ? 'Авто' : 'Вручную'} Установка
             </div>
             {choice === 0 ? (
               <AutomaticSetup
@@ -243,10 +242,10 @@ const ManualSetup = ({ setStep }) => {
           font-size: 18px;
         `}
       >
-        Enter the required paths to java. Java 8 will be used for all the
-        versions {'<'} 1.17, java {LATEST_JAVA_VERSION} for versions {'>='}{' '}
-        1.17. You can also use the same executable but some versions might not
-        run.
+        Укажите путь установки Java. Java 8 будет использована для всех версий
+        ниже 1.17, Java {LATEST_JAVA_VERSION} для версий {'>='}{' '}
+        1.17. Можно указать один и тот же исполняемый файл, но некоторые версии
+        работать не будут.
       </div>
 
       <div
@@ -257,7 +256,7 @@ const ManualSetup = ({ setStep }) => {
         `}
       >
         <Input
-          placeholder="Select your Java8 executable (MC < 1.17)"
+          placeholder="Выберите файл исполняемый файл Java 8 (MC < 1.17)"
           onChange={e => setJavaPath(e.target.value)}
           value={javaPath}
         />
@@ -279,7 +278,7 @@ const ManualSetup = ({ setStep }) => {
         `}
       >
         <Input
-          placeholder={`Select your Java ${LATEST_JAVA_VERSION} executable (MC >= 1.17)`}
+          placeholder={`Выберите файл исполняемый файл Java ${LATEST_JAVA_VERSION} (MC >= 1.17)`}
           onChange={e => setJavaLatestPath(e.target.value)}
           value={javaLatestPath}
         />
@@ -305,7 +304,7 @@ const ManualSetup = ({ setStep }) => {
         `}
       >
         <Button type="primary" onClick={() => setStep(0)}>
-          Go Back
+          Назад
         </Button>
         <Button
           type="danger"
@@ -316,7 +315,7 @@ const ManualSetup = ({ setStep }) => {
             dispatch(closeModal());
           }}
         >
-          Continue with custom java
+          Указать вручную
         </Button>
       </div>
     </div>
@@ -395,7 +394,7 @@ const AutomaticSetup = ({
       await fse.remove(path.join(javaBaseFolder, version));
       const downloadLocation = path.join(tempFolder, path.basename(url));
 
-      setCurrentSubStep(`Java ${javaVersion} - Downloading`);
+      setCurrentSubStep(`Java ${javaVersion} - Загрузка`);
       await downloadFile(downloadLocation, url, p => {
         ipcRenderer.invoke('update-progress-bar', p);
         setDownloadPercentage(p);
@@ -409,7 +408,7 @@ const AutomaticSetup = ({
       await new Promise(resolve => setTimeout(resolve, 500));
 
       setCurrentSubStep(
-        `Java ${javaVersion} - Extracting 1 / ${totalExtractionSteps}`
+        `Java ${javaVersion} - Извлечение 1 / ${totalExtractionSteps}`
       );
       let { extractedParentDir } = await extractAll(
         downloadLocation,
@@ -437,7 +436,7 @@ const AutomaticSetup = ({
         ipcRenderer.invoke('update-progress-bar', -1);
         await new Promise(resolve => setTimeout(resolve, 500));
         setCurrentSubStep(
-          `Java ${javaVersion} - Extracting 2 / ${totalExtractionSteps}`
+          `Java ${javaVersion} - Извлечение 2 / ${totalExtractionSteps}`
         );
 
         const tempTarName = path.join(
@@ -490,7 +489,7 @@ const AutomaticSetup = ({
 
     dispatch(updateJavaPath(null));
     dispatch(updateJavaLatestPath(null));
-    setCurrentSubStep(`Java is ready!`);
+    setCurrentSubStep(`Java установлена!`);
     ipcRenderer.invoke('update-progress-bar', -1);
     setDownloadPercentage(100);
     setCurrentStepPercentage(100);
@@ -561,17 +560,17 @@ const AutomaticSetup = ({
             }
           `}
         >
-          <h2>Java is already installed!</h2>
+          <h2>Java уже установлена!</h2>
           <div
             css={`
               margin-bottom: 10px;
             `}
           >
-            <h3>Java 8 details:</h3>
+            <h3>Параметры Java 8:</h3>
             <code>{java8Log}</code>
           </div>
           <div>
-            <h3>Java {LATEST_JAVA_VERSION} details:</h3>
+            <h3>Параметры Java {LATEST_JAVA_VERSION}:</h3>
             <code>{javaLatestLog}</code>
           </div>
         </div>
@@ -586,7 +585,7 @@ const AutomaticSetup = ({
           type="primary"
           onClick={() => dispatch(closeModal())}
         >
-          Close
+          Закрыть
         </Button>
       )}
     </div>

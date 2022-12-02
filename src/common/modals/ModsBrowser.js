@@ -241,9 +241,9 @@ const ModsListWrapper = ({
 
                   if (preferredFile === null) {
                     setLoading(false);
-                    setError('Mod Not Available');
+                    setError('Модификация недоступна');
                     console.error(
-                      `Could not find any release candidate for addon: ${item?.id} / ${gameVersions}`
+                      `Не получилось найти релизов для мода: ${item?.id} / ${gameVersions}`
                     );
                     return;
                   }
@@ -430,7 +430,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
         width: 90%;
         max-width: 1500px;
       `}
-      title="Instance Manager"
+      title="Менеджер модификаций"
     >
       <Container>
         <Header>
@@ -444,15 +444,15 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
             disabled={areModsLoading}
             virtual={false}
           >
-            <Select.Option value="Featured">Featured</Select.Option>
-            <Select.Option value="Popularity">Popularity</Select.Option>
-            <Select.Option value="LastUpdated">Last Updated</Select.Option>
-            <Select.Option value="Name">Name</Select.Option>
-            <Select.Option value="Author">Author</Select.Option>
-            <Select.Option value="TotalDownloads">Downloads</Select.Option>
+            <Select.Option value="Featured">Рекомендуемые</Select.Option>
+            <Select.Option value="Popularity">Популярные</Select.Option>
+            <Select.Option value="LastUpdated">Обновлённые</Select.Option>
+            <Select.Option value="Name">Название</Select.Option>
+            <Select.Option value="Author">Автор</Select.Option>
+            <Select.Option value="TotalDownloads">Загрузки</Select.Option>
           </Select>
           <Select
-            placeholder="Minecraft Category"
+            placeholder="Категория"
             onChange={setCategoryId}
             defaultValue={null}
             virtual={false}
@@ -462,7 +462,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
             `}
           >
             <Select.Option key="allcategories" value={null}>
-              All Categories
+              Все категории
             </Select.Option>
             {(categories || [])
               .filter(v => v?.classId === 6)
@@ -495,7 +495,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
             css={`
               height: 32px !important;
             `}
-            placeholder="Search..."
+            placeholder="Поиск..."
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
@@ -523,7 +523,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
                   margin-top: 70px;
                 `}
               >
-                No mods has been found with the current filters.
+                По заданным параметров модификаций не найдено.
               </div>
             </div>
           ) : (
@@ -562,7 +562,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
                 margin-top: 70px;
               `}
             >
-              An error occurred while loading the mods list...
+              Возникла ошибка при загрузке списка модификаций...
             </div>
           </div>
         )}

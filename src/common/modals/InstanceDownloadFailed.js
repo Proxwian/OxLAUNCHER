@@ -61,10 +61,10 @@ const InstanceDownloadFailed = ({
         overflow-x: hidden;
       `}
       preventClose={preventClose}
-      title={`Instance Download Failed - ${ellipsedName}`}
+      title={`Ошибка загрузки - ${ellipsedName}`}
     >
       <div>
-        The download for {instanceName} failed.
+        Загрузка {instanceName} не удалась.
         <div
           css={`
             background: ${props => props.theme.palette.grey[900]};
@@ -75,7 +75,7 @@ const InstanceDownloadFailed = ({
           {'> '}
           {error.toString()}
         </div>
-        <div>What do you want to do?</div>
+        <div>Как поступим?</div>
         <div
           css={`
             margin-top: 50px;
@@ -90,10 +90,10 @@ const InstanceDownloadFailed = ({
             onClick={cancelDownload}
             loading={loading}
           >
-            Cancel Download
+            Отмена
           </Button>
           <Button danger type="primary" onClick={retry} disabled={loading}>
-            Retry Download
+            Повторить загрузку
           </Button>
         </div>
       </div>

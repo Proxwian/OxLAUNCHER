@@ -18,7 +18,7 @@ const Background = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  background: ${props => props.theme.palette.colors.darkBlue};
+  background: ${props => props.theme.palette.colors.jungleGreen};
   overflow: hidden;
 `;
 
@@ -49,12 +49,6 @@ const Home = () => {
       case 2:
         scrollToRef(thirdSlideRef);
         break;
-      case 3:
-        scrollToRef(forthSlideRef);
-        break;
-      case 4:
-        scrollToRef(fifthSlideRef);
-        break;
       default:
         scrollToRef(firstSlideRef);
         break;
@@ -75,41 +69,6 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.grey[700]};
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          color: ${props => props.theme.palette.text.primary};
-        `}
-      >
-        <div
-          css={`
-            font-size: 40px;
-            font-weight: 800;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-          `}
-        >
-          <video
-            autoPlay
-            muted
-            css={`
-              height: 100vh;
-            `}
-          >
-            <source src={backgroundVideo} type="video/webm" />
-          </video>
-        </div>
-      </div>
-      <div
-        ref={secondSlideRef}
-        css={`
-          height: 100%;
-          width: 100%;
           background: ${props => props.theme.palette.grey[800]};
           display: flex;
           flex-direction: column;
@@ -125,8 +84,49 @@ const Home = () => {
             padding: 0 120px;
           `}
         >
-          {account.selectedProfile.name}, welcome to GDLauncher!
+          {account.selectedProfile.name}, Добро Пожаловать!
+          Спасибо за загрузку OxLAUNCHER :3
         </div>
+      </div>
+      <div
+        ref={secondSlideRef}
+        css={`
+          height: 100%;
+          width: 100%;
+          background: ${props => props.theme.palette.grey[700]};
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        `}
+      >
+        <div
+          css={`
+				font-size: 24px;
+				font-weight: 600;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+				margin: 20%;
+			  `}
+        >
+          <a href="https://discord.gg/Yy4y7tjKfY">Наш Discord сервер</a> 
+          Вся  информация о сборках и лаунчере, а также новости проекта
+          <iframe
+            css={`
+				  margin-top: 40px;
+				`}
+            src="https://discord.com/widget?id=1043933263565160498&theme=dark"
+            width="350"
+            height="320"
+            allowTransparency="true"
+            frameBorder="0"
+            title="discordFrame"
+          />
+        </div>
+
       </div>
       <div
         ref={thirdSlideRef}
@@ -143,98 +143,13 @@ const Home = () => {
         <div
           css={`
             font-size: 30px;
-            font-weight: 600;
+            font-weight: 700;
             text-align: center;
-            margin: 20% 10%;
+            padding: 0 120px;
           `}
         >
-          GDlauncher is completely free and open source. <br />
-          If you want to support us, consider renting a server on BisectHosting,
-          our official partner!
-          <br />
-          <br />
-          <div
-            css={`
-              cursor: pointer;
-            `}
-          >
-            <BisectHosting
-              showPointerCursor
-              size={100}
-              onClick={() => dispatch(openModal('BisectHosting'))}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        ref={forthSlideRef}
-        css={`
-          height: 100%;
-          width: 100%;
-          background: ${props => props.theme.palette.grey[800]};
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        `}
-      >
-        <div
-          css={`
-            font-size: 30px;
-            font-weight: 600;
-            text-align: center;
-            margin: 20%;
-          `}
-        >
-          Or you can also support us through Ko-Fi.
-          <div
-            css={`
-              margin: 40px;
-            `}
-          >
-            <a href="https://ko-fi.com/gdlauncher">
-              <img src={KoFiButton} alt="Ko-Fi" />
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        ref={fifthSlideRef}
-        css={`
-          height: 100%;
-          width: 100%;
-          background: ${props => props.theme.palette.grey[700]};
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        `}
-      >
-        <div
-          css={`
-            font-size: 30px;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            margin: 20%;
-          `}
-        >
-          Also, don&apos;t forget to join us on Discord! This is where our
-          community is!
-          <iframe
-            css={`
-              margin-top: 40px;
-            `}
-            src="https://discordapp.com/widget?id=398091532881756161&theme=dark"
-            width="350"
-            height="410"
-            allowTransparency="true"
-            frameBorder="0"
-            title="discordFrame"
-          />
+          Чтобы начать, скачай сборку OxLAUNCHER (или любую другую),
+          Нажав кнопку <b>+</b> в левом нижнем углу. Приятной игры!
         </div>
       </div>
       {currentSlide !== 0 && currentSlide !== 1 && initScrolled && (
@@ -283,7 +198,7 @@ const Home = () => {
             }
           `}
           onClick={() => {
-            if (currentSlide === 4) {
+            if (currentSlide === 2) {
               dispatch(push('/home'));
             } else {
               executeScroll(1);
@@ -291,10 +206,11 @@ const Home = () => {
           }}
         >
           <FontAwesomeIcon
-            icon={currentSlide === 4 ? faLongArrowAltRight : faLongArrowAltDown}
+            icon={currentSlide === 2 ? faLongArrowAltRight : faLongArrowAltDown}
           />
         </div>
       )}
+      dispatch(push('/home'));
     </Background>
   );
 };

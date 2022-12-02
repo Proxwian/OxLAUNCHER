@@ -113,25 +113,25 @@ export const convertMinutesToHumanTime = minutes => {
 
   switch (true) {
     case months >= 2:
-      return `${months} months`;
+      return `${months} мес.`;
     case months === 1:
-      return `1 month`;
+      return `1 мес.`;
     case weeks >= 2:
-      return `${weeks} weeks`;
+      return `${weeks} нед.`;
     case weeks === 1:
-      return `1 week`;
+      return `1 неделя`;
     case days >= 1:
-      return `${days} d, ${hours} h, ${min} m`;
+      return `${days} в, ${hours} ч, ${min} м`;
     case hours >= 2:
-      return `${hours} h, ${min} m`;
+      return `${hours} ч, ${min} м`;
     case hours === 1:
-      return `1 hour`;
+      return `1 час`;
     case minutes >= 2:
-      return `${min} minutes`;
+      return `${min} мин`;
     case minutes === 1:
-      return `1 minute`;
+      return `1 мин`;
     case minutes === 0:
-      return '0 minutes';
+      return '0 мин';
     default:
       return '';
   }

@@ -143,7 +143,7 @@ const ChangeLogs = () => {
         height: 550px;
         width: 475px;
       `}
-      title={`What's new in ${version}`}
+      title={`Что нового в ${version}`}
       removePadding
     >
       <Container>
@@ -181,30 +181,7 @@ const ChangeLogs = () => {
           ) : (
             ''
           )}
-          <img
-            css={`
-              border-radius: 5px;
-              width: 401px;
-            `}
-            src={isChristmas ? UpdateIllustrationChristmas : UpdateIllustration}
-            alt="New Version"
-          />
-          <div
-            css={`
-              margin-top: 20px;
-              color: ${props => props.theme.palette.text.third};
-              span {
-                color: ${props => props.theme.palette.text.primary};
-                cursor: pointer;
-                text-decoration: underline;
-              }
-            `}
-          >
-            If you appreciate our work, please consider supporting us through a
-            donation or grab a server from our official partner{' '}
-            <span onClick={openBisectModal}>BisectHosting</span>
-          </div>
-          <div
+          {/* <div
             css={`
               display: flex;
               align-items: center;
@@ -228,8 +205,8 @@ const ChangeLogs = () => {
             <a href="https://ko-fi.com/gdlauncher">
               <img src={KoFiButton} alt="Ko-Fi" />
             </a>
-          </div>
-          <a
+          </div> */}
+          {/* <a
             css={`
               margin-top: 20px;
               color: ${props => props.theme.palette.primary.light};
@@ -237,9 +214,9 @@ const ChangeLogs = () => {
             onClick={() => setShowAdvanced(!showAdvanced)}
           >
             {showAdvanced
-              ? 'Hide extended information'
-              : 'Show extended information'}
-          </a>
+              ? 'Скрыть подробности'
+              : 'Показать подробности'}
+          </a> */}
         </Header>
         <Section>
           {changelog.new.length ? (
@@ -261,7 +238,7 @@ const ChangeLogs = () => {
                     font-size: 20px;
                   `}
                 />
-                New
+                Добавлено
               </span>
             </SectionTitle>
           ) : null}
@@ -297,7 +274,7 @@ const ChangeLogs = () => {
                     font-size: 20px;
                   `}
                 />
-                Improved
+                Улучшено
               </span>
             </SectionTitle>
           ) : null}
@@ -333,7 +310,7 @@ const ChangeLogs = () => {
                     font-size: 20px;
                   `}
                 />
-                Bug Fixes
+                Исправлено
               </span>
             </SectionTitle>
           ) : null}
@@ -350,7 +327,7 @@ const ChangeLogs = () => {
           </ul>
         </Section>
       </Container>
-      <div
+      {/* <div
         css={`
           position: sticky;
           bottom: 0;
@@ -372,7 +349,7 @@ const ChangeLogs = () => {
         >
           Follow us for more updates
         </span>
-      </div>
+      </div> */}
     </Modal>
   );
 };

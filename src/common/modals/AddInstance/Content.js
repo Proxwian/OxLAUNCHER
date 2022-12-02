@@ -10,6 +10,7 @@ import {
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin, Radio } from 'antd';
 import CurseForgeModpacks from './CurseForgeModpacks';
+import Oxfortpacks from './Oxfortpacks';
 import FTBModpacks from './FTBModpacks';
 import Import from './Import';
 import NewInstance from './NewInstance';
@@ -32,8 +33,18 @@ const Content = ({
   const [loading, setLoading] = useState(false);
 
   let pages = [
+    <Oxfortpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
+    />,
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
     <CurseForgeModpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
+    />,
+    <FTBModpacks
       setVersion={setVersion}
       setStep={setStep}
       setModpack={setModpack}
@@ -44,11 +55,6 @@ const Content = ({
       importZipPath={importZipPath}
       setImportZipPath={setImportZipPath}
       setOverrideNextStepOnClick={setOverrideNextStepOnClick}
-    />,
-    <FTBModpacks
-      setVersion={setVersion}
-      setStep={setStep}
-      setModpack={setModpack}
     />
   ];
 
@@ -82,6 +88,9 @@ const Content = ({
                   onChange={e => setPage(e.target.value)}
                 >
                   <Radio.Button value={0}>
+                    OxFORTPACK
+                  </Radio.Button>
+                  <Radio.Button value={1}>
                     <img
                       src={minecraftIcon}
                       css={`
@@ -90,9 +99,9 @@ const Content = ({
                         width: 22px;
                       `}
                     />
-                    Vanilla
+                    Ванила
                   </Radio.Button>
-                  <Radio.Button value={1}>
+                  <Radio.Button value={2}>
                     <img
                       src={curseForgeIcon}
                       css={`
@@ -116,7 +125,7 @@ const Content = ({
                     />
                     FTB
                   </Radio.Button>
-                  <Radio.Button value={2}>
+                  <Radio.Button value={4}>
                     <FontAwesomeIcon
                       icon={faArchive}
                       css={`
@@ -124,7 +133,7 @@ const Content = ({
                         cursor: pointer;
                       `}
                     />
-                    Import Zip
+                    Zip
                   </Radio.Button>
                 </Radio.Group>
               </div>

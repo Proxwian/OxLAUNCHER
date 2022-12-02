@@ -162,36 +162,36 @@ const PlayButtonAnimation = keyframes`
 
 const menuEntries = {
   overview: {
-    name: 'Overview',
+    name: 'Описание',
     component: AsyncComponent(lazy(() => import('./Overview')))
   },
   mods: {
-    name: 'Mods',
+    name: 'Модификации',
     component: AsyncComponent(lazy(() => import('./Mods')))
   },
   modpack: {
-    name: 'Modpack',
+    name: 'Обновления',
     component: AsyncComponent(lazy(() => import('./Modpack')))
   },
   notes: {
-    name: 'Notes',
+    name: 'Заметки',
     component: AsyncComponent(lazy(() => import('./Notes')))
   },
   resourcePacks: {
-    name: 'Resource Packs',
+    name: 'Ресурспаки',
     component: AsyncComponent(lazy(() => import('./ResourcePacks')))
   },
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
   screenshots: {
-    name: 'Screenshots',
+    name: 'Скриншоты',
     component: AsyncComponent(lazy(() => import('./Screenshots')))
   }
   // settings: { name: "Settings", component: Overview },
   // servers: { name: "Servers", component: Overview }
 };
 
-const InstanceManager = ({ instanceName }) => {
+const InstanceManager = ({ instanceName, openUpdater }) => {
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
@@ -264,7 +264,7 @@ const InstanceManager = ({ instanceName }) => {
         width: 85%;
         max-width: 1500px;
       `}
-      title={`Instance Manager - ${instanceName}`}
+      title={`Управление клиентом: ${instanceName}`}
       removePadding
     >
       <Container>
@@ -272,7 +272,7 @@ const InstanceManager = ({ instanceName }) => {
           <SideMenu>
             <InstanceBackground onClick={openFileDialog} imagePath={background}>
               <Overlay />
-              <p>Change Icon</p>
+              <p>Изменить</p>
               {background && (
                 <FontAwesomeIcon
                   icon={faTimesCircle}
@@ -355,7 +355,7 @@ const InstanceManager = ({ instanceName }) => {
                     {!isPlaying.initialized && <div className="spinner" />}
                   </div>
                 ) : (
-                  <span>PLAY</span>
+                  <span>ИГРАТЬ</span>
                 )}
               </div>
               <div

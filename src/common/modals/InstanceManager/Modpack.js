@@ -131,7 +131,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
 
   return (
     <Container>
-      Installed version: {versionName}
+      Текущая версия: {versionName}
       <div
         css={`
           display: flex;
@@ -139,7 +139,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         `}
       >
         <StyledSelect
-          placeholder={loading ? 'Loading Versions' : 'Select a version'}
+          placeholder={loading ? 'Загрузка обновлений...' : 'Выберите версию'}
           onChange={handleChange}
           listItemHeight={50}
           listHeight={400}
@@ -218,7 +218,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
           dispatch(closeModal());
         }}
       >
-        Switch Version
+        Изменить версию
       </Button>
     </Container>
   );

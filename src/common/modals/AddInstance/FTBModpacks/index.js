@@ -86,7 +86,7 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
     <Container>
       <HeaderContainer>
         <StyledInput
-          placeholder="Search..."
+          placeholder="Поиск..."
           onSearch={setSearchText}
           onChange={e => setSearchText(e.target.value)}
           style={{ width: 200 }}
@@ -111,7 +111,7 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
                   margin-top: 70px;
                 `}
               >
-                No modpack has been found with the current filters.
+                По заданным критериям сборок не найдено.
               </div>
             </div>
           ) : (
@@ -149,7 +149,7 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
                 margin-top: 70px;
               `}
             >
-              An error occurred while loading the modpacks list...
+              Произошла ошибка при загрузке списка...
             </div>
           </div>
         )}

@@ -171,11 +171,11 @@ const OptedOutModsList = ({
       preventClose={preventClose}
       closeCallback={() => {
         setTimeout(
-          () => reject(new Error('Download Aborted by the user')),
+          () => reject(new Error('Загрузка прервана пользователем')),
           300
         );
       }}
-      title="Opted out mods list"
+      title="Загрузка сторонних модов"
     >
       <Container>
         <div
@@ -184,10 +184,10 @@ const OptedOutModsList = ({
             margin-bottom: 2rem;
           `}
         >
-          Hey oh! It looks like some developers opted out from showing their
-          mods on third-party launchers. We can still attempt to download them
-          automatically. Please click continue and wait for all downloads to
-          finish. Please don&apos;t click anything inside the browser.
+		  Часть модов из сборки необходимо скачать через внутренний браузер.
+		  Не переживайте, это произойдёт автоматически. Нажмите "Продолжить",
+		  и подождите, пока все загрузки завершатся! Пожалуйста, не нажимайте
+		  ничего внутри браузера - процесс автоматический.
         </div>
         <ModsContainer>
           {optedOutMods &&
@@ -217,12 +217,12 @@ const OptedOutModsList = ({
             onClick={() => {
               dispatch(closeModal());
               setTimeout(
-                () => reject(new Error('Download Aborted by the user')),
+                () => reject(new Error('Загрузка прервана пользователем')),
                 300
               );
             }}
           >
-            Cancel
+            Отмена
           </Button>
           {missingMods.length === 0 && (
             <Button
@@ -254,7 +254,7 @@ const OptedOutModsList = ({
                 background-color: ${props => props.theme.palette.colors.green};
               `}
             >
-              Confirm
+              Подтвердить
             </Button>
           )}
           {missingMods.length > 0 && (
@@ -269,7 +269,7 @@ const OptedOutModsList = ({
                 background-color: ${props => props.theme.palette.colors.green};
               `}
             >
-              Continue
+              Продолжить
             </Button>
           )}
         </div>

@@ -13,6 +13,7 @@ import {
   initNews,
   loginThroughNativeLauncher,
   switchToFirstValidAccount,
+  selectFirstValidAccount,
   checkClientToken,
   updateUserData,
   loginWithOAuthAccessToken
@@ -126,10 +127,9 @@ function DesktopRoot({ store }) {
       });
     }
 
-    if (process.env.NODE_ENV === 'development' && currentAccount) {
-      dispatch(received(features.mcAuthentication));
-      dispatch(push('/home'));
-    } else if (currentAccount) {
+    console.log("current account is " + currentAccount);
+
+    if (currentAccount) {
       dispatch(
         load(
           features.mcAuthentication,
@@ -140,16 +140,14 @@ function DesktopRoot({ store }) {
           )
         )
       ).catch(() => {
-        dispatch(switchToFirstValidAccount());
+        dispatch(selectFirstValidAccount());
       });
     } else {
       dispatch(
         load(features.mcAuthentication, dispatch(loginThroughNativeLauncher()))
-      ).catch(console.error);
-    }
-
-    if (shouldShowDiscordRPC) {
-      ipcRenderer.invoke('init-discord-rpc');
+      ).catch(() => {
+        dispatch(selectFirstValidAccount());
+      });
     }
 
     ipcRenderer.on('custom-protocol-event', (e, data) => {

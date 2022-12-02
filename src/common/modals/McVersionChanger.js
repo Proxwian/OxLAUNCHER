@@ -57,7 +57,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
 
   return (
     <Modal
-      title="Minecraft Version Changer"
+      title="Изменение версии Minecraft"
       css={`
         height: 380px;
         width: 600px;
@@ -85,13 +85,11 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                   margin-bottom: 10px;
                 `}
               >
-                DISCLAIMER
+                ВНИМАНИЕ
               </div>
               <div>
-                Changing modloader (forge -&gt; fabric...) will result in the
-                loss of the modpack metadata. You won&apos;t be able to change
-                the modpack version or recognize this instance as a modpack
-                anymore.
+                Изменение вида загрузчика модификаций (Forge, Fabric, Quilt)
+                приведёт к потере данных установленных модов.
               </div>
             </div>
           )}
@@ -100,7 +98,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
           defaultValue={patchedDefaultValue}
           onChange={setSelectedVersion}
           allowClear={false}
-          placeholder="Select a version"
+          placeholder="Выберите версию"
           size="large"
           css={`
             width: 400px;

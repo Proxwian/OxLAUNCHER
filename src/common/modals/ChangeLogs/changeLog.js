@@ -1,31 +1,33 @@
 module.exports = {
-  new: [],
-  improvements: [],
+  new: [
+    {
+      header: 'Отображение скинов у лицензионных аккаунтов',
+      content: 'в Менеджере профилей',
+      advanced: { cm: '8ec97baa' }
+    }
+  ],
+  improvements: [
+    {
+      header: 'Отображение окна Настроек клиента',
+      content: 'перерисовано',
+      advanced: { cm: '8ec97baa' }
+    }
+  ],
   bugfixes: [
     {
-      header: 'No longer killing the game',
-      content: 'when closing the Launcher.',
-      advanced: { cm: '391dd9cc', pr: '1412' }
+      header: 'Вылет из профиля',
+      content: 'при перезапуске приложения.',
+      advanced: { cm: '8ec97baa', pr: '1382' }
     },
     {
-      header: 'Fixed the game resolution setting',
-      content: 'being ignored.',
-      advanced: { cm: '87f89ed9', pr: '1429' }
+      header: 'Добавление аккаунта Microsoft',
+      content: 'через Менеджер аккаунтов.',
+      advanced: { cm: '1d17f128', pr: '1381' }
     },
     {
-      header: 'Fixed the kill button',
-      content: 'having to be clicked twice.',
-      advanced: { cm: '2664f8bb', pr: '1419' }
-    },
-    {
-      header: 'Fixed error code one ',
-      content: 'when certain java args are missing.',
-      advanced: { cm: 'cdae501a', pr: '1420' }
-    },
-    {
-      header: 'Fixed settings resetting',
-      content: 'caused by the CurseForge workaround.',
-      advanced: { cm: '7f29ca64', pr: '1431' }
+      header: 'Добавление Fabric модификаций в сборку',
+      content: 'при помощи встроенного браузера".',
+      advanced: { cm: '8ec97baa', pr: '1384' }
     }
   ]
 };

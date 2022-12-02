@@ -141,7 +141,7 @@ const Import = ({
   return (
     <Container>
       <div>
-        Local file or link to a direct download
+        Путь к локальному файлу или прямая ссылка на архив
         <div
           css={`
             display: flex;
@@ -159,7 +159,7 @@ const Import = ({
             `}
           />
           <Button disabled={loading} type="primary" onClick={openFileDialog}>
-            Browse
+            Открыть...
           </Button>
         </div>
         <div
@@ -178,7 +178,7 @@ const Import = ({
               transparentize(0.7, props.theme.palette.grey[700])};
           `}
         >
-          {error && 'There was an issue while importing.'}
+          {error && 'При импорте возникла ошибка.'}
         </div>
       </div>
     </Container>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, memo, useMemo } from 'react';
 import styled from 'styled-components';
 import { Spin, message } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,13 +16,21 @@ import {
 } from '../reducers/actions';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
-import { ACCOUNT_MICROSOFT } from '../utils/constants';
+import { ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE } from '../utils/constants';
+import { extractFace } from '../../app/desktop/utils';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
   const accounts = useSelector(_getAccounts);
   const currentAccount = useSelector(_getCurrentAccount);
   const isLoading = useSelector(state => state.loading.accountAuthentication);
+
+  useEffect(() => {
+    accounts.map(async account => {
+      account.skinFace = await extractFace(account.skin);
+    })
+  }, [accounts]);
+
   return (
     <Modal
       css={`
@@ -30,7 +38,7 @@ const ProfileSettings = () => {
         width: 400px;
         max-height: 700px;
       `}
-      title="Account Manager"
+      title="Менеджер профилей"
     >
       <Container>
         <AccountsContainer>
@@ -47,8 +55,7 @@ const ProfileSettings = () => {
                     if (
                       isLoading.isRequesting ||
                       account.selectedProfile.id ===
-                        currentAccount.selectedProfile.id ||
-                      !account.accessToken
+                        currentAccount.selectedProfile.id
                     ) {
                       return;
                     }
@@ -56,50 +63,45 @@ const ProfileSettings = () => {
                     dispatch(
                       updateCurrentAccountId(account.selectedProfile.id)
                     );
-                    dispatch(
-                      load(
-                        features.mcAuthentication,
-                        dispatch(
-                          account.accountType === ACCOUNT_MICROSOFT
-                            ? loginWithOAuthAccessToken(false)
-                            : loginWithAccessToken(false)
-                        )
-                      )
-                    ).catch(() => {
-                      dispatch(updateCurrentAccountId(currentId));
+                    if (account.accountType != ACCOUNT_OFFLINE) {
                       dispatch(
-                        updateAccount(account.selectedProfile.id, {
-                          ...account,
-                          accessToken: null
-                        })
-                      );
-                      message.error('Account not valid');
-                    });
+                        load(
+                          features.mcAuthentication,
+                          dispatch(
+                            account.accountType === ACCOUNT_MICROSOFT
+                              ? loginWithOAuthAccessToken(false)
+                              : loginWithAccessToken(false)
+                          )
+                        )
+                      ).catch(() => {
+                        dispatch(updateCurrentAccountId(currentId));
+                        dispatch(
+                          updateAccount(account.selectedProfile.id, {
+                            ...account,
+                            accessToken: null
+                          })
+                        );
+                        message.error('Аккаунт недействителен.');
+                      });
+                    }
                   }}
                 >
                   <div>
-                    {account.selectedProfile.name}{' '}
-                    <span
+                   {(account.accountType === ACCOUNT_MICROSOFT) && (
+                    
+                    <img
+                      src={`data:image/jpeg;base64,${account.skinFace}`}
                       css={`
-                        color: ${props => props.theme.palette.error.main};
+                        width: 15px;
+                        cursor: pointer;
+                        height: 15px;
+                        margin-right: 10px;
                       `}
-                    >
-                      {!account.accessToken && '(EXPIRED)'}
-                    </span>
+                      alt="profile"
+                    />
+                   )}
+                    {account.selectedProfile.name}   
                   </div>
-                  {!account.accessToken && (
-                    <HoverContainer
-                      onClick={() =>
-                        dispatch(
-                          openModal('AddAccount', {
-                            username: account.user.username
-                          })
-                        )
-                      }
-                    >
-                      Login again
-                    </HoverContainer>
-                  )}
                   {account.selectedProfile.id ===
                     currentAccount.selectedProfile.id && (
                     <Spin spinning={isLoading.isRequesting} />
@@ -134,7 +136,7 @@ const ProfileSettings = () => {
         </AccountsContainer>
         <AccountContainer>
           <AccountItem onClick={() => dispatch(openModal('AddAccount'))}>
-            Add Account
+            Добавить профиль
           </AccountItem>
         </AccountContainer>
       </Container>
