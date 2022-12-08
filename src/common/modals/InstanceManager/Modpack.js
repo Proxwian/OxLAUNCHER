@@ -99,7 +99,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            [Stable]
+            [Релиз]
           </span>
         );
       case 2:
@@ -109,7 +109,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
               color: ${props => props.theme.palette.colors.yellow};
             `}
           >
-            [Beta]
+            [Бета]
           </span>
         );
       case 3:
@@ -120,7 +120,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
               color: ${props => props.theme.palette.colors.red};
             `}
           >
-            [Alpha]
+            [Альфа]
           </span>
         );
     }
@@ -132,6 +132,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   return (
     <Container>
       Текущая версия: {versionName}
+      <br />
       <div
         css={`
           display: flex;
@@ -234,7 +235,7 @@ const Container = styled.div`
 `;
 
 const StyledSelect = styled(Select)`
-  width: 650px;
+  width: 450px;
   height: 50px;
   margin-top: 20px;
   .ant-select-selection-placeholder {

@@ -77,11 +77,11 @@ const ModOverview = ({
 
   const getPlaceholderText = () => {
     if (loadingFiles) {
-      return 'Loading files';
+      return 'Загрузка файлов...';
     } else if (files.length === 0 && !loadingFiles) {
-      return 'Mod not available';
+      return 'Модификация недоступна';
     } else {
-      return 'Select a version';
+      return 'Выберите версию';
     }
   };
 
@@ -94,7 +94,7 @@ const ModOverview = ({
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            [Stable]
+            [Релиз]
           </span>
         );
       case 2:
@@ -104,7 +104,7 @@ const ModOverview = ({
               color: ${props => props.theme.palette.colors.yellow};
             `}
           >
-            [Beta]
+            [Бета]
           </span>
         );
       case 3:
@@ -115,7 +115,7 @@ const ModOverview = ({
               color: ${props => props.theme.palette.colors.red};
             `}
           >
-            [Alpha]
+            [Альфа]
           </span>
         );
     }
@@ -143,21 +143,21 @@ const ModOverview = ({
                 {addon?.name}
                 <ParallaxContentInfos>
                   <div>
-                    <label>Author: </label>
+                    <label>Автор: </label>
                     {addon?.authors[0].name}
                   </div>
                   {addon?.downloadCount && (
                     <div>
-                      <label>Downloads: </label>
+                      <label>Скачиваний: </label>
                       {formatNumber(addon?.downloadCount)}
                     </div>
                   )}
                   <div>
-                    <label>Last Update: </label>{' '}
+                    <label>Обновлено: </label>{' '}
                     {formatDate(addon?.dateModified)}
                   </div>
                   <div>
-                    <label>MC version: </label>
+                    <label>Версия MC: </label>
                     {addon?.latestFilesIndexes[0]?.gameVersion}
                   </div>
                 </ParallaxContentInfos>
@@ -214,9 +214,8 @@ const ModOverview = ({
                   font-weight: 700;
                 `}
               >
-                The installed version of this mod has been removed from
-                CurseForge, so you will only be able to get it as part of legacy
-                modpacks.
+                Установленная версия этой модификации была удалена с сайта
+                CurseForge, поэтому вы не можете ее выбрать для новой сборки.
               </div>
             )}
           <StyledSelect
@@ -326,7 +325,7 @@ const ModOverview = ({
               setLoading(false);
             }}
           >
-            {installedData.fileID ? 'Switch Version' : 'Download'}
+            {installedData.fileID ? 'Изменить версию' : 'Загрузить'}
           </Button>
         </Footer>
       </>

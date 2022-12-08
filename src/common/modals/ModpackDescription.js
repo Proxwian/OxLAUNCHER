@@ -328,13 +328,14 @@ const ModpackDescription = ({
 export default React.memo(ModpackDescription);
 
 const StyledSelect = styled(Select)`
-  width: 650px;
+  width: 450px;
   height: 50px;
   .ant-select-selection-placeholder {
     height: 50px !important;
     line-height: 50px !important;
   }
   .ant-select-selector {
+    width: 350px;
     height: 50px !important;
     cursor: pointer !important;
   }

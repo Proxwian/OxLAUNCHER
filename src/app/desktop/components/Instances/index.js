@@ -9,8 +9,8 @@ const Container = styled.div`
   flex-wrap: wrap;
   width: 100%;
   margin-bottom: 2rem;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   left: 20px;
 `;
 
