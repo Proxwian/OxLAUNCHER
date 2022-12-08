@@ -190,7 +190,6 @@ const Instance = ({ instanceName }) => {
           };
         })
       );
-    console.log("projectId is "  + instance?.loader?.projectID)
     setFilesCache(mappedFiles);
     if (mappedFiles[0]?.id != null 
       && instance?.loader?.fileID != null 
