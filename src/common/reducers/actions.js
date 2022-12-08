@@ -28,6 +28,7 @@ import makeDir from 'make-dir';
 import { major, minor, patch, prerelease } from 'semver';
 import { generate as generateRandomString } from 'randomstring';
 import { XMLParser } from 'fast-xml-parser';
+import getInstances from '../../app/desktop/utils/getInstances';
 import * as ActionTypes from './actionTypes';
 import {
   ACCOUNT_MICROSOFT,
@@ -1024,6 +1025,12 @@ export function removeDownloadFromQueue(instanceName) {
       type: ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE,
       instanceName
     });
+    const instancesPath = _getInstancesPath(getState());
+    const instances = await getInstances(instancesPath);
+      dispatch({
+        type: ActionTypes.UPDATE_INSTANCES,
+        instances
+      });
   };
 }
 
@@ -2404,7 +2411,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         loaderType: instance.loader?.loaderType,
         mcVersion: newManifest.minecraft.version,
         loaderVersion,
-        fileID: instance.loader?.fileID,
+        fileID: newModpackData?.id,
         projectID: instance.loader?.projectID,
         source: instance.loader?.source
       };

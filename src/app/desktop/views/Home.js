@@ -81,8 +81,8 @@ const Home = () => {
 
   useEffect(() => {
     const init = async () => {
-		setInstalling(false);
-		setInitinstall(false);
+		// setInstalling(false);
+		// setInitinstall(false);
       //const appVersion = await ipcRenderer.invoke('getAppVersion');
       //if (lastUpdateVersion !== appVersion) {
         //dispatch(updateLastUpdateVersion(appVersion));
@@ -108,10 +108,7 @@ const Home = () => {
   const [modpack, setModpack] = useState([]);
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [installing, setInstalling] = useState(true);
-  const [initInstall, setInitinstall] = useState(true);
   const [error, setError] = useState(false);
-  const [step, setStep] = useState(false);
   const [version, setVersion] = useState(null);
   
   const imageURL = useMemo(() => {

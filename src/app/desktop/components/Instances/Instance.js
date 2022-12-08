@@ -168,7 +168,7 @@ const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
   const [filesCache, setFilesCache] = useState(false);
-  const [needUpdate, setNeedUpdate] = useState(false);
+  const [isNeedUpdate, setNeedUpdate] = useState(false);
   const [background, setBackground] = useState(`${instanceDefaultBackground}`);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
@@ -190,8 +190,15 @@ const Instance = ({ instanceName }) => {
           };
         })
       );
+    console.log("projectId is "  + instance?.loader?.projectID)
     setFilesCache(mappedFiles);
-    if (mappedFiles[0]?.id != null && instance?.loader?.fileID != null && mappedFiles[0]?.id != instance?.loader?.fileID) {
+    if (mappedFiles[0]?.id != null 
+      && instance?.loader?.fileID != null 
+      && mappedFiles[0]?.id != instance?.loader?.fileID
+      && instance?.loader?.projectID != null
+      && instance?.loader?.projectID != 0
+      && instance?.loader?.projectID != -1
+    ) {
       setNeedUpdate(true);
     } else {
       setNeedUpdate(false);
@@ -241,7 +248,8 @@ const Instance = ({ instanceName }) => {
     const finallyUpdate = await dispatch(
         changeModpackVersion(instanceName, mappedFiles[0])
       );
-    finallyUpdate;    
+    finallyUpdate;  
+    setNeedUpdate(false);  
   }
   const updatePack = () => {
     dispatch(openModal('InstanceManager', { instanceName: instanceName, openUpdater: true }));
@@ -256,13 +264,18 @@ const Instance = ({ instanceName }) => {
     dispatch(openModal('InstanceDuplicateName', { instanceName }));
   };
   const killProcess = () => {
-    console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
+      process.kill(isPlaying.pid);
       if (children?.length) {
         children.forEach(el => {
           if (el) {
             try {
               process.kill(el.PID);
+            } catch {
+              // No-op
+            }
+            try {
+              process.kill(el.PPID);
             } catch {
               // No-op
             }
@@ -283,7 +296,7 @@ const Instance = ({ instanceName }) => {
       <ContextMenuTrigger id={instanceName}>
         <Container
           css={`
-          filter: drop-shadow(0px ${needUpdate ? 8 : 0}px ${needUpdate ? 8 : 0}px aqua);
+          filter: drop-shadow(0px ${isNeedUpdate ? 8 : 0}px ${isNeedUpdate ? 8 : 0}px #007a41);
           `}
           
           installing={isInQueue}
@@ -379,16 +392,16 @@ const Instance = ({ instanceName }) => {
               Остановить
             </MenuItem>
           )}
-          {Boolean(needUpdate) && (
+          {Boolean(isNeedUpdate) && (
           <MenuItem disabled={Boolean(isInQueue)}
             css={`
-                  color: aqua;
+                  color: #007a41;
                   `}
             onClick={updateDatapack}>
             <FontAwesomeIcon
               icon={faSpinner}
               css={`
-                color: aqua;
+                color: #007a41;
                 margin-right: 10px;
                 width: 25px !important;
               `}
