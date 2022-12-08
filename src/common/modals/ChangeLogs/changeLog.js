@@ -11,6 +11,11 @@ module.exports = {
       header: 'Отображение окна Настроек клиента',
       content: 'перерисовано',
       advanced: { cm: '8ec97baa' }
+    },
+    {
+      header: 'Отображение главного экрана',
+      content: 'лаунчера',
+      advanced: { cm: '8ec97baa' }
     }
   ],
   bugfixes: [
