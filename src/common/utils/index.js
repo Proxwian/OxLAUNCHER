@@ -121,17 +121,17 @@ export const convertMinutesToHumanTime = minutes => {
     case weeks === 1:
       return `1 неделя`;
     case days >= 1:
-      return `${days} в, ${hours} ч, ${min} м`;
+      return `${days} дн., ${hours} ч., ${min} м.`;
     case hours >= 2:
-      return `${hours} ч, ${min} м`;
+      return `${hours} ч., ${min} м.`;
     case hours === 1:
       return `1 час`;
     case minutes >= 2:
-      return `${min} мин`;
+      return `${min} мин.`;
     case minutes === 1:
-      return `1 мин`;
+      return `1 мин.`;
     case minutes === 0:
-      return '0 мин';
+      return '0 мин.';
     default:
       return '';
   }
