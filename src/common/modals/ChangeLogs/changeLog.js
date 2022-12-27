@@ -13,12 +13,22 @@ module.exports = {
       advanced: { cm: '8ec97baa' }
     },
     {
+      header: 'Отображение карточки загрузки',
+      content: 'клиента',
+      advanced: { cm: '8ec97baa' }
+    },
+    {
       header: 'Отображение главного экрана',
       content: 'лаунчера',
       advanced: { cm: '8ec97baa' }
     }
   ],
   bugfixes: [
+    {
+      header: 'Загрузка модификаций',
+      content: 'через браузер.',
+      advanced: { cm: '8ec97baa', pr: '1382' }
+    },
     {
       header: 'Вылет из профиля',
       content: 'при перезапуске приложения.',
