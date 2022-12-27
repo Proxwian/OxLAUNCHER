@@ -675,19 +675,23 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
   try {
     // eslint-disable-next-line no-loop-func
     await new Promise((resolve, reject) => {
+      const mainDownloadPage = url;
+      const mirrorDownloadPage = `https://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
+
       win.webContents.session.webRequest.onCompleted(
-        { urls: [url] },
+        { urls: [mirrorDownloadPage] },
         details => {
-          if (details.statusCode === 404) {
-            mainWindow.webContents.send('opted-out-download-mod-status', {
-              error: new Error('Error 404, Mod page not found')
-            });
-            reject();
+          log.log('Trying to download from mirror ' + mirrorDownloadPage);
+          if (details.statusCode == 404) {
+            log.log('Failed. loading from main link: ' + mainDownloadPage);
+            win.loadURL(mainDownloadPage, { userAgent });
+          } else {
+            resolve();
           }
         }
       );
+      win.loadURL(mirrorDownloadPage, { userAgent });
 
-      win.loadURL(url, { userAgent });
       cleanupFn = async err => {
         reject(new Error(err));
         // eslint-disable-next-line promise/param-names
@@ -772,23 +776,28 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
     try {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
-        const urlDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
+        const mainDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
+        const mirrorDownloadPage = `https://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
 
         win.webContents.session.webRequest.onCompleted(
-          { urls: [urlDownloadPage] },
+          { urls: [mirrorDownloadPage] },
           details => {
-            if (details.statusCode === 404) {
+            log.log('trying to download from mirror: ' + mirrorDownloadPage);
+            if (details.statusCode == 404) {
+              log.log('failed. loading from main link: ' + mainDownloadPage);
+              win.loadURL(mainDownloadPage, { userAgent });
+            } else {
               resolve();
               mainWindow.webContents.send('opted-out-download-mod-status', {
                 modId: modManifest.id,
                 error: false,
-                warning: true
+                warning: false
               });
             }
           }
         );
+        win.loadURL(mirrorDownloadPage, { userAgent });
 
-        win.loadURL(urlDownloadPage, { userAgent });
         cleanupFn = async err => {
           reject(new Error(err));
           // eslint-disable-next-line promise/param-names
