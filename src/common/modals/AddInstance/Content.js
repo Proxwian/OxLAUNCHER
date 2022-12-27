@@ -152,7 +152,7 @@ const Content = ({
                 bottom: 20px;
                 right: 20px;
                 opacity: ${props =>
-                  props.page === 0 || props.page === 2 ? 1 : 0};
+                  props.page === 1 || props.page === 4 ? 1 : 0};
               `}
             >
               <div
