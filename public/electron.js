@@ -271,9 +271,9 @@ patchSevenZip();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 900,
+    width: 1000,
     height: 600,
-    minWidth: 700,
+    minWidth: 618,
     minHeight: 450,
     show: true,
     frame: false,
