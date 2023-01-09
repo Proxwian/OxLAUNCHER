@@ -682,11 +682,9 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
         { urls: [mirrorDownloadPage] },
         details => {
           log.log('Trying to download from mirror ' + mirrorDownloadPage);
-          if (details.statusCode == 404) {
+          if (details.statusCode === 404) {
             log.log('Failed. loading from main link: ' + mainDownloadPage);
             win.loadURL(mainDownloadPage, { userAgent });
-          } else {
-            resolve();
           }
         }
       );
@@ -783,16 +781,9 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
           { urls: [mirrorDownloadPage] },
           details => {
             log.log('trying to download from mirror: ' + mirrorDownloadPage);
-            if (details.statusCode == 404) {
+            if (details.statusCode === 404) {
               log.log('failed. loading from main link: ' + mainDownloadPage);
               win.loadURL(mainDownloadPage, { userAgent });
-            } else {
-              resolve();
-              mainWindow.webContents.send('opted-out-download-mod-status', {
-                modId: modManifest.id,
-                error: false,
-                warning: false
-              });
             }
           }
         );
