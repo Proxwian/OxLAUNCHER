@@ -125,7 +125,7 @@ const commonConfig = {
     generateUpdatesFilesForAllChannels: true,
     npmRebuild: false,
     productName: 'OxLAUNCHER',
-    appId: 'org.gorilladevs.GDLauncher',
+    appId: 'com.proxwian.OxLauncher',
     files: [
       '!node_modules/**/*',
       'build/**/*',
@@ -182,9 +182,9 @@ const commonConfig = {
     },
     protocols: [
       {
-        name: 'gdlauncher',
+        name: 'oxlauncher',
         role: 'Viewer',
-        schemes: ['gdlauncher']
+        schemes: ['oxlauncher']
       }
     ]
   },

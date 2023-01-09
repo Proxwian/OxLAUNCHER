@@ -221,7 +221,7 @@ const InstancesMigration = () => {
             color: ${props => props.theme.palette.text.secondary};
           `}
         >
-          Please, do NOT close GDLauncher.
+          Пожалуйста, не закрывайте OxLAUNCHER.
         </div>
         <div
           css={`
