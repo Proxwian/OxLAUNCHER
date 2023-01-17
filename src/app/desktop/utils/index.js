@@ -81,6 +81,21 @@ export const convertOSToJavaFormat = ElectronFormat => {
   }
 };
 
+export const convertArchToJavaFormat = ElectronFormat => {
+  switch (ElectronFormat) {
+    case 'x64':
+      return 'x64';
+    case 'ia32':
+      return 'x32';
+    case 'arm':
+      return 'arm';
+    case 'arm64':
+      return 'aarch64';
+    default:
+      return false;
+  }
+};
+
 export const skipLibrary = lib => {
   let skip = false;
   if (lib.rules) {
