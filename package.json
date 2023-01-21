@@ -14,11 +14,11 @@
     "webpack"
   ],
   "bugs": {
-    "url": "https://github.com/gorilla-devs/GDLauncher/issues"
+    "url": "https://github.com/Proxwian/OxLAUNCHER/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gorilla-devs/GDLauncher.git"
+    "url": "git+https://github.com/Proxwian/OxLAUNCHER.git"
   },
   "license": "GPL-3.0",
   "author": {
@@ -123,7 +123,7 @@
     "dotenv": "^10.0.0",
     "electron": "^19.0.4",
     "electron-builder": "^23.0.3",
-    "electron-updater": "^5.0.1",
+    "electron-updater": "^5.0.4",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.3.0",
