@@ -79,7 +79,7 @@ const UpdateButton = ({ isAppImage }) => {
       onClick={() => {
         if (isAppImage || isWindows) {
           dispatch(openModal('AutoUpdatesNotAvailable'));
-          ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+          //ipcRenderer.invoke('installUpdateAndQuitOrRestart');
         } else {
           dispatch(openModal('AutoUpdatesNotAvailable'));
         }
