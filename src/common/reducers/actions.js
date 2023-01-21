@@ -3672,7 +3672,7 @@ export const initLatestMods = instanceName => {
 
 export const isNewVersionAvailable = async () => {
   const { data: latestReleases } = await axios.get(
-    'https://api.github.com/repos/gorilla-devs/GDLauncher/releases?per_page=10'
+    'https://api.github.com/repos/Proxwian/OxLAUNCHER/releases?per_page=10'
   );
 
   const latestPrerelease = latestReleases.find(v => v.prerelease);
@@ -3684,12 +3684,13 @@ export const isNewVersionAvailable = async () => {
 
   try {
     const rChannel = await fs.readFile(
-      path.join(appData, 'gdlauncher_next', 'rChannel')
+      path.join(appData, 'oxlauncher', 'rChannel')
     );
     releaseChannel = parseInt(rChannel.toString(), 10);
   } catch {
     // swallow error
   }
+
 
   const v = await ipcRenderer.invoke('getAppVersion');
 
@@ -3728,7 +3729,7 @@ export const checkForPortableUpdates = () => {
 
     // Latest version has a value only if the user is not using the latest
     if (newVersion) {
-      const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${newVersion?.tag_name}`;
+      const baseAssetUrl = `https://github.com/Proxwian/OxLAUNCHER/releases/download/${newVersion?.tag_name}`;
       const { data: latestManifest } = await axios.get(
         `${baseAssetUrl}/${process.platform}_latest.json`
       );

@@ -83,19 +83,19 @@ const Home = () => {
     const init = async () => {
 		// setInstalling(false);
 		// setInitinstall(false);
-      //const appVersion = await ipcRenderer.invoke('getAppVersion');
-      //if (lastUpdateVersion !== appVersion) {
-        //dispatch(updateLastUpdateVersion(appVersion));
-        //dispatch(openModal('ChangeLogs'));
-      //}
-      /*try {
+      const appVersion = await ipcRenderer.invoke('getAppVersion');
+      if (lastUpdateVersion !== appVersion) {
+        dispatch(updateLastUpdateVersion(appVersion));
+        dispatch(openModal('ChangeLogs'));
+      }
+      try {
         const { data } = await axios.get(
-          'https://api.gdlauncher.com/announcement'
+          'https://raw.githubusercontent.com/Proxwian/OxLAUNCHER/master/announcement.md'
         );
         setAnnoucement(data || null);
       } catch (e) {
         console.log('No announcement to show');
-      }*/
+      }
     };
 
     init();

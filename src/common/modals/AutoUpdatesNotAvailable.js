@@ -9,17 +9,17 @@ const AutoUpdatesNotAvailable = () => {
         height: 200px;
         width: 400px;
       `}
-      title="Auto Updates Not Available"
+      title="Доступно обновление лаунчера"
     >
       <Container>
-        <div>Auto updates are not available on this platform.</div>
+        <div></div>
         <div
           css={`
             margin-top: 20px;
           `}
         >
-          Please, update GDLauncher through your package manager or download the
-          new version from our website <a href="https://gdevs.io">here</a>
+          Для OxLAUNCHER вышло обновление! Пожалуйста, загрузите его с 
+          <a href="https://oxlauncher.online"> официального сайта</a>
         </div>
       </Container>
     </Modal>

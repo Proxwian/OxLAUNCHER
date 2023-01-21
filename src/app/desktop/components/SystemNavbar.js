@@ -78,6 +78,7 @@ const UpdateButton = ({ isAppImage }) => {
     <TerminalButton
       onClick={() => {
         if (isAppImage || isWindows) {
+          dispatch(openModal('AutoUpdatesNotAvailable'));
           ipcRenderer.invoke('installUpdateAndQuitOrRestart');
         } else {
           dispatch(openModal('AutoUpdatesNotAvailable'));
@@ -102,10 +103,12 @@ const SystemNavbar = () => {
   const checkForUpdates = async () => {
     const isAppImageVar = await ipcRenderer.invoke('isAppImage');
     setIsAppImage(isAppImageVar);
+    console.log("checkForUpdates: start!");
     if (
       process.env.REACT_APP_RELEASE_TYPE === 'setup' &&
       (isAppImageVar || process.platform === 'win32')
     ) {
+      console.log("checkForUpdates: ipcRenderer...");
       ipcRenderer.invoke('checkForUpdates');
       ipcRenderer.on('updateAvailable', () => {
         dispatch(updateUpdateAvailable(true));
@@ -114,10 +117,12 @@ const SystemNavbar = () => {
       process.platform === 'win32' &&
       process.env.REACT_APP_RELEASE_TYPE !== 'setup'
     ) {
+      console.log("checkForUpdates: checkPortableUpdates...");
       dispatch(checkForPortableUpdates())
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
+      console.log("checkForUpdates: check isNewVersionAvailable...");
       isNewVersionAvailable()
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
@@ -138,8 +143,7 @@ const SystemNavbar = () => {
   }, []);
 
   useEffect(() => {
-    return;
-    if (process.env.NODE_ENV === 'development') return;
+    //if (process.env.NODE_ENV === 'development') return;
     setTimeout(() => {
       checkForUpdates();
       setInterval(() => {
@@ -183,7 +187,7 @@ const SystemNavbar = () => {
             {!isLocation('/') && !isLocation('/onboarding') && (
               <SettingsButton />
             )}
-            
+             {isUpdateAvailable && <UpdateButton isAppImage={isAppImage} />}
           </div>
         </>
       )}
