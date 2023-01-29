@@ -178,17 +178,19 @@ const OptedOutModsList = ({
       title="Загрузка сторонних модов"
     >
       <Container>
-        <div
-          css={`
-            text-align: left;
-            margin-bottom: 2rem;
-          `}
-        >
-		  Часть модов из сборки необходимо скачать через внутренний браузер.
-		  Не переживайте, это произойдёт автоматически. Нажмите "Продолжить",
-		  и подождите, пока все загрузки завершатся! Пожалуйста, не нажимайте
-		  ничего внутри браузера - процесс автоматический.
-        </div>
+        {!cloudflareBlock && (
+          <div
+            css={`
+              text-align: left;
+              margin-bottom: 2rem;
+            `}
+          >
+            Часть модов из сборки необходимо скачать через внутренний браузер.
+            Не переживайте, это произойдёт автоматически. Нажмите "Продолжить",
+            и подождите, пока все загрузки завершатся! Пожалуйста, не нажимайте
+            ничего внутри браузера - процесс автоматический.
+          </div>
+        )}
         <ModsContainer>
           {optedOutMods &&
             optedOutMods.map(mod => (
@@ -200,6 +202,18 @@ const OptedOutModsList = ({
               />
             ))}
         </ModsContainer>
+        {cloudflareBlock && (
+          <p
+            css={`
+              margin: 20px auto 0 auto;
+            `}
+          >
+            Cloudflare заблокировал траффик из вашей сети. Вы можете загрузить
+            модификации вручную и поместить их в папку mods. Используйте кнопки
+            Загрузить напротив незагруженных модификаций выше, и кнопку ниже,
+            чтобы открыть папку с игрой.
+          </p>
+        )}
         <div
           css={`
             display: flex;
@@ -213,7 +227,9 @@ const OptedOutModsList = ({
           <Button
             danger
             type="text"
-            disabled={downloading || loadedMods.length !== 0}
+            disabled={
+              (missingMods.length > 0 && !cloudflareBlock) || downloading
+            }
             onClick={() => {
               dispatch(closeModal());
               setTimeout(
@@ -249,6 +265,7 @@ const OptedOutModsList = ({
                   mods: optedOutMods,
                   instancePath
                 });
+                setDownloading(false);
               }}
               css={`
                 background-color: ${props => props.theme.palette.colors.green};

@@ -8,7 +8,7 @@ import {
   removeDownloadFromQueue,
   updateInstanceConfig
 } from '../reducers/actions';
-import { closeModal } from '../reducers/modals/actions';
+import { openModal, closeModal } from '../reducers/modals/actions';
 import { _getInstancesPath, _getTempPath } from '../utils/selectors';
 import { rollBackInstanceZip } from '../utils';
 
@@ -28,7 +28,15 @@ const InstanceDownloadFailed = ({
       ? `${instanceName.substring(0, 20)}...`
       : instanceName;
 
-  const cancelDownload = async () => {
+  const deleteDownload = async () => {
+    await dispatch(removeDownloadFromQueue(instanceName, true));
+
+    dispatch(closeModal());
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    dispatch(openModal('InstanceDeleteConfirmation', { instanceName }));
+  };
+
+  const restoreDownload = async () => {
     await dispatch(removeDownloadFromQueue(instanceName, true));
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -64,7 +72,7 @@ const InstanceDownloadFailed = ({
       title={`Ошибка загрузки - ${ellipsedName}`}
     >
       <div>
-        Загрузка {instanceName} не удалась.
+        Загрузкаs {instanceName} не удалась.
         <div
           css={`
             background: ${props => props.theme.palette.grey[900]};
@@ -87,11 +95,21 @@ const InstanceDownloadFailed = ({
           <Button
             variant="contained"
             color="primary"
-            onClick={cancelDownload}
-            loading={loading}
+            onClick={deleteDownload}
+            disabled={loading}
           >
             Отмена
           </Button>
+          {isUpdate && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={restoreDownload}
+              loading={loading}
+            >
+              Restore instance
+            </Button>
+          )}
           <Button danger type="primary" onClick={retry} disabled={loading}>
             Повторить загрузку
           </Button>
