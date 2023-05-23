@@ -29,7 +29,7 @@ const calcError = code => {
     case 12:
       return 'Invalid Debug Argument';
     default:
-      return code > 128 ? 'Signal Exits' : 'Unknown Error';
+      return code > 128 ? 'Ошибка проверки файлов клиента' : 'Unknown Error';
   }
 };
 
@@ -50,7 +50,7 @@ const InstanceCrashed = ({ code, errorLogs }) => {
   return (
     <Modal
       css={`
-        height: 450px;
+        height: 300px;
         width: 500px;
       `}
       title="Не удалось запустить сборку :("
@@ -60,7 +60,7 @@ const InstanceCrashed = ({ code, errorLogs }) => {
           <Logo size={100} />
           <h3>
             ОЙ-ОЙ-ОЙ!
-            <br /> Крипер взорвал ваш клиент снова
+            <br /> Произошла фатальная ошибка, игра была закрыта
           </h3>
         </InnerContainer>
         <Card
@@ -73,7 +73,8 @@ const InstanceCrashed = ({ code, errorLogs }) => {
           <h3>код: </h3>
           <ErrorContainer>{code}</ErrorContainer>
         </Card>
-        <Collapse
+        <div>Убедитесь, что сборка была загружена без ошибок, а также установлены свежие драйвера для видеокарты. <a href="https://oxlauncher.online/link/discord/">Нужна помощь?</a><br/><br/></div>
+        {/* <Collapse
           css={`
             width: 100%;
           `}
@@ -89,7 +90,7 @@ const InstanceCrashed = ({ code, errorLogs }) => {
                   align-items: center;
                 `}
               >
-                Error Log &nbsp;
+                Лог ошибки (неполный) &nbsp;
                 <Tooltip title={copiedLog ? 'Copied' : 'Copy'} placement="top">
                   <div
                     css={`
@@ -113,7 +114,7 @@ const InstanceCrashed = ({ code, errorLogs }) => {
               {errorLogs}
             </p>
           </Panel>
-        </Collapse>
+        </Collapse> */}
       </Container>
     </Modal>
   );
