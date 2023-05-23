@@ -1,17 +1,22 @@
 module.exports = {
   new: [
-    {
-      header: 'Кнопка обновления лаунчера',
-      content: '',
-      advanced: { cm: '8ec97baa' }
-    }
+    // {
+    //   header: 'Кнопка обновления лаунчера',
+    //   content: '',
+    //   advanced: { cm: '8ec97baa' }
+    // }
   ],
   improvements: [
-    // {
-    //   header: 'Отображение окна Настроек клиента',
-    //   content: 'перерисовано',
-    //   advanced: { cm: '8ec97baa' }
-    // },
+    {
+      header: 'Отображение подробностей ошибок',
+      content: 'загрузки клиента'
+      // advanced: { cm: '8ec97baa' }
+    },
+    {
+      header: 'Отображение подробностей ошибок',
+      content: 'запуска игры'
+      // advanced: { cm: '8ec97baa' }
+    }
     // {
     //   header: 'Отображение карточки загрузки',
     //   content: 'клиента',
@@ -24,11 +29,11 @@ module.exports = {
     // }
   ],
   bugfixes: [
-    // {
-    //   header: 'Загрузка модификаций',
-    //   content: 'через браузер.',
-    //   advanced: { cm: '8ec97baa', pr: '1382' }
-    // },
+    {
+      header: 'Поддержка символа "_"',
+      content: 'в нике игрока.',
+      // advanced: { cm: '8ec97baa', pr: '1382' }
+    }
     // {
     //   header: 'Вылет из профиля',
     //   content: 'при перезапуске приложения.',
