@@ -75,10 +75,10 @@ const InstanceDownloadFailed = ({
           {'> '}
           {error.toString()}
         </div>
-        <div>Как поступим?</div>
+        <div>Похоже, подключение оборвалось. Такое бывает, если провайдер ограничивает число подключений к серверам Forge. Рекомендуем установить VPN для загрузки клиента. Если же у вас просто пропал интернет, можете попробовать скачать игру заново.</div>
         <div
           css={`
-            margin-top: 50px;
+            margin-top: 10px;
             display: flex;
             width: 100%;
             justify-content: space-between;
