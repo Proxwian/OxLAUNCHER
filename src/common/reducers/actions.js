@@ -453,7 +453,7 @@ export function downloadJavaLegacyFixer() {
 }
 
 function lettersNumbersDashes(str) {
-  return /^[A-Za-z0-9-]*$/.test(str);
+  return /^[A-Za-z0-9_]*$/.test(str);
 }
 
 export function login(username, redirect = true, pushHome = false) {
