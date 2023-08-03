@@ -546,6 +546,44 @@ const General = () => {
             v {version}
           </div>
         </div>
+        <p>
+          {updateAvailable
+            ? 'Доступно обновление лаунчера. Нажмите на кнопку Обновить, чтобы загрузить актуальную версию лаунчера'
+            : 'У вас установлена актуальная версия лаунчера.'}
+        </p>
+        <div
+          css={`
+            margin-top: 20px;
+            height: 36px;
+            display: flex;
+            flex-direction: row;
+          `}
+        >
+          {updateAvailable ? (
+            <Button
+              onClick={() =>
+                ipcRenderer.invoke('installUpdateAndQuitOrRestart')
+              }
+              css={`
+                margin-right: 10px;
+              `}
+              type="primary"
+            >
+              Обновить &nbsp;
+              <FontAwesomeIcon icon={faDownload} />
+            </Button>
+          ) : (
+            <div
+              css={`
+                width: 96px;
+                height: 36px;
+                padding: 6px 8px;
+              `}
+            >
+              Нет обновлений
+            </div>
+          )}
+        </div>
       </LauncherVersion>
     </>
   );

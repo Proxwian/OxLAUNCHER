@@ -774,7 +774,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
     try {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
-        const mainDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
+        const mainDownloadPage = `${addon.links.websiteUrl}.com/download/${modManifest.id}`;
         const mirrorDownloadPage = `https://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
 
         win.webContents.session.webRequest.onCompleted(
@@ -828,6 +828,11 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
         mainWindow.webContents.send('opted-out-download-mod-status', {
           modId: modManifest.id,
           error: false
+        });
+      } else {
+        mainWindow.webContents.send('opted-out-download-mod-status', {
+          modId: modManifest.id,
+          error: true
         });
       }
     } catch (err) {
@@ -890,8 +895,8 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     !allowUnstableReleases && app.getVersion().includes('beta');
   autoUpdater.allowPrerelease = allowUnstableReleases;
   autoUpdater.setFeedURL({
-    owner: 'gorilla-devs',
-    repo: 'GDLauncher',
+    owner: 'proxwian',
+    repo: 'OxLAUNCHER',
     provider: 'github'
   });
 
