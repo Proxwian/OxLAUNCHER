@@ -117,7 +117,7 @@ const OptedOutModsList = ({
     const listener = () => {
       dispatch(closeModal());
       setTimeout(() => {
-        reject('Download window closed unexpectedly');
+        reject('Окно загрузки было неожиданно закрыто');
       }, 300);
     };
 
