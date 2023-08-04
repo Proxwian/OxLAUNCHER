@@ -774,30 +774,31 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
     try {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
-        const mainDownloadPage = `${addon.links.websiteUrl}.com/download/${modManifest.id}`;
+        const mainDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
         const mirrorDownloadPage = `https://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
 
-        win.webContents.session.webRequest.onCompleted(
-          { urls: [mirrorDownloadPage] },
-          details => {
-            log.log('trying to download from mirror: ' + mirrorDownloadPage);
-            if (details.statusCode === 404) {
-              log.log('failed. loading from main link: ' + mainDownloadPage);
-              win.loadURL(mainDownloadPage, { userAgent });
-            }
-          }
-        );
+        let mirrorChecked = false;
 
         win.webContents.session.webRequest.onCompleted(
-          { urls: [mainDownloadPage] },
+          { urls: [mainDownloadPage, mirrorDownloadPage] },
           details => {
+            if (!mirrorChecked) {
+              log.log('trying to download from mirror: ' + mirrorDownloadPage);
+            }
             if (details.statusCode === 404) {
-              resolve();
-              mainWindow.webContents.send('opted-out-download-mod-status', {
-                modId: modManifest.id,
-                error: false,
-                warning: true
-              });
+              if (mirrorChecked) {
+                resolve();
+                mainWindow.webContents.send('opted-out-download-mod-status', {
+                  modId: modManifest.id,
+                  error: false,
+                  warning: true
+                });
+              } else {
+                mirrorChecked = true;
+                log.log('failed. loading from main link: ' + mainDownloadPage);
+                win.loadURL(mainDownloadPage, { userAgent });
+              }
+
             } else if (details.statusCode > 400) {
               /**
                * Check for Cloudflare blocking automated downloads.
@@ -846,6 +847,8 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
             }
           }
         );
+
+        win.loadURL(mirrorDownloadPage, { userAgent });
 
         cleanupFn = async err => {
           reject(new Error(err));
