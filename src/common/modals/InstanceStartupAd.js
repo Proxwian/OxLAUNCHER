@@ -48,13 +48,23 @@ const InstanceStartupAd = ({ instanceName }) => {
             margin-top: 20px;
           `}
         >
-          Ваша сборка запускается....
+          Запускаю Minecraft....
           <LoadingOutlined
             css={`
               margin-left: 30px;
               font-size: 50px;
             `}
           />
+           <div
+              css={`
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                text-align: center;
+              `}
+            >
+              <a href="https://mineserv.top/oxfortpack" target="_blank" rel="noopener noreferrer" data-project="1955" class="mn-srv-btn mn-srv-btn--online"><span class="mn-srv-btn__icon"><span><svg viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-dasharray="14.0625, 100"></path></svg> <span>9</span></span></span> <span class="mn-srv-btn__text"><span>MineAdventure 🔥 320 модов без ограничений</span> <p>Игроков 9 из 64</p></span></a><script src="https://mineserv.top/widgets.js"></script>
+            </div>
         </span>
       </div>
     </Modal>
