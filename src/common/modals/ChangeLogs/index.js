@@ -141,7 +141,7 @@ const ChangeLogs = () => {
     <Modal
       css={`
         height: 550px;
-        width: 475px;
+        width: 375px;
       `}
       title={`Что нового в ${version}`}
       removePadding
