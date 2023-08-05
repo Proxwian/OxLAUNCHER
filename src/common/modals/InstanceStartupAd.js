@@ -58,7 +58,9 @@ const InstanceStartupAd = ({ instanceName }) => {
                 text-align: center;
               `}
             >
-              <a href="https://mineserv.top/oxfortpack" target="_blank" rel="noopener noreferrer" data-project="1955" class="mn-srv-btn mn-srv-btn--online"><span class="mn-srv-btn__icon"><span><svg viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-dasharray="14.0625, 100"></path></svg> <span>9</span></span></span> <span class="mn-srv-btn__text"><span>MineAdventure 🔥 320 модов без ограничений</span> <p>Игроков 9 из 64</p></span></a><script src="https://mineserv.top/widgets.js"></script>
+              <link rel="stylesheet" href="https://mineserv.top/widgets.min.css"/> 
+              <a href="https://mineserv.top/oxfortpack" target="_blank" rel="noopener noreferrer" class="mn-srv-btn mn-srv-btn--small">
+                <span class="mn-srv-btn__icon"><svg width="16" height="16" viewBox="0 0 360 360"><g fill="none" fill-rule="evenodd"><path d="M0 0H360V360H0z" transform="translate(-371 -350) translate(371 350)"></path> <g fill="#FFF"><path d="M253.844 259.461L253.844.539 203.075.539 203.065 52.329 152.307 52.324 152.307 104.108 203.065 104.108 203.075 259.461zM152.307 156.432L152.307 104.647 101.538 104.647 101.538 156.432zM50.769.539L0 .539 0 259.461 50.769 259.461 50.769 104.108 101.538 104.108 101.538 52.324 50.769 52.324z" transform="translate(-371 -350) translate(371 350) translate(53 50)"></path></g></g></svg></span> <span class="mn-srv-btn__text">MineAdventure | OxFORTPACK Online</span></a>
             </div>
       </div>
     </Modal>
