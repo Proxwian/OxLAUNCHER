@@ -17,7 +17,7 @@ const SocialButtons = () => {
         justify-content: space-between;
         margin-right: 30px;
         a {
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0,0,0,1);
         }
         div {
           width: 28px;

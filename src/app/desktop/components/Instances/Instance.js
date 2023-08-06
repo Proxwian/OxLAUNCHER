@@ -86,7 +86,7 @@ const InstanceContainer = styled.div`
   font-size: 20px;
   overflow: hidden;
   height: 100%;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+  background: linear-gradient(0deg, rgba(60, 60, 60, 0.6), rgba(42, 42, 42, 0.6)),
     url('${props => props.background}') center no-repeat;
   background-position: center;
   color: ${props => props.theme.palette.text.secondary};
@@ -295,7 +295,7 @@ const Instance = ({ instanceName }) => {
       <ContextMenuTrigger id={instanceName}>
         <Container
           css={`
-          filter: drop-shadow(0px ${isNeedUpdate ? 8 : 0}px ${isNeedUpdate ? 8 : 0}px #007a41);
+          filter: drop-shadow(0px ${isNeedUpdate ? 8 : 0}px ${isNeedUpdate ? 8 : 0}px #6D4D52);
           `}
           
           installing={isInQueue}
@@ -394,13 +394,13 @@ const Instance = ({ instanceName }) => {
           {Boolean(isNeedUpdate) && (
           <MenuItem disabled={Boolean(isInQueue)}
             css={`
-                  color: #007a41;
+                  color: #6D4D52;
                   `}
             onClick={updateDatapack}>
             <FontAwesomeIcon
               icon={faSpinner}
               css={`
-                color: #007a41;
+                color: #6D4D52;
                 margin-right: 10px;
                 width: 25px !important;
               `}

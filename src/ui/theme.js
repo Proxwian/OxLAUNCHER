@@ -6,13 +6,13 @@ module.exports = {
     },
     primary: {
       light: '#5a8e91',
-      main: '#356e75',
+      main: '#6D4D52',
       dark: '#2a5d66'
     },
     secondary: {
       light: '#546d6b',
-      main: '#1b3329',
-      dark: '#04160a'
+      main: '#283332',
+      dark: '#161B1C'
     },
     error: {
       light: '#DE6967',
@@ -26,10 +26,10 @@ module.exports = {
       300: '#7b918e',
       400: '#677f7c',
       500: '#546d6b',
-      600: '#2d4949',
-      700: '#1b3133',
-      800: '#112428',
-      900: '#04160a'
+      600: '#3C4C4A',
+      700: '#283332',
+      800: '#161B1C',
+      900: '#161B1C'
     },
     colors: {
       red: '#D64441',
@@ -48,8 +48,8 @@ module.exports = {
       disabled: 'rgba(255, 255, 255, 0.38)',
       hint: 'rgba(255, 255, 255, 0.38)',
       primary: '#E1E2E4',
-      secondary: '#D2D4D6',
-      third: '#979CA1',
+      secondary: '#fffff3',
+      third: '#D2D4D5',
       icon: '#F0F0F1'
     },
     type: 'dark'
