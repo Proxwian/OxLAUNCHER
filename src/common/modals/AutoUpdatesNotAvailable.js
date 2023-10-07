@@ -19,7 +19,7 @@ const AutoUpdatesNotAvailable = () => {
           `}
         >
           Для OxLAUNCHER вышло обновление! Пожалуйста, загрузите его с 
-          <a href="https://oxlauncher.online"> официального сайта</a>
+          <a href="http://oxlauncher.online"> официального сайта</a>
         </div>
       </Container>
     </Modal>

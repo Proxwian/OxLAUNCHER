@@ -676,7 +676,7 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
     // eslint-disable-next-line no-loop-func
     await new Promise((resolve, reject) => {
       const mainDownloadPage = url;
-      const mirrorDownloadPage = `https://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
+      const mirrorDownloadPage = `http://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
 
       win.webContents.session.webRequest.onCompleted(
         { urls: [mirrorDownloadPage] },
@@ -775,7 +775,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
         const mainDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
-        const mirrorDownloadPage = `https://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
+        const mirrorDownloadPage = `http://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
 
         let mirrorChecked = false;
 
