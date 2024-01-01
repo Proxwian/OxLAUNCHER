@@ -89,7 +89,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
               </div>
               <div>
                 Изменение вида загрузчика модификаций (Forge, Fabric, Quilt)
-                приведёт к потере данных установленных модов.
+                приведёт к потере данных установленных модификаций.
               </div>
             </div>
           )}

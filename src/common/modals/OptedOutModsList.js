@@ -199,7 +199,7 @@ const OptedOutModsList = ({
           300
         );
       }}
-      title="Загрузка сторонних модов"
+      title="Загрузка сторонних модификаций"
     >
       <Container>
         {!cloudflareBlock && (
@@ -237,7 +237,7 @@ const OptedOutModsList = ({
               margin: 20px auto 0 auto;
             `}
           >
-            Cloudflare заблокировал траффик из вашей сети. Вы можете загрузить
+            Cloudflare заблокировал трафик из вашей сети. Вы можете загрузить
             модификации вручную и поместить их в папку mods. Используйте кнопки
             Загрузить напротив незагруженных модификаций выше, и кнопку ниже,
             чтобы открыть папку с игрой.
@@ -330,7 +330,21 @@ const OptedOutModsList = ({
                   background-color: ${props => props.theme.palette.colors.blue};
                 `}
               >
-                Open folder
+                Открыть папку
+              </Button>
+              <Button
+                type="primary"
+                disabled={downloading}
+                onClick={() => {
+                  for (const index in manualDownloadUrls) {
+                    window.open(`${optedOutMods[0].addon.links.websiteUrl}/download/${manualDownloadUrls[index]}`);
+                  }
+                }}
+                css={`
+                  background-color: ${props => props.theme.palette.colors.blue};
+                `}
+              >
+                Открыть все ссылки
               </Button>
               <Button
                 type="primary"
@@ -341,10 +355,10 @@ const OptedOutModsList = ({
                 }}
                 css={`
                   background-color: ${props =>
-                    props.theme.palette.colors.green};
+                    props.theme.palette.colors.orange};
                 `}
               >
-                Continue
+                Продолжить
               </Button>
             </>
           )}

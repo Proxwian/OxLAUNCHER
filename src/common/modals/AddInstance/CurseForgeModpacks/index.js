@@ -178,7 +178,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                   margin-top: 70px;
                 `}
               >
-                Мы ничего не нашли по заданным фильтрам...
+                Я ничего не нашёл по заданным фильтрам...
               </div>
             </div>
           ) : (
@@ -216,7 +216,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                 margin-top: 70px;
               `}
             >
-              Произошла ошибка при загрузке списка модов...
+              Произошла ошибка при загрузке списка модификаций...
             </div>
           </div>
         )}

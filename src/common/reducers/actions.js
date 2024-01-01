@@ -1639,7 +1639,7 @@ export function processFTBManifest(instanceName) {
     const files = allFiles.filter(v => v.url && v.url !== '');
     const CFFiles = allFiles.filter(v => !v.url || v.url === '');
 
-    dispatch(updateDownloadStatus(instanceName, 'Загружаем CF файлы...'));
+    dispatch(updateDownloadStatus(instanceName, 'Загружаю CF файлы...'));
     const addonsHashmap = {};
     const addonsFilesHashmap = {};
 
@@ -2160,7 +2160,7 @@ export function downloadInstance(instanceName) {
         }
       }
 
-      dispatch(updateDownloadStatus(instanceName, 'Скачиваем файлы игры...'));
+      dispatch(updateDownloadStatus(instanceName, 'Скачиваю файлы игры...'));
 
       const mcVersion = loader?.mcVersion;
 
@@ -2481,7 +2481,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Синхронизируем модификации. ${queueLength} осталось.`,
+            content: `Синхронизирую модификации. ${queueLength} осталось.`,
             duration: 0
           })
         );
@@ -2492,7 +2492,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Синхронизируем модификации. ${queueLength} осталось.`,
+            content: `Синхронизирую модификации. ${queueLength} осталось.`,
             duration: 0
           })
         );

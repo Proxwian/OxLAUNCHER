@@ -1,3 +1,3 @@
 # OxLAUNCHER
 
-Latest version: 1.3.1
+Latest version: 1.3.3

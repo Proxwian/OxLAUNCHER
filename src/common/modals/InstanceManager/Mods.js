@@ -822,7 +822,7 @@ const Mods = ({ instanceName }) => {
           css={`
             width: 200px !important;
           `}
-          placeholder={`Поиск среди ${mods.length} модов`}
+          placeholder={`Поиск среди ${mods.length} модификаций`}
         />
       </Header>
       <div

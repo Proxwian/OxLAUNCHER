@@ -675,20 +675,62 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
   try {
     // eslint-disable-next-line no-loop-func
     await new Promise((resolve, reject) => {
-      const mainDownloadPage = url;
-      const mirrorDownloadPage = `http://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
-
       win.webContents.session.webRequest.onCompleted(
-        { urls: [mirrorDownloadPage] },
+        { urls: [mainDownloadPage] },
         details => {
-          log.log('Trying to download from mirror ' + mirrorDownloadPage);
           if (details.statusCode === 404) {
-            log.log('Failed. loading from main link: ' + mainDownloadPage);
-            win.loadURL(mainDownloadPage, { userAgent });
+            resolve();
+              mainWindow.webContents.send('opted-out-download-mod-status', {
+                modId: modManifest.id,
+                error: true,
+                warning: false
+              });
+          } else if (details.statusCode > 400) {
+            /**
+             * Check for Cloudflare blocking automated downloads.
+             *
+             * Sometimes, Cloudflare prevents the internal browser from navigating to the
+             * Curseforge mod download page and starting the download. The HTTP status code
+             * it returns is (generally) either 403 or 503. The code below retrieves the
+             * HTML of the page returned to the browser and checks for the title and some
+             * content on the page to determine if the returned page is Cloudflare.
+             * Unfortunately using the `webContents.getTitle()` returns an empty string.
+             */
+            details.webContents
+              .executeJavaScript(
+                `
+                  function getHTML () {
+                    return new Promise((resolve, reject) => { resolve(document.documentElement.innerHTML); });
+                  }
+                  getHTML();
+                `
+              )
+              .then(content => {
+                const isCloudflare = content.includes('Проверка безопасности подключения к сайту');
+
+                if (isCloudflare) {
+                  resolve();
+                  mainWindow.webContents.send(
+                    'opted-out-download-mod-status',
+                    {
+                      modId: modManifest.id,
+                      error: false,
+                      warning: true,
+                      cloudflareBlock: true
+                    }
+                  );
+                }
+
+                return null;
+              })
+              .catch(() => {
+                // no-op
+              });
           }
         }
       );
-      win.loadURL(mirrorDownloadPage, { userAgent });
+
+      win.loadURL(url, { userAgent });
 
       cleanupFn = async err => {
         reject(new Error(err));
@@ -775,30 +817,17 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
         const mainDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
-        const mirrorDownloadPage = `http://oxlauncher.online/download/cfmirror/${modManifest.projectID}/${modManifest.id}`;
-
-        let mirrorChecked = false;
 
         win.webContents.session.webRequest.onCompleted(
-          { urls: [mainDownloadPage, mirrorDownloadPage] },
+          { urls: [mainDownloadPage] },
           details => {
-            if (!mirrorChecked) {
-              log.log('trying to download from mirror: ' + mirrorDownloadPage);
-            }
             if (details.statusCode === 404) {
-              if (mirrorChecked) {
-                resolve();
+              resolve();
                 mainWindow.webContents.send('opted-out-download-mod-status', {
                   modId: modManifest.id,
-                  error: false,
-                  warning: true
+                  error: true,
+                  warning: false
                 });
-              } else {
-                mirrorChecked = true;
-                log.log('failed. loading from main link: ' + mainDownloadPage);
-                win.loadURL(mainDownloadPage, { userAgent });
-              }
-
             } else if (details.statusCode > 400) {
               /**
                * Check for Cloudflare blocking automated downloads.
@@ -820,11 +849,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
                   `
                 )
                 .then(content => {
-                  const isCloudflare =
-                    content.includes('Just a moment...') &&
-                    content.includes(
-                      'needs to review the security of your connection before proceeding.'
-                    );
+                  const isCloudflare = content.includes('www.curseforge.com');
 
                   if (isCloudflare) {
                     resolve();
@@ -848,7 +873,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
           }
         );
 
-        win.loadURL(mirrorDownloadPage, { userAgent });
+        win.loadURL(mainDownloadPage, { userAgent });
 
         cleanupFn = async err => {
           reject(new Error(err));
