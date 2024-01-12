@@ -887,10 +887,11 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
         );
 
         const isResourcePack = addon.classId === 12;
+        const isShaderPack = addon.classId === 6552;
 
         const modDestFile = path.join(
           instancePath,
-          isResourcePack ? 'resourcepacks' : 'mods'
+          isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods'
         );
 
         win.webContents.session.once('will-download', (_, item) => {

@@ -1639,7 +1639,7 @@ export function processFTBManifest(instanceName) {
     const files = allFiles.filter(v => v.url && v.url !== '');
     const CFFiles = allFiles.filter(v => !v.url || v.url === '');
 
-    dispatch(updateDownloadStatus(instanceName, 'Загружаю CF файлы...'));
+    dispatch(updateDownloadStatus(instanceName, 'Загружаю файлы CF...'));
     const addonsHashmap = {};
     const addonsFilesHashmap = {};
 
@@ -1690,11 +1690,12 @@ export function processFTBManifest(instanceName) {
 
           const addon = addonsHashmap[item.curseforge?.project];
           const isResourcePack = addon.classId === 12;
+          const isShaderPack = addon.classId === 6552;
           const modManifest = addonsFilesHashmap[item.curseforge?.project];
           const destFile = path.join(
             _getInstancesPath(state),
             instanceName,
-            isResourcePack ? 'resourcepacks' : 'mods',
+            isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods',
             modManifest.fileName
           );
 
@@ -1933,11 +1934,12 @@ export function processForgeManifest(instanceName) {
 
           const addon = addonsHashmap[item.projectID];
           const isResourcePack = addon.classId === 12;
+          const isShaderPack = addon.classId === 6552;
           const modManifest = addonsFilesHashmap[item.projectID];
           const destFile = path.join(
             _getInstancesPath(state),
             instanceName,
-            isResourcePack ? 'resourcepacks' : 'mods',
+            isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods',
             modManifest.fileName
           );
 
