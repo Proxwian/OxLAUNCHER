@@ -7,7 +7,7 @@ let activity;
 const initialAppStartup = Math.floor(Date.now() / 1000);
 
 const defaultValue = {
-  details: 'Idle',
+  details: 'Спит',
   startTimestamp: initialAppStartup,
   largeImageKey: 'default_big',
   largeImageText: 'OxLAUNCHER - Лучший Minecraft лаунчер',

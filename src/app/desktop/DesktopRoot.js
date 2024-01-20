@@ -150,6 +150,10 @@ function DesktopRoot({ store }) {
       });
     }
 
+    //if (shouldShowDiscordRPC) {
+      ipcRenderer.invoke('init-discord-rpc');
+    //}
+
     ipcRenderer.on('custom-protocol-event', (e, data) => {
       console.log(data);
     });
