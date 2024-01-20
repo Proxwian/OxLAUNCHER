@@ -147,7 +147,7 @@ const Home = () => {
       }
 	  data = await getSearch(
         'modpacks',
-        "oxfortpack",
+        "oxmodpack",
         40,
         0,
         'Popularity',
