@@ -140,7 +140,7 @@ const ChangeLogs = () => {
   return (
     <Modal
       css={`
-        height: 550px;
+        height: 450px;
         width: 375px;
       `}
       title={`Что нового в ${version}`}
@@ -358,7 +358,7 @@ export default memo(ChangeLogs);
 
 const Container = styled.div`
   width: 100%;
-  height: calc(100% - 60px);
+  height: calc(100% - 20px);
   overflow-y: auto;
   color: ${props => props.theme.palette.text.primary};
   padding: 20px;
