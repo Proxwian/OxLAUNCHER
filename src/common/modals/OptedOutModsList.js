@@ -64,12 +64,14 @@ const ModRow = ({
   loadedMods,
   currentMod,
   missingMods,
+  downloadedMods,
   cloudflareBlock,
   downloadUrl
 }) => {
   const { modManifest, addon } = mod;
   const loaded = loadedMods.includes(modManifest.id);
   const missing = missingMods.includes(modManifest.id);
+  const downloaded = downloadedMods.includes(modManifest.id);
   const ref = useRef();
 
   const isCurrentMod = currentMod?.modManifest?.id === modManifest.id;
@@ -96,7 +98,7 @@ const ModRow = ({
           `}
         />
       )}
-      {loaded && !missing && cloudflareBlock && (
+      {loaded && !missing && cloudflareBlock && !downloaded && (
         <Button href={downloadUrl}>
           <FontAwesomeIcon icon={faFileDownload} />
         </Button>
@@ -117,6 +119,7 @@ const OptedOutModsList = ({
 }) => {
   const [loadedMods, setLoadedMods] = useState([]);
   const [missingMods, setMissingMods] = useState([]);
+  const [downloadedMods, setDownloadedMods] = useState([]);
   const [cloudflareBlock, setCloudflareBlock] = useState(false);
   const [manualDownloadUrls, setManualDownloadUrls] = useState([]);
   const [downloading, setDownloading] = useState(false);
@@ -166,6 +169,8 @@ const OptedOutModsList = ({
             setCloudflareBlock(true);
             setManualDownloadUrls(prev => [...prev, status.modId]);
           }
+        } else {
+          setDownloadedMods(prev => [...prev, status.modId]);
         }
       } else {
         dispatch(closeModal());
@@ -183,7 +188,7 @@ const OptedOutModsList = ({
         listener
       );
     };
-  }, [loadedMods, missingMods, cloudflareBlock, manualDownloadUrls]);
+  }, [downloadedMods, loadedMods, missingMods, cloudflareBlock, manualDownloadUrls]);
 
   return (
     <Modal
@@ -224,6 +229,7 @@ const OptedOutModsList = ({
                   loadedMods={loadedMods}
                   currentMod={currentMod}
                   missingMods={missingMods}
+                  downloadedMods={downloadedMods}
                   cloudflareBlock={cloudflareBlock}
                   downloadUrl={`${mod.addon.links.websiteUrl}/download/${mod.modManifest.id}`}
                 />
