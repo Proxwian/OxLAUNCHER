@@ -236,7 +236,7 @@ const Login = () => {
                 `}
               >
                 <center>
-                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.3.4</a>
+                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.3.5</a>
                 </center>
               </div>
               <div
