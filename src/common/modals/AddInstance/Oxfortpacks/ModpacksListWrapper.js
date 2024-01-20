@@ -85,19 +85,6 @@ const ModpacksListWrapper = ({
         <ModpackHover>
           <div
             onClick={() => {
-              setVersion({
-                projectID: modpack.id,
-                fileID: modpack.latestFiles[modpack.latestFiles.length - 1].id,
-                source: CURSEFORGE
-              });
-              setModpack(modpack);
-              setStep(1);
-            }}
-          >
-            Загрузить
-          </div>
-          <div
-            onClick={() => {
               dispatch(
                 openModal('ModpackDescription', {
                   modpack,
@@ -110,6 +97,19 @@ const ModpacksListWrapper = ({
             }}
           >
             Подробнее / Версии
+          </div>
+          <div
+            onClick={() => {
+              setVersion({
+                projectID: modpack.id,
+                fileID: modpack.latestFiles[modpack.latestFiles.length - 1].id,
+                source: CURSEFORGE
+              });
+              setModpack(modpack);
+              setStep(1);
+            }}
+          >
+            Установить
           </div>
         </ModpackHover>
       </div>

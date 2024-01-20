@@ -94,7 +94,7 @@ export default function ThirdStep({
         break;
       default:
         throw new Error(
-          `Unknown loader type. Cannot export modloaderName: ${modloaderName}`
+          `Незивестный тип загрузчика. Не удалось загрузить: ${modloaderName}`
         );
     }
 
@@ -281,7 +281,7 @@ export default function ThirdStep({
                   {isCompleted ? (
                     <div>
                       <h1>
-                        All Done!{' '}
+                        Импорт завершён!{' '}
                         <FontAwesomeIcon
                           icon={faCheck}
                           css={`
@@ -297,7 +297,7 @@ export default function ThirdStep({
                             margin-top: 20px;
                           `}
                         >
-                          Open Export Location
+                          Открыть местоположение
                         </Button>
                       </div>
                       <div>
@@ -308,12 +308,12 @@ export default function ThirdStep({
                             margin-top: 20px;
                           `}
                         >
-                          Go Back To Instances
+                          Вернуться к сборкам
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <h2>We&apos;re doing some magical stuff</h2>
+                    <h2>Делаю некоторые магические штуки...</h2>
                   )}
                 </div>
               </div>

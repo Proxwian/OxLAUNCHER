@@ -107,14 +107,7 @@ const ModpacksListWrapper = ({
           <div>{modpack.name}</div>
         </Modpack>
         <ModpackHover>
-          <div
-            onClick={() => {
-              selectFTBModpack(modpack, setVersion, setModpack, setStep);
-            }}
-          >
-            Скачать
-          </div>
-          <div
+        <div
             onClick={() => {
               dispatch(
                 openModal('ModpackDescription', {
@@ -128,6 +121,13 @@ const ModpacksListWrapper = ({
             }}
           >
             Подробнее
+          </div>
+          <div
+            onClick={() => {
+              selectFTBModpack(modpack, setVersion, setModpack, setStep);
+            }}
+          >
+            Установить
           </div>
         </ModpackHover>
       </div>

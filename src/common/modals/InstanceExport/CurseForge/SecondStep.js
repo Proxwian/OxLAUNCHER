@@ -54,7 +54,7 @@ export default function SecondStep({
                   height: calc(100% - 40px);
                 `}
               >
-                <h2>Files to include in export</h2>
+                <h2>Какие файлы включить в архив</h2>
                 <div
                   css={`
                     overflow-y: auto;

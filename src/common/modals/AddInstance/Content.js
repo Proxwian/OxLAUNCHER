@@ -99,7 +99,7 @@ const Content = ({
                         width: 22px;
                       `}
                     />
-                    Ванила
+                    Своя сборка
                   </Radio.Button>
                   <Radio.Button value={2}>
                     <img

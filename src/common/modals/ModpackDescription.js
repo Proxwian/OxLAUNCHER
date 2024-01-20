@@ -317,7 +317,7 @@ const ModpackDescription = ({
               dispatch(closeModal());
             }}
           >
-            Загрузить
+            Установить
           </Button>
         </Footer>
       </>
