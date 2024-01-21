@@ -876,7 +876,7 @@ export const downloadAddonZip = async (id, fileID, instancePath, tempPath) => {
     const addon = await getAddon(id);
 
     const addonZipUrl = `https://www.curseforge.com/minecraft/modpacks/${addon.slug}/download/${fileID}`;
-    await browserDownload(addonZipUrl, zipFile);
+    await browserDownload(addonZipUrl, addonZipUrl, zipFile);
   }
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {

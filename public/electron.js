@@ -642,7 +642,7 @@ const removeOriginHeader = (details, callback) => {
   callback({ cancel: false, requestHeaders });
 };
 
-ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
+ipcMain.handle('download-optedout-mod', async (e, { url, mirror, filePath }) => {
   let win = new BrowserWindow();
 
   await win.webContents.session.clearCache();
@@ -676,36 +676,78 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
     // eslint-disable-next-line no-loop-func
     await new Promise((resolve, reject) => {
       const mainDownloadPage = url;
-      const mirrorDownloadPage = `https://github.com/Proxwian/OxMIRROR/raw/main/${modManifest.projectID}/${modManifest.id}`;
+      const mirrorDownloadPage = mirror;
 
       win.webContents.session.webRequest.onCompleted(
-        { urls: [mirrorDownloadPage] },
+        { urls: [mainDownloadPage, mirrorDownloadPage] },
         details => {
-          log.log('Trying to download from mirror ' + mirrorDownloadPage);
+          if (!isMirrorChecked) {
+            isMirrorChecked = true;
+            log.log('Trying to download from mirror ' + mirrorDownloadPage);
 
-          details.webContents
-            .executeJavaScript(
-              `
-                function getHTML () {
-                  return new Promise((resolve, reject) => { resolve(document.documentElement.innerHTML); });
-                }
-                getHTML();
-              `
-            )
-            .then(content => {
-              const isMissing = content.includes('This is not the web page you are looking for');
+            // if raw file is missing, we're assuming web page to display instead
+            if (details.webContents != "undefined" || details.statusCode === 404 || details.statusCode > 400) {
+              log.log('Failed. loading from main link: ' + mainDownloadPage);
+              win.loadURL(mainDownloadPage, { userAgent });
+            } else {
+              resolve();
+            }
+            
+          } else {
+            log.log('Trying to download from main link ' + mainDownloadPage);
 
-              if (isMissing) {
-                log.log('Failed. loading from main link: ' + mainDownloadPage);
-                win.loadURL(mainDownloadPage, { userAgent });
-              }
+            if (details.statusCode === 404) {
+              resolve();
+                mainWindow.webContents.send('opted-out-download-mod-status', {
+                  modId: modManifest.id,
+                  error: true,
+                  warning: false
+                });
+            } else if (details.statusCode > 400) {
+              /**
+               * Check for Cloudflare blocking automated downloads.
+               *
+               * Sometimes, Cloudflare prevents the internal browser from navigating to the
+               * Curseforge mod download page and starting the download. The HTTP status code
+               * it returns is (generally) either 403 or 503. The code below retrieves the
+               * HTML of the page returned to the browser and checks for the title and some
+               * content on the page to determine if the returned page is Cloudflare.
+               * Unfortunately using the `webContents.getTitle()` returns an empty string.
+               */
+              details.webContents
+                .executeJavaScript(
+                  `
+                    function getHTML () {
+                      return new Promise((resolve, reject) => { resolve(document.documentElement.innerHTML); });
+                    }
+                    getHTML();
+                  `
+                )
+                .then(content => {
+                  const isCloudflare = content.includes('www.curseforge.com');
 
-              return null;
-            })
-            .catch(() => {
-              // no-op
-            });
+                  if (isCloudflare) {
+                    resolve();
+                    mainWindow.webContents.send(
+                      'opted-out-download-mod-status',
+                      {
+                        modId: modManifest.id,
+                        error: false,
+                        warning: true,
+                        cloudflareBlock: true
+                      }
+                    );
+                  }
+
+                  return null;
+                })
+                .catch(() => {
+                  // no-op
+                });
+            }
+          }
         }
+          
       );
 
       win.loadURL(mirrorDownloadPage, { userAgent });

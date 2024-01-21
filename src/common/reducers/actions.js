@@ -2968,6 +2968,8 @@ export function launchInstance(instanceName, forceQuit = false) {
 
     ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
+
     const defaultJavaPathVersion = _getJavaPath(state)(
       dispatch(getJavaVersionForMCVersion(loader?.mcVersion))
     );
@@ -3453,11 +3455,12 @@ export function installMod(
     };
 
     const urlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${item.slug}/download/${mainModData.id}`;
+    const mirrorDownloadPage = `https://github.com/Proxwian/OxMIRROR/raw/main/${projectID}/${mainModData.id}`;
     try {
       if (useTempMiddleware) {
         if (!mainModData.downloadUrl) {
           try {
-            await browserDownload(urlDownloadPage, destFile);
+            await browserDownload(urlDownloadPage, mirrorDownloadPage, destFile);
           } catch (e) {
             await removeModFromConfig();
             dispatch(
@@ -3505,7 +3508,7 @@ export function installMod(
           if (murmur2 !== mainModData.fileFingerprint) {
             if (!mainModData.downloadUrl) {
               try {
-                await browserDownload(urlDownloadPage, destFile);
+                await browserDownload(urlDownloadPage, mirrorDownloadPage, destFile);
               } catch (e) {
                 await removeModFromConfig();
                 dispatch(
@@ -3523,7 +3526,7 @@ export function installMod(
         } catch {
           if (!mainModData.downloadUrl) {
             try {
-              await browserDownload(urlDownloadPage, destFile);
+              await browserDownload(urlDownloadPage, mirrorDownloadPage, destFile);
             } catch (e) {
               await removeModFromConfig();
               dispatch(

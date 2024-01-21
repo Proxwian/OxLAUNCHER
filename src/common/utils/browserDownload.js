@@ -1,9 +1,10 @@
 import { ipcRenderer } from 'electron';
 
-export default function browserDownload(url, filePath) {
+export default function browserDownload(url, mirror, filePath) {
   return new Promise((resolve, reject) => {
     ipcRenderer.invoke('download-optedout-mod', {
       url,
+      mirror,
       filePath
     });
 
