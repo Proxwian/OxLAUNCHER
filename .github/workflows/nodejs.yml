@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Context
@@ -50,11 +50,6 @@ jobs:
       - name: Switch rust to nightly
         run: |
           rustup default nightly
-      - uses: actions/checkout@v4
-      - name: Set up Python 2.7.13
-        uses: actions/setup-python@v4
-        with:
-          python-version: "2.7.13"
       - name: npm run install
         run: |
           npm i --legacy-peer-deps
@@ -114,72 +109,13 @@ jobs:
           name: Linux Release
           path: deploy
 
-  build-linux:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-
-    container: coatldev/six:3.11
-
-    steps:
-      - name: Context
+      - uses: actions/setup-ruby@v1
+      - name: Send Webhook Notification
+        if: matrix.os == 'macos-latest'
         env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-      - name: Use Node.js 16.17.0
-        uses: actions/setup-node@v1
-        with:
-          node-version: '16.17.0'
-                      
-      - name: Setup Rust      
-        uses: ATiltedTree/setup-rust@v1.0.5
-        with:
-          rust-version: stable
-
-      - name: Install Nightly
+          JOB_STATUS: ${{ job.status }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
-          rustup toolchain install nightly
-          
-      - name: Install rust (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          rustup target add x86_64-unknown-linux-gnu --toolchain nightly
-      - name: Switch rust to nightly
-        run: |
-          rustup default nightly
-      - name: npm run install
-        run: |
-          npm i --legacy-peer-deps
-      - name: npm run release for mac and linux
-        if: matrix.os != 'windows-latest' || github.event_name != 'push'
-        env:
-          CI: ''
-          TRAVIS_TAG: ''
-          APPVEYOR_REPO_TAG_NAME: ''
-          CIRCLE_TAG: ''
-          GITHUB_ACTIONS: ''
-          BITRISE_GIT_TAG: ''
-          CI_BUILD_TAG: ''
-          SENTRY_DSN: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_DSN || '' }}"
-          SOURCE_MAPS_UPLOAD: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_UPLOAD_SOURCE_MAPS_URL || '' }}"
-          SENTRY_AUTH: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_AUTH || '' }}"
-          REACT_CF_API_KEY: "${{ secrets.CF_API_KEY }}"
-        run: |
-          npm run release
-      - name: upload release to gh releases
-        if: github.event_name == 'push' && github.ref == 'refs/heads/releases'
-        env:
-          GH_ACCESS_TOKEN_RELEASES: ${{ secrets.GH_ACCESS_TOKEN_RELEASES }}
-        run: |
-          npm run upload
-
-      - uses: actions/upload-artifact@v1
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          name: Linux Release
-          path: deploy
+          git clone https://github.com/Proxwian/github-actions-discord-webhook.git webhook
+          bash webhook/send.sh $JOB_STATUS $WEBHOOK_URL
+        shell: bash
