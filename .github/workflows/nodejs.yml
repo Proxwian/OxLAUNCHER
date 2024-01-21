@@ -35,18 +35,10 @@ jobs:
         run: |
           rustup toolchain install nightly
 
-      - name: Debug Python Version (MacOS)
+      - name: Change Python version (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          python3 --version
-      - name: Debug Python3 Folder (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          ls -ltr /usr/local/bin/python*
-      - name: Change Python version
-        if: matrix.os == 'macos-latest'
-        run: |
-          ln -s -f /usr/local/bin/python3.12.1 /usr/local/bin/python3.11
+          ln -s -f /usr/local/bin/python3.11 /usr/local/bin/python3
           
       - name: Install rust (Windows)
         if: matrix.os == 'windows-latest'
