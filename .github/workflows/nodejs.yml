@@ -42,7 +42,16 @@ jobs:
       - name: Change Python version (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew link python@3.11
+          brew link python3@3.11
+
+      - name: Debug Python Version (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          which python
+      - name: Debug Python3 version (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          which python3
           
       - name: Install rust (Windows)
         if: matrix.os == 'windows-latest'
