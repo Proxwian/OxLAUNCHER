@@ -136,6 +136,11 @@ jobs:
         with:
           node-version: '16.17.0'
 
+      - name: Setup | Rust
+        uses: ATiltedTree/setup-rust@v1
+        with:
+          rust-version: stable
+
       - name: Install Nightly
         run: |
           rustup toolchain install nightly
