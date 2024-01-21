@@ -38,11 +38,11 @@ jobs:
       - name: Debug Python Version (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          which python
-      - name: Debug Python3 version (MacOS)
+          python3 --version
+      - name: Debug Python3 Folder (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          which python3
+          ls -ltr /usr/local/bin/python*
           
       - name: Install rust (Windows)
         if: matrix.os == 'windows-latest'
