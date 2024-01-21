@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Context
@@ -34,6 +34,12 @@ jobs:
       - name: Install Nightly
         run: |
           rustup toolchain install nightly
+
+
+      - name: Fix Distutils
+        if: matrix.os == 'macos-latest'
+        run: |
+          python3 -m pip install packaging
           
       - name: Install rust (Windows)
         if: matrix.os == 'windows-latest'
