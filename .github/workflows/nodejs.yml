@@ -144,7 +144,7 @@ jobs:
           sudo apt install curl -y
       - name: Rust | Setup
         run: |
-          curl -y --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
       - name: Install Nightly
         run: |
