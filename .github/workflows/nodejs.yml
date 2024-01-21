@@ -36,10 +36,10 @@ jobs:
           rustup toolchain install nightly
 
 
-      - name: Fix Distutils
+      - name: Change Python version (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          python3 -m pip install packaging
+          brew link --overwrite python@3.11
           
       - name: Install rust (Windows)
         if: matrix.os == 'windows-latest'
