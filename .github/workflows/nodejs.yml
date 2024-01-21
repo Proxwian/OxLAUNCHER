@@ -51,10 +51,10 @@ jobs:
         run: |
           rustup default nightly
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ "2.7.10" }}
+      - name: Set up Python 2.7.10
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ "2.7.10" }}
+          python-version: "2.7.10"
       - name: npm run install
         run: |
           npm i --legacy-peer-deps
