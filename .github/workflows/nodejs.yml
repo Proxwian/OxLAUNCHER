@@ -35,11 +35,14 @@ jobs:
         run: |
           rustup toolchain install nightly
 
-
+      - name: Reset Python Version (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew unlink python3
       - name: Change Python version (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew link --overwrite python@3.11
+          brew link python@3.11
           
       - name: Install rust (Windows)
         if: matrix.os == 'windows-latest'
