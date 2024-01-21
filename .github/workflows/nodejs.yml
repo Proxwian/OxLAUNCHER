@@ -35,15 +35,6 @@ jobs:
         run: |
           rustup toolchain install nightly
 
-      - name: Reset Python Version (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew unlink python3
-      - name: Change Python version (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew link python3@3.11
-
       - name: Debug Python Version (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
