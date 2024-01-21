@@ -141,7 +141,7 @@ jobs:
           sudo apt update
       - name: Rust | Prepare Curl
         run: |
-          sudo apt install curl
+          sudo apt install curl -y
       - name: Rust | Setup
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
