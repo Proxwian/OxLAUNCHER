@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [windows-latest]
 
     steps:
       - name: Context
@@ -135,16 +135,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '16.17.0'
-
-      - name: Rust | Prepare Apt
-        run: |
-          sudo apt update
-      - name: Rust | Prepare Curl
-        run: |
-          sudo apt install curl -y
-      - name: Rust | Setup
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+                      
+      - name: Setup Rust      
+        uses: ATiltedTree/setup-rust@v1.0.5
+        with:
+          rust-version: stable
 
       - name: Install Nightly
         run: |
