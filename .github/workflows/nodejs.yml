@@ -61,7 +61,7 @@ jobs:
       - name: npm i dmg-license (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          npm i dmg-license --save-optional
+          npm i dmg-license --save-optional --legacy-peer-deps
       - name: npm run release for windows
         if: matrix.os == 'windows-latest' && github.event_name == 'push'
         env:
