@@ -136,9 +136,15 @@ jobs:
         with:
           node-version: '16.17.0'
 
-      - name: Setup | Rust
+      - name: Rust | Prepare Apt
         run: |
-          wget --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+          sudo apt update
+      - name: Rust | Prepare Curl
+        run: |
+          sudo apt install curl
+      - name: Rust | Setup
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
       - name: Install Nightly
         run: |
