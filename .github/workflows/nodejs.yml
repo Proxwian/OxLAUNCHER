@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest]
 
     steps:
       - name: Context
@@ -115,7 +115,11 @@ jobs:
           path: deploy
 
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
 
     container: coatldev/six:3.11
 
