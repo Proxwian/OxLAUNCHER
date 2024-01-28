@@ -123,7 +123,7 @@ const OptedOutModsList = ({
   const [cloudflareBlock, setCloudflareBlock] = useState(false);
   const [manualDownloadUrls, setManualDownloadUrls] = useState([]);
   const [downloading, setDownloading] = useState(false);
-
+  
   const dispatch = useDispatch();
   const modals = useSelector(state => state.modals);
 
@@ -155,7 +155,7 @@ const OptedOutModsList = ({
     const listener = (e, status) => {
       if (!status.error) {
         if (optedOutMods.length === loadedMods.length + 1) {
-          if (missingMods.length === 0 && !cloudflareBlock) {
+          if (missingMods.length === 0 && !cloudflareBlock && !status.cloudflareBlock) {
             resolve();
             dispatch(closeModal());
           }
