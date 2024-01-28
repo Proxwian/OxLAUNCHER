@@ -63,6 +63,8 @@ export default function ThirdStep({
   const dispatch = useDispatch();
   const tempExport = path.join(tempPath, instanceName);
 
+  const log = require('electron-log');
+
   const openExportLocation = async () => {
     await ipcRenderer.invoke('openFolder', filePath);
   };
@@ -94,7 +96,7 @@ export default function ThirdStep({
         break;
       default:
         throw new Error(
-          `Незивестный тип загрузчика. Не удалось загрузить: ${modloaderName}`
+          `Неизвестный тип загрузчика. Не удалось загрузить: ${modloaderName}`
         );
     }
 
@@ -201,10 +203,14 @@ export default function ThirdStep({
                 path.join(tempExport, 'overrides', slicedFile)
               );
             } catch {
-              await fse.copy(
-                file,
-                path.join(tempExport, 'overrides', slicedFile)
-              );
+              try {
+                await fse.copy(
+                  file,
+                  path.join(tempExport, 'overrides', slicedFile)
+                );
+              } catch (e) {
+                log.error(e);
+              }
             }
           }
         },
@@ -231,7 +237,12 @@ export default function ThirdStep({
       await fse.remove(
         path.join(filePath, `${packZipName}-${packVersion}.zip`)
       );
-      await createZip(`${packZipName}-${packVersion}`, filePath, filesToZip);
+      try {
+        await createZip(`${packZipName}-${packVersion}`, filePath, filesToZip);
+      } catch (e) {
+        log.error(e);
+      }
+      
 
       // Clean up temp folder
       await fse.remove(tempExport);

@@ -2043,55 +2043,59 @@ export function processForgeManifest(instanceName) {
 
       dispatch(updateDownloadStatus(instanceName, 'Заканчиваю с импортами...'));
 
-      const overrideFiles = await getFilesRecursive(
-        path.join(_getTempPath(state), instanceName, 'overrides')
-      );
-      await dispatch(
-        updateInstanceConfig(instanceName, config => {
-          return {
-            ...config,
-            mods: [...(config.mods || []), ...modManifests],
-            overrides: overrideFiles.map(v =>
-              path.relative(
-                path.join(_getTempPath(state), instanceName, 'overrides'),
-                v
-              )
-            )
-          };
-        })
-      );
-
-      await new Promise(resolve => {
-        // Force premature unlock to let our listener catch mods from override
-        lockfile.unlock(
-          path.join(
-            _getInstancesPath(getState()),
-            instanceName,
-            'installing.lock'
-          ),
-          err => {
-            if (err) console.error(err);
-            resolve();
-          }
+      try {
+        const overrideFiles = await getFilesRecursive(
+          path.join(_getTempPath(state), instanceName, 'overrides')
         );
-      });
+        await dispatch(
+          updateInstanceConfig(instanceName, config => {
+            return {
+              ...config,
+              mods: [...(config.mods || []), ...modManifests],
+              overrides: overrideFiles.map(v =>
+                path.relative(
+                  path.join(_getTempPath(state), instanceName, 'overrides'),
+                  v
+                )
+              )
+            };
+          })
+        );
 
-      await Promise.all(
-        overrideFiles.map(v => {
-          const relativePath = path.relative(
-            path.join(_getTempPath(state), instanceName, 'overrides'),
-            v
+        await new Promise(resolve => {
+          // Force premature unlock to let our listener catch mods from override
+          lockfile.unlock(
+            path.join(
+              _getInstancesPath(getState()),
+              instanceName,
+              'installing.lock'
+            ),
+            err => {
+              if (err) console.error(err);
+              resolve();
+            }
           );
-          const newPath = path.join(
-            _getInstancesPath(state),
-            instanceName,
-            relativePath
-          );
-          return fse.copy(v, newPath, { overwrite: true });
-        })
-      );
+        });
 
-      await fse.remove(addonPathZip);
+        await Promise.all(
+          overrideFiles.map(v => {
+            const relativePath = path.relative(
+              path.join(_getTempPath(state), instanceName, 'overrides'),
+              v
+            );
+            const newPath = path.join(
+              _getInstancesPath(state),
+              instanceName,
+              relativePath
+            );
+            return fse.copy(v, newPath, { overwrite: true });
+          })
+        );
+
+        await fse.remove(addonPathZip);
+      } catch (e) {
+        log.error(e);
+      }
     } else {
       await new Promise(resolve => {
         // Force premature unlock to let our listener catch mods from override
