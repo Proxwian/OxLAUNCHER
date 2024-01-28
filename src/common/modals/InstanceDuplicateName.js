@@ -130,8 +130,8 @@ const InstanceDuplicateName = ({ instanceName }) => {
           `}
         >
           {invalidName &&
-            'Instance name is not valid or too long. Please try another one'}
-          {alreadyExists && 'An instance with this name already exists!'}
+            'Название клиента слишком длинное, или некорректное. Введите другое'}
+          {alreadyExists && 'Клиент с таким названием уже существует!'}
         </div>
       </div>
       <div
