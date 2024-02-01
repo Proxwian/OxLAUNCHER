@@ -48,7 +48,7 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
       }
       data = await getSearch(
         'modpacks',
-        'oxfortpack',
+        'oxmodpack',
         8,
         reset ? 0 : modpacks.length,
         'popularity',
