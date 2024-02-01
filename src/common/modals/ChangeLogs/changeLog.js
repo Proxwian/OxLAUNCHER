@@ -12,11 +12,10 @@ module.exports = {
     // }
   ],
   improvements: [
-    // {
-    //   header: 'Обновлён фильтр поиска для сборок',
-    //   content: 'OxMODPACK / OxFORTPACK',
-    //   advanced: { cm: 'd0362c96' }
-    // },
+    {
+      header: 'Изменён порядок отображения',
+      content: 'сборок OxMODPACK'
+    }
     // {
     //   header: 'Изменён текст на экранах установки и импорта',
     //   content: 'сборок с модификациями',
