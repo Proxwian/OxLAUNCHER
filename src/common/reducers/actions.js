@@ -62,6 +62,7 @@ import {
   getJavaLatestManifest,
   getJavaManifest,
   getMcManifest,
+  getMirrorManifest,
   getMultipleAddons,
   mcAuthenticate,
   mcInvalidate,
@@ -1885,8 +1886,9 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest, loader } = _getCurrentDownloadItem(state);
+    const { manifest, loader, version } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
+    let mirrorManifest = fse.readJson("");
 
     dispatch(updateDownloadStatus(instanceName, 'Загружаю модификации...'));
 
@@ -1915,7 +1917,20 @@ export function processForgeManifest(instanceName) {
       );
     };
 
-    await Promise.all([_getAddons(), _getAddonFiles()]);
+    const _getMirrorFiles = async () => {
+      const mirrorManifestHttp = await getMirrorManifest(version?.projectID);
+      mirrorManifest = await fse.readJson(mirrorManifestHttp);
+
+      mirrorManifest?.files?.forEach(async v => {
+        addonsHashmap[v.id] = v;
+
+        const modManifest = await getMirrorAddon(v.id);
+
+        addonsFilesHashmap[v.id] = modManifest;
+      });
+    };
+
+    await Promise.all([_getAddons(), _getAddonFiles(), _getMirrorFiles()]);
 
     let modManifests = [];
     const optedOutMods = [];
@@ -1956,6 +1971,58 @@ export function processForgeManifest(instanceName) {
               optedOutMods.push({ addon, modManifest: normalizedModData });
               return;
             }
+            await downloadFile(destFile, modManifest.downloadUrl);
+            modManifests = modManifests.concat(
+              normalizeModData(modManifest, item.projectID, addon.name)
+            );
+          }
+          const percentage =
+            (modManifests.length * 100) / manifest.files.length - 1;
+
+          dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+          ok = true;
+        } while (!ok && tries <= 3);
+        /* eslint-enable no-await-in-loop */
+      },
+      { concurrency }
+    );
+
+    await pMap(
+      mirrorManifest?.files,
+      async item => {
+        let ok = false;
+        let tries = 0;
+        /* eslint-disable no-await-in-loop */
+        do {
+          tries += 1;
+          if (tries !== 1) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+
+          const addon = addonsHashmap[item.projectID];
+          const isResourcePack = addon.classId === 12;
+          const isShaderPack = addon.classId === 6552;
+          const modManifest = addonsFilesHashmap[item.projectID];
+          const destFile = path.join(
+            _getInstancesPath(state),
+            instanceName,
+            isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods',
+            modManifest.fileName
+          );
+
+          const fileExists = await fse.pathExists(destFile);
+
+          if (!fileExists) {
+            // if (!modManifest.downloadUrl) {
+            //   const normalizedModData = normalizeModData(
+            //     modManifest,
+            //     item.projectID,
+            //     addon.name
+            //   );
+
+            //   optedOutMods.push({ addon, modManifest: normalizedModData });
+            //   return;
+            // }
             await downloadFile(destFile, modManifest.downloadUrl);
             modManifests = modManifests.concat(
               normalizeModData(modManifest, item.projectID, addon.name)
