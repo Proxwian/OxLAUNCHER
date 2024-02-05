@@ -1173,7 +1173,8 @@ export function addToQueue(
   background,
   timePlayed,
   settings = {},
-  updateOptions
+  updateOptions,
+  version
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1191,6 +1192,7 @@ export function addToQueue(
       background,
       isUpdate,
       bypassCopy,
+      version,
       ...patchedSettings
     });
 
@@ -1920,17 +1922,18 @@ export function processForgeManifest(instanceName) {
     const _getMirrorFiles = async () => {
       if (!version) {
         log.log('Version info is missed, skip mirror check');
+      } else {
+        const mirrorManifestHttp = await getMirrorManifest(version?.projectID);
+        mirrorManifest = await fse.readJson(mirrorManifestHttp);
+  
+        mirrorManifest?.files?.forEach(async v => {
+          addonsHashmap[v.id] = v;
+  
+          const modManifest = await getMirrorAddon(v.id);
+  
+          addonsFilesHashmap[v.id] = modManifest;
+        });
       }
-      const mirrorManifestHttp = await getMirrorManifest(version?.projectID);
-      mirrorManifest = await fse.readJson(mirrorManifestHttp);
-
-      mirrorManifest?.files?.forEach(async v => {
-        addonsHashmap[v.id] = v;
-
-        const modManifest = await getMirrorAddon(v.id);
-
-        addonsFilesHashmap[v.id] = modManifest;
-      });
     };
 
     await Promise.all([_getAddons(), _getAddonFiles(), _getMirrorFiles()]);
