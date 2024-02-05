@@ -1924,6 +1924,14 @@ export function processForgeManifest(instanceName) {
         log.log('ProjectID is missed, skip mirror check');
       } else {
         mirrorManifest = await getMirrorManifest(loader?.projectID);
+          
+        mirrorManifest?.files?.forEach(async v => {
+          addonsHashmap[v.id] = v;
+  
+          const modManifest = await getMirrorAddon(v.id);
+  
+          addonsFilesHashmap[v.id] = modManifest;
+        });
       }
     };
 
@@ -1988,6 +1996,7 @@ export function processForgeManifest(instanceName) {
       await pMap(
         mirrorManifest?.files,
         async item => {
+          if (!addonsHashmap[item.projectID]) return;
           let ok = false;
           let tries = 0;
           /* eslint-disable no-await-in-loop */
