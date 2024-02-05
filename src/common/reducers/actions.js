@@ -1886,7 +1886,7 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest, version } = _getCurrentDownloadItem(state);
+    const { manifest, loader, version } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
     let mirrorManifest;
 
@@ -1918,7 +1918,9 @@ export function processForgeManifest(instanceName) {
     };
 
     const _getMirrorFiles = async () => {
-      if (!mirrorManifest) return;
+      if (!version) {
+        log.log('Version info is missed, skip mirror check');
+      }
       const mirrorManifestHttp = await getMirrorManifest(version?.projectID);
       mirrorManifest = await fse.readJson(mirrorManifestHttp);
 
@@ -1988,57 +1990,59 @@ export function processForgeManifest(instanceName) {
       { concurrency }
     );
 
-    await pMap(
-      mirrorManifest?.files,
-      async item => {
-        let ok = false;
-        let tries = 0;
-        /* eslint-disable no-await-in-loop */
-        do {
-          tries += 1;
-          if (tries !== 1) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-          }
-
-          const addon = addonsHashmap[item.projectID];
-          const isResourcePack = addon.classId === 12;
-          const isShaderPack = addon.classId === 6552;
-          const modManifest = addonsFilesHashmap[item.projectID];
-          const destFile = path.join(
-            _getInstancesPath(state),
-            instanceName,
-            isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods',
-            modManifest.fileName
-          );
-
-          const fileExists = await fse.pathExists(destFile);
-
-          if (!fileExists) {
-            // if (!modManifest.downloadUrl) {
-            //   const normalizedModData = normalizeModData(
-            //     modManifest,
-            //     item.projectID,
-            //     addon.name
-            //   );
-
-            //   optedOutMods.push({ addon, modManifest: normalizedModData });
-            //   return;
-            // }
-            await downloadFile(destFile, modManifest.downloadUrl);
-            modManifests = modManifests.concat(
-              normalizeModData(modManifest, item.projectID, addon.name)
+    if (mirrorManifest) {
+      await pMap(
+        mirrorManifest?.files,
+        async item => {
+          let ok = false;
+          let tries = 0;
+          /* eslint-disable no-await-in-loop */
+          do {
+            tries += 1;
+            if (tries !== 1) {
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+  
+            const addon = addonsHashmap[item.projectID];
+            const isResourcePack = addon.classId === 12;
+            const isShaderPack = addon.classId === 6552;
+            const modManifest = addonsFilesHashmap[item.projectID];
+            const destFile = path.join(
+              _getInstancesPath(state),
+              instanceName,
+              isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods',
+              modManifest.fileName
             );
-          }
-          const percentage =
-            (modManifests.length * 100) / manifest.files.length - 1;
-
-          dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
-          ok = true;
-        } while (!ok && tries <= 3);
-        /* eslint-enable no-await-in-loop */
-      },
-      { concurrency }
-    );
+  
+            const fileExists = await fse.pathExists(destFile);
+  
+            if (!fileExists) {
+              // if (!modManifest.downloadUrl) {
+              //   const normalizedModData = normalizeModData(
+              //     modManifest,
+              //     item.projectID,
+              //     addon.name
+              //   );
+  
+              //   optedOutMods.push({ addon, modManifest: normalizedModData });
+              //   return;
+              // }
+              await downloadFile(destFile, modManifest.downloadUrl);
+              modManifests = modManifests.concat(
+                normalizeModData(modManifest, item.projectID, addon.name)
+              );
+            }
+            const percentage =
+              (modManifests.length * 100) / manifest.files.length - 1;
+  
+            dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+            ok = true;
+          } while (!ok && tries <= 3);
+          /* eslint-enable no-await-in-loop */
+        },
+        { concurrency }
+      );
+    }
 
     if (optedOutMods.length) {
       await new Promise((resolve, reject) => {
@@ -2366,7 +2370,7 @@ export function downloadInstance(instanceName) {
       if (manifest && loader?.source === FTB)
         await dispatch(processFTBManifest(instanceName));
       else if (manifest && loader?.source === CURSEFORGE)
-        await dispatch(processForgeManifest(instanceName, loader));
+        await dispatch(processForgeManifest(instanceName));
 
       dispatch(updateDownloadProgress(0));
 
