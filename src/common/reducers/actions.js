@@ -1943,7 +1943,7 @@ export function processForgeManifest(instanceName) {
     await pMap(
       manifest.files,
       async item => {
-        if (!addonsHashmap[item.id]) return;
+        if (!addonsHashmap[item.projectID]) return;
         let ok = false;
         let tries = 0;
         /* eslint-disable no-await-in-loop */
@@ -1953,10 +1953,10 @@ export function processForgeManifest(instanceName) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
 
-          const addon = addonsHashmap[item.id];
+          const addon = addonsHashmap[item.projectID];
           const isResourcePack = addon.classId === 12;
           const isShaderPack = addon.classId === 6552;
-          const modManifest = addonsFilesHashmap[item.id];
+          const modManifest = addonsFilesHashmap[item.projectID];
           const destFile = path.join(
             _getInstancesPath(state),
             instanceName,
@@ -1970,7 +1970,7 @@ export function processForgeManifest(instanceName) {
             if (!modManifest.downloadUrl) {
               const normalizedModData = normalizeModData(
                 modManifest,
-                item.id,
+                item.projectID,
                 addon.name
               );
 
@@ -1979,7 +1979,7 @@ export function processForgeManifest(instanceName) {
             }
             await downloadFile(destFile, modManifest.downloadUrl);
             modManifests = modManifests.concat(
-              normalizeModData(modManifest, item.id, addon.name)
+              normalizeModData(modManifest, item.projectID, addon.name)
             );
           }
           const percentage =
@@ -1997,7 +1997,7 @@ export function processForgeManifest(instanceName) {
       await pMap(
         mirrorManifest?.files,
         async item => {
-          if (!addonsHashmap[item.projectID]) return;
+          if (!addonsHashmap[item.id]) return;
           let ok = false;
           let tries = 0;
           /* eslint-disable no-await-in-loop */
@@ -2007,10 +2007,10 @@ export function processForgeManifest(instanceName) {
               await new Promise(resolve => setTimeout(resolve, 5000));
             }
   
-            const addon = addonsHashmap[item.projectID];
+            const addon = addonsHashmap[item.id];
             const isResourcePack = addon.classId === 12;
             const isShaderPack = addon.classId === 6552;
-            const modManifest = addonsFilesHashmap[item.projectID];
+            const modManifest = addonsFilesHashmap[item.id];
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
@@ -2024,7 +2024,7 @@ export function processForgeManifest(instanceName) {
               // if (!modManifest.downloadUrl) {
               //   const normalizedModData = normalizeModData(
               //     modManifest,
-              //     item.projectID,
+              //     item.id,
               //     addon.name
               //   );
   
@@ -2033,7 +2033,7 @@ export function processForgeManifest(instanceName) {
               // }
               await downloadFile(destFile, modManifest.downloadUrl);
               modManifests = modManifests.concat(
-                normalizeModData(modManifest, item.projectID, addon.name)
+                normalizeModData(modManifest, item.id, addon.name)
               );
             }
             const percentage =
