@@ -63,6 +63,7 @@ import {
   getJavaManifest,
   getMcManifest,
   getMirrorManifest,
+  getMirrorAddon,
   getMultipleAddons,
   mcAuthenticate,
   mcInvalidate,
