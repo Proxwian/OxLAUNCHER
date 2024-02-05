@@ -423,6 +423,11 @@ export const getMirrorManifest = async modpackId => {
   }
 };
 
+export const getForgeManifest = () => {
+  const url = `https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.json?timestamp=${new Date().getTime()}`;
+  return axios.get(url);
+};
+
 export const getMirrorAddon = async fileID => {
   const url = `${MIRROR_API_URL}/addons/${fileID}.json`;
   const { data } = await axioInstance.get(url);

@@ -1919,24 +1919,15 @@ export function processForgeManifest(instanceName) {
       );
     };
 
-    const _getMirrorFiles = async () => {
-      if (!version) {
-        log.log('Version info is missed, skip mirror check');
+    const _getMirrorManifest = async () => {
+      if (loader?.projectID == undefined) {
+        log.log('ProjectID is missed, skip mirror check');
       } else {
-        const mirrorManifestHttp = await getMirrorManifest(version?.projectID);
-        mirrorManifest = await fse.readJson(mirrorManifestHttp);
-  
-        mirrorManifest?.files?.forEach(async v => {
-          addonsHashmap[v.id] = v;
-  
-          const modManifest = await getMirrorAddon(v.id);
-  
-          addonsFilesHashmap[v.id] = modManifest;
-        });
+        mirrorManifest = await getMirrorManifest(loader?.projectID);
       }
     };
 
-    await Promise.all([_getAddons(), _getAddonFiles(), _getMirrorFiles()]);
+    await Promise.all([_getAddons(), _getAddonFiles(), _getMirrorManifest()]);
 
     let modManifests = [];
     const optedOutMods = [];
