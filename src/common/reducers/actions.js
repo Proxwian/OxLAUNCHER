@@ -1886,9 +1886,9 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest, loader, version } = _getCurrentDownloadItem(state);
+    const { manifest, version } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
-    let mirrorManifest = fse.readJson("");
+    let mirrorManifest;
 
     dispatch(updateDownloadStatus(instanceName, 'Загружаю модификации...'));
 
@@ -1918,6 +1918,7 @@ export function processForgeManifest(instanceName) {
     };
 
     const _getMirrorFiles = async () => {
+      if (!mirrorManifest) return;
       const mirrorManifestHttp = await getMirrorManifest(version?.projectID);
       mirrorManifest = await fse.readJson(mirrorManifestHttp);
 
@@ -2365,7 +2366,7 @@ export function downloadInstance(instanceName) {
       if (manifest && loader?.source === FTB)
         await dispatch(processFTBManifest(instanceName));
       else if (manifest && loader?.source === CURSEFORGE)
-        await dispatch(processForgeManifest(instanceName));
+        await dispatch(processForgeManifest(instanceName, loader));
 
       dispatch(updateDownloadProgress(0));
 
