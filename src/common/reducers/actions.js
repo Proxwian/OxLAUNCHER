@@ -1486,7 +1486,7 @@ export function downloadForge(instanceName) {
 
       // Patching
       if (forgeJson.install?.processors?.length) {
-        dispatch(updateDownloadStatus(instanceName, 'Патчим Forge...'));
+        dispatch(updateDownloadStatus(instanceName, 'Устанавливаю Forge...'));
 
         // Extract client.lzma from installer
 
@@ -1566,7 +1566,7 @@ export function downloadForge(instanceName) {
         { concurrency: state.settings.concurrentDownloads }
       );
 
-      dispatch(updateDownloadStatus(instanceName, 'Инжектим Forge...'));
+      dispatch(updateDownloadStatus(instanceName, 'Встраиваю Forge...'));
       dispatch(updateDownloadProgress(0));
 
       // Perform forge injection
@@ -1778,7 +1778,7 @@ export function processFTBManifest(instanceName) {
         path: path.join(instancePath, item.path, item.name)
       };
     });
-    dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
+    dispatch(updateDownloadStatus(instanceName, 'Скачиваю файлы сборки...'));
     await downloadInstanceFiles(
       mappedFiles,
       updatePercentage,
@@ -1800,7 +1800,7 @@ export function processFTBManifest(instanceName) {
       { concurrency: 10 }
     );
 
-    dispatch(updateDownloadStatus(instanceName, 'Finalizing FTB files...'));
+    dispatch(updateDownloadStatus(instanceName, 'Работаю с файлами FTB...'));
 
     const data = await getAddonsByFingerprint(
       Object.values(mappedFiles).map(v => v.murmur2)
@@ -2093,7 +2093,7 @@ export function processForgeManifest(instanceName) {
     }
 
     if (validAddon) {
-      dispatch(updateDownloadStatus(instanceName, 'Копируем overrides...'));
+      dispatch(updateDownloadStatus(instanceName, 'Копирую overrides...'));
       let progress = 0;
       await extractAll(
         addonPathZip,
@@ -2238,7 +2238,7 @@ export function downloadInstance(instanceName) {
         }
       }
 
-      dispatch(updateDownloadStatus(instanceName, 'Скачиваю файлы игры...'));
+      dispatch(updateDownloadStatus(instanceName, 'Скачиваю Minecraft...'));
 
       const mcVersion = loader?.mcVersion;
 

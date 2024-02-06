@@ -7,10 +7,10 @@ let activity;
 const initialAppStartup = Math.floor(Date.now() / 1000);
 
 const defaultValue = {
-  details: 'Спит',
+  details: 'Смотрит сборки',
   startTimestamp: initialAppStartup,
   largeImageKey: 'default_big',
-  largeImageText: 'OxLAUNCHER - Лучший Minecraft лаунчер',
+  largeImageText: 'OxLAUNCHER - Лучший Minecraft лаунчер для установки сборок с модификациями и не только',
   instance: false
 };
 

@@ -72,7 +72,7 @@ const InstanceDownloadFailed = ({
       title={`Ошибка загрузки - ${ellipsedName}`}
     >
       <div>
-        Загрузкаs {instanceName} не удалась.
+        Загрузка {instanceName} не удалась.
         <div
           css={`
             background: ${props => props.theme.palette.grey[900]};

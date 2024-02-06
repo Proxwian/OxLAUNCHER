@@ -51,7 +51,7 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
         'oxmodpack',
         8,
         reset ? 0 : modpacks.length,
-        'popularity',
+        'LastUpdated',
         true,
         minecraftVersion,
         categoryId
