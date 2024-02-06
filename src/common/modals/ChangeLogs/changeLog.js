@@ -1,10 +1,9 @@
 module.exports = {
   new: [
-    // {
-    //   header: 'Поддержка зеркала OxMIRROR',
-    //   content: 'для загрузки сторонних модификаций',
-    //   advanced: { cm: '4eec052e' }
-    // },
+     {
+       header: 'Поддержка внешних манифестов при загрузке',
+       content: 'модпаков CurseForge для OxMIRROR',
+     },
     // {
     //   header: 'Поддержка Discord RPC',
     //   content: '(отображение активности в лаунчере)',
@@ -13,8 +12,11 @@ module.exports = {
   ],
   improvements: [
     {
-      header: 'Изменён порядок отображения',
-      content: 'сборок OxMODPACK'
+      header: 'Изменён текст в некоторых диалогах',
+      //content: 'сборок OxMODPACK'
+    },
+    {
+      header: 'Добавлена кнопка отключения активностей Discord',
     }
     // {
     //   header: 'Изменён текст на экранах установки и импорта',
@@ -33,16 +35,16 @@ module.exports = {
     // }
   ],
   bugfixes: [
-    {
-      header: 'Исправлена загрузка модпаков',
-      content: 'с одной внешней загрузкой'
+    // {
+    //   header: 'Исправлена загрузка модпаков',
+    //   content: 'с одной внешней загрузкой'
       // advanced: { cm: '8ec97baa', pr: '1382' }
-    },
-    {
-      header: 'Исправлена установка модпаков',
-      content: 'без папки overrides.'
+    // },
+    // {
+    //   header: 'Исправлена установка модпаков',
+    //   content: 'без папки overrides.'
     //   advanced: { cm: '8ec97baa', pr: '1382' }
-    }
+    // }
     // {
     //   header: 'Добавление аккаунта Microsoft',
     //   content: 'через Менеджер аккаунтов.',
