@@ -1985,7 +1985,7 @@ export function processForgeManifest(instanceName) {
       { concurrency }
     );
 
-    if (mirrorManifest && mirrorManifest != undefined) {
+    if (mirrorManifest?.files) {
       await pMap(
         mirrorManifest?.files,
         async item => {
