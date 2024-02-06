@@ -354,6 +354,19 @@ const createInstance = async localInstanceName => {
 
   return (
     <div>
+      {annoucement ? (
+        <div
+          css={`
+            margin-top: 10px;
+            padding: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: ${props => props.theme.palette.colors.yellow};
+          `}
+        >
+          {annoucement}
+        </div>
+      ) : null}
       <Instances 
       css={`
         bottom: 20px;
