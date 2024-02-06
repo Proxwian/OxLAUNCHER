@@ -1989,7 +1989,6 @@ export function processForgeManifest(instanceName) {
       await pMap(
         mirrorManifest?.files,
         async item => {
-          if (!addonsHashmap[item.id]) return;
           let ok = false;
           let tries = 0;
           /* eslint-disable no-await-in-loop */
