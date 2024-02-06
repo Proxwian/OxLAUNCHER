@@ -21,7 +21,6 @@ import { updateLastUpdateVersion } from '../../../common/reducers/actions';
 import { _getInstances, _getInstancesPath, _getTempPath } from '../../../common/utils/selectors';
 
 import { useDebouncedCallback } from 'use-debounce';
-import { getSearch } from '../../../common/api';
 import { ACCOUNT_MICROSOFT } from '../../../common/utils/constants';
 
 const AddInstanceIcon = styled(Button)`
@@ -80,75 +79,6 @@ const Home = () => {
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
-
-  const [modpacks, setModpacks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  
-  const imageURL = useMemo(() => {
-    if (!modpack) return null;
-    // Curseforge
-    if (!modpack.synopsis) {
-      return modpack?.logo?.thumbnailUrl;
-    } else {
-      // FTB
-      const image = modpack?.art?.reduce((prev, curr) => {
-        if (!prev || curr.size < prev.size) return curr;
-        return prev;
-      });
-      return image.url;
-    }
-  }, [modpack]);
-  
-  const instanceSortOrder = useSelector(
-    state => state.settings.instanceSortOrder
-  );
-  const tempPath = useSelector(_getTempPath);
-  
-   const loadMoreModpacks = async (reset = false) => {
-    const reqObj = {};
-    lastRequest = reqObj;
-    if (!loading) {
-      setLoading(true);
-    }
-    if (reset && (modpacks.length !== 0)) {
-      setModpacks([]);
-    }
-    let data = null;
-    try {
-      if (error) {
-        return;
-      }
-	  data = await getSearch(
-        'modpacks',
-        "oxmodpack",
-        10,
-        0,
-        'LastUpdated',
-        true,
-        '',
-        0
-      );
-    } catch (err) {
-		console.log("catch err")
-      setError(err);
-      return;
-    }
-    const newModpacks = reset ? data : [...modpacks, ...data];
-    if (modpacks.length < 1) {
-      setLoading(false);
-      setModpacks(newModpacks);
-	  if (modpacks.length > 0) {
-		
-	  } else {
-		  console.log("modpacks not loaded")
-	  }
-    }
-  };
-  
-  const updateModpacks = useDebouncedCallback(() => {
-    loadMoreModpacks(true);
-  }, 250);
   
   const getInstances = (instances, sortOrder) => {
   // Data normalization for missing fields
@@ -164,7 +94,7 @@ const Home = () => {
     default:
       return inst;
   }
-};
+  };
 
 
   return (
