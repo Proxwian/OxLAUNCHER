@@ -99,11 +99,10 @@ const Home = () => {
 
   return (
     <div>
-      <News news={news} />
+      {/* <News news={news} /> */}
       {annoucement ? (
         <div
           css={`
-            margin-top: 10px;
             padding: 30px;
             font-size: 18px;
             font-weight: bold;
