@@ -293,7 +293,7 @@ const General = () => {
               <br />
               <Uuid>
                 {dashUuid(currentAccount.selectedProfile.id)}
-                <Tooltip title={copiedUuid ? 'Copied' : 'Copy'} placement="top">
+                <Tooltip title={copiedUuid ? 'Скопировано' : 'Копировать'} placement="top">
                   <div
                     css={`
                       width: 13px;
@@ -390,6 +390,38 @@ const General = () => {
           <Select.Option value={2}>Бета</Select.Option>
           <Select.Option value={3}>Альфа</Select.Option>
         </Select>
+      </Content>
+      <Title>
+        Активность Discord &nbsp; <FontAwesomeIcon icon={faDiscord} />
+      </Title>
+      <Content>
+        <p>
+          Включить / выключить отображение текущей сборки
+          и информации о лаунчере в профиле Discord.
+        </p>
+        <Switch
+          onChange={e => {
+            dispatch(updateDiscordRPC(e));
+            if (e) {
+              ipcRenderer.invoke('init-discord-rpc');
+            } else {
+              ipcRenderer.invoke('shutdown-discord-rpc');
+            }
+          }}
+          checked={DiscordRPC}
+        />
+      </Content>
+      <Title>
+        Новости &nbsp; <FontAwesomeIcon icon={faNewspaper} />
+      </Title>
+      <Content>
+        <p>Включить / выключить блок новостей на главном экране.</p>
+        <Switch
+          onChange={e => {
+            dispatch(updateShowNews(e));
+          }}
+          checked={showNews}
+        />
       </Content>
       <Title>
         Спрятать лаунчер во время игры &nbsp; <FontAwesomeIcon icon={faPlay} />
