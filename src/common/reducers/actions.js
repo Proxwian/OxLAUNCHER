@@ -2029,7 +2029,7 @@ export function processForgeManifest(instanceName) {
               await downloadFile(destFile, modManifest.downloadUrl);
               log.log('downloaded!');
               modManifests = modManifests.concat(
-                normalizeModData(modManifest, item.id, addon.name)
+                normalizeModData(modManifest, item.id, item.name)
               );
             }
             const percentage =
