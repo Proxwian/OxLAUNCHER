@@ -1925,14 +1925,6 @@ export function processForgeManifest(instanceName) {
         log.log('ProjectID is missed, skip mirror check');
       } else {
         mirrorManifest = await getMirrorManifest(loader?.projectID);
-          
-        mirrorManifest?.files?.forEach(async v => {
-          addonsHashmap[v.id] = v;
-  
-          const modManifest = await getMirrorAddon(v.id);
-  
-          addonsFilesHashmap[v.id] = modManifest;
-        });
       }
     };
 
@@ -2006,11 +1998,10 @@ export function processForgeManifest(instanceName) {
             if (tries !== 1) {
               await new Promise(resolve => setTimeout(resolve, 5000));
             }
-  
-            const addon = addonsHashmap[item.id];
-            const isResourcePack = addon.classId === 12;
-            const isShaderPack = addon.classId === 6552;
-            const modManifest = addonsFilesHashmap[item.id];
+
+            const modManifest = await getMirrorAddon(v.id);
+            const isResourcePack = item.classId === 12;
+            const isShaderPack = item.classId === 6552;
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
