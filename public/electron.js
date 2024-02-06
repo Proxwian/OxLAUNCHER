@@ -358,7 +358,7 @@ function createWindow() {
     },
     {
       label: 'Discord',
-      click: () => window.open(`${DISCORD_INVITE_URL}`)
+      click: () => shell.openExternal(DISCORD_INVITE_URL)
     }
   ];
 
