@@ -35,7 +35,7 @@ let tray;
 let watcher;
 
 const discordRPC = require('./discordRPC');
-const { DISCORD_INVITE_URL } = require('../src/common/utils/constants');
+const { DISCORD_INVITE_URL, BOOSTY_MAIN_URL } = require('../src/common/utils/constants');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -359,6 +359,10 @@ function createWindow() {
     {
       label: 'Discord',
       click: () => shell.openExternal(DISCORD_INVITE_URL)
+    },
+    {
+      label: 'Поблагодарить :3',
+      click: () => shell.openExternal(BOOSTY_MAIN_URL)
     }
   ];
 
