@@ -424,7 +424,11 @@ export const getMirrorManifest = async modpackId => {
 };
 
 export const getMirrorAddon = async fileID => {
-  const url = `${MIRROR_API_URL}/addons/${fileID}.json`;
-  const { data } = await axioInstance.get(url);
-  return data?.data;
+  try {
+    const url = `${MIRROR_API_URL}/addons/${fileID}.json`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
 };
