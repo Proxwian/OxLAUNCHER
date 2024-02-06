@@ -306,7 +306,11 @@ const createInstance = async localInstanceName => {
             localInstanceName,
             loader,
             manifest,
-            imageURL ? `background${path.extname(imageURL)}` : null
+            imageURL ? `background${path.extname(imageURL)}` : null,
+            undefined,
+            undefined,
+            undefined,
+            version
           )
         );
       } else if (isFabric) {
@@ -324,7 +328,11 @@ const createInstance = async localInstanceName => {
             localInstanceName,
             loader,
             manifest,
-            imageURL ? `background${path.extname(imageURL)}` : null
+            imageURL ? `background${path.extname(imageURL)}` : null,
+            undefined,
+            undefined,
+            undefined,
+            version
           )
         );
       } else if (isVanilla) {

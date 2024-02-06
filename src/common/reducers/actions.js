@@ -62,6 +62,8 @@ import {
   getJavaLatestManifest,
   getJavaManifest,
   getMcManifest,
+  getMirrorManifest,
+  getMirrorAddon,
   getMultipleAddons,
   mcAuthenticate,
   mcInvalidate,
@@ -1172,7 +1174,8 @@ export function addToQueue(
   background,
   timePlayed,
   settings = {},
-  updateOptions
+  updateOptions,
+  version
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1190,6 +1193,7 @@ export function addToQueue(
       background,
       isUpdate,
       bypassCopy,
+      version,
       ...patchedSettings
     });
 
@@ -1885,8 +1889,9 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest, loader } = _getCurrentDownloadItem(state);
+    const { manifest, loader, version } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
+    let mirrorManifest;
 
     dispatch(updateDownloadStatus(instanceName, 'Загружаю модификации...'));
 
@@ -1915,7 +1920,15 @@ export function processForgeManifest(instanceName) {
       );
     };
 
-    await Promise.all([_getAddons(), _getAddonFiles()]);
+    const _getMirrorManifest = async () => {
+      if (loader?.projectID == undefined) {
+        log.log('ProjectID is missed, skip mirror check');
+      } else {
+        mirrorManifest = await getMirrorManifest(loader?.projectID);
+      }
+    };
+
+    await Promise.all([_getAddons(), _getAddonFiles(), _getMirrorManifest()]);
 
     let modManifests = [];
     const optedOutMods = [];
@@ -1971,6 +1984,65 @@ export function processForgeManifest(instanceName) {
       },
       { concurrency }
     );
+
+    if (mirrorManifest) {
+      await pMap(
+        mirrorManifest?.files,
+        async item => {
+          let ok = false;
+          let tries = 0;
+          /* eslint-disable no-await-in-loop */
+          do {
+            tries += 1;
+            if (tries !== 1) {
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+
+            log.log('try to download mod from mirror:' + item.id);
+
+            const modManifest = await getMirrorAddon(item.id);
+            const isResourcePack = item.classId === 12;
+            const isShaderPack = item.classId === 6552;
+            const destFile = path.join(
+              _getInstancesPath(state),
+              instanceName,
+              isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods',
+              modManifest.fileName
+            );
+
+            log.log('destFile:' + modManifest.fileName);
+  
+            const fileExists = await fse.pathExists(destFile);
+  
+            if (!fileExists) {
+              // if (!modManifest.downloadUrl) {
+              //   const normalizedModData = normalizeModData(
+              //     modManifest,
+              //     item.id,
+              //     addon.name
+              //   );
+  
+              //   optedOutMods.push({ addon, modManifest: normalizedModData });
+              //   return;
+              // }
+              log.log('download url:' + modManifest.downloadUrl);
+              await downloadFile(destFile, modManifest.downloadUrl);
+              log.log('downloaded!');
+              modManifests = modManifests.concat(
+                normalizeModData(modManifest, item.id, item.name)
+              );
+            }
+            const percentage =
+              (modManifests.length * 100) / manifest.files.length - 1;
+  
+            dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+            ok = true;
+          } while (!ok && tries <= 3);
+          /* eslint-enable no-await-in-loop */
+        },
+        { concurrency }
+      );
+    }
 
     if (optedOutMods.length) {
       await new Promise((resolve, reject) => {

@@ -12,6 +12,7 @@ import {
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
   FTB_API_URL,
+  MIRROR_API_URL,
   JAVA_LATEST_MANIFEST_URL
 } from './utils/constants';
 import { sortByDate, getMcManifestUrl } from './utils';
@@ -408,4 +409,26 @@ export const getFTBSearch = async searchText => {
   trackFTBAPI();
   const url = `${FTB_API_URL}/modpack/search/1000?term=${searchText}`;
   return axios.get(url);
+};
+
+// OxMIRROR API
+
+export const getMirrorManifest = async modpackId => {
+  try {
+    const url = `${MIRROR_API_URL}/manifests/${modpackId}.json`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getMirrorAddon = async fileID => {
+  try {
+    const url = `${MIRROR_API_URL}/addons/${fileID}.json`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
 };
