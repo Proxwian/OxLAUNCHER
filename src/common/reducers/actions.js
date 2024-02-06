@@ -1998,7 +1998,9 @@ export function processForgeManifest(instanceName) {
               await new Promise(resolve => setTimeout(resolve, 5000));
             }
 
-            const modManifest = await getMirrorAddon(v.id);
+            log.log('try to download mod from mirror:' + item.id);
+
+            const modManifest = await getMirrorAddon(item.id);
             const isResourcePack = item.classId === 12;
             const isShaderPack = item.classId === 6552;
             const destFile = path.join(
@@ -2007,6 +2009,8 @@ export function processForgeManifest(instanceName) {
               isResourcePack ? 'resourcepacks' : isShaderPack ? 'shaderpacks' : 'mods',
               modManifest.fileName
             );
+
+            log.log('destFile:' + modManifest.fileName);
   
             const fileExists = await fse.pathExists(destFile);
   
@@ -2021,7 +2025,9 @@ export function processForgeManifest(instanceName) {
               //   optedOutMods.push({ addon, modManifest: normalizedModData });
               //   return;
               // }
+              log.log('download url:' + modManifest.downloadUrl);
               await downloadFile(destFile, modManifest.downloadUrl);
+              log.log('downloaded!');
               modManifests = modManifests.concat(
                 normalizeModData(modManifest, item.id, addon.name)
               );
