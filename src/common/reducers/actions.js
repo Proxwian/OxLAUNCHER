@@ -1486,7 +1486,7 @@ export function downloadForge(instanceName) {
 
       // Patching
       if (forgeJson.install?.processors?.length) {
-        dispatch(updateDownloadStatus(instanceName, 'Патчим Forge...'));
+        dispatch(updateDownloadStatus(instanceName, 'Устанавливаю Forge...'));
 
         // Extract client.lzma from installer
 
@@ -1566,7 +1566,7 @@ export function downloadForge(instanceName) {
         { concurrency: state.settings.concurrentDownloads }
       );
 
-      dispatch(updateDownloadStatus(instanceName, 'Инжектим Forge...'));
+      dispatch(updateDownloadStatus(instanceName, 'Встраиваю Forge...'));
       dispatch(updateDownloadProgress(0));
 
       // Perform forge injection

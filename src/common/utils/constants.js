@@ -18,6 +18,7 @@ export const NEWS_URL =
 export const FMLLIBS_OUR_BASE_URL = 'https://fmllibs.gdevs.io';
 export const FMLLIBS_FORGE_BASE_URL =
   'https://files.minecraftforge.net/fmllibs';
+export const DISCORD_INVITE_URL = 'http://discord.gg/G4wjUF32Sg';
 export const IMGUR_CLIENT_ID = '509a564cf4466c9';
 export const FABRIC = 'fabric';
 export const FORGE = 'forge';

@@ -35,6 +35,7 @@ let tray;
 let watcher;
 
 const discordRPC = require('./discordRPC');
+const { DISCORD_INVITE_URL } = require('../src/common/utils/constants');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -354,6 +355,10 @@ function createWindow() {
     {
       label: 'Консоль разработчика',
       click: () => mainWindow.webContents.openDevTools()
+    },
+    {
+      label: 'Discord',
+      click: () => window.open(`${DISCORD_INVITE_URL}`)
     }
   ];
 
