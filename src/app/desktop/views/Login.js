@@ -170,14 +170,14 @@ const Login = () => {
   };
 
   const authSelectedBackend = () => {
-    if (selectedBackend == 'mojang') {
-      loginMojang(email, password)
-    } else if (selectedBackend == 'oxauth') {
+    if (selectedBackend == 'OxAUTH') {
       loginOx(email, password);
-    } else if (selectedBackend == 'elyby') {
+    } else if (selectedBackend == 'ElyBy') {
       loginElyBy(email, password);
-    } else if (selectedBackend == 'offline') {
+    } else if (selectedBackend == 'Offline') {
       loginOffline(email);
+    } else {
+      loginMojang(email, password)
     }
   }
 
@@ -196,6 +196,8 @@ const Login = () => {
 
   useKey(['Enter'], authenticate);
 
+  setSelectedBackend('Mojang');
+
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
   }, []);
@@ -209,18 +211,26 @@ const Login = () => {
               <a href="https://oxlauncher.ru"><HorizontalLogo size={200} /></a>
             </Header>
             <Form>
-                {selectedBackend != 'mojang' ? (
-                  <div>
+              <div>
+                {selectedBackend != 'Mojang' ? (
                     <Input
                       placeholder="Никнейм"
                       value={email}
                       onChange={({ target: { value } }) => setEmail(value)}
                     />
+                ) : null }
+
+                <br />
+
+                {selectedBackend != 'Offline' ? (
                     <Input
                       placeholder="Пароль"
                       value={password}
                       onChange={({ target: { value } }) => setPassword(value)}
                     />
+                ) : null }
+
+                {selectedBackend != 'Mojang' ? (
                     <LoginButton color="primary" onClick={authenticate}>
                       Войти
                       <FontAwesomeIcon
@@ -230,7 +240,6 @@ const Login = () => {
                         icon={faArrowRight}
                       />
                     </LoginButton>
-                  </div>
                 ) : (
                   <MicrosoftLoginButton
                     color="primary"
@@ -245,6 +254,7 @@ const Login = () => {
                     />
                   </MicrosoftLoginButton>
                 )}
+                </div>
               
               {loginFailed && (
                 <LoginFailMessage>{loginFailed?.message}</LoginFailMessage>
@@ -252,13 +262,13 @@ const Login = () => {
 
               <Select
                 css={`
-                  width: 100px;
+                  width: 200px;
                   margin: 10px;
                 `}
                 onChange={v => {
                   setSelectedBackend(v);
                 }}
-                placeholder="Авторизация"
+                placeholder="Mojang"
                 virtual={false}
               >
                 {Object.entries(BACKEND_SERVERS).map(([k, v]) => (
