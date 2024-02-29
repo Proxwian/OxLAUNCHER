@@ -48,10 +48,10 @@ export const OXAUTH_REGISTER_URL = 'https://oxlauncher.ru/';
 export const ELYBY_REGISTER_URL = 'https://ely.by/login'
 
 export const BACKEND_SERVERS = {
-  oxauth: 'OxAuth',
-  mojang: 'Mojang',
-  elyby: 'ElyBy',
-  offline: 'Offline'
+  OXAUTH: 'OxAuth',
+  MOJANG: 'Mojang',
+  ELYBY: 'ElyBy',
+  OFFLINE: 'Offline'
 };
 
 export const MC_STARTUP_METHODS = {

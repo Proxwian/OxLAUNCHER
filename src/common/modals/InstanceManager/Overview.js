@@ -126,7 +126,7 @@ const ResolutionInputContainer = styled.div`
 `;
 
 const Card = memo(
-  ({ title, children, color, icon, instanceName, defaultValue }) => {
+  ({ title, children, color, icon, instanceName, backend, defaultValue }) => {
     const dispatch = useDispatch();
     return (
       <CardBox
@@ -161,7 +161,7 @@ const Card = memo(
             `}
             onClick={() => {
               dispatch(
-                openModal('McVersionChanger', { instanceName, defaultValue })
+                backend ? openModal('BackendChanger', { instanceName, backend }) : openModal('McVersionChanger', { instanceName, defaultValue })
               );
             }}
           >
@@ -316,22 +316,23 @@ const Overview = ({ instanceName, background, manifest }) => {
             defaultValue={config?.loader}
             icon={<FontAwesomeIcon icon={faCog} />}
           >
-            {config?.loader?.loaderType}
+            {config?.loader?.loaderType} {config?.loader?.loaderType === 'forge'
+              ? config?.loader?.loaderVersion?.split('-')[1]
+              : config?.loader?.loaderVersion || '-'}
           </Card>
           <Card
-            title="Версия загрузчика"
+            title="Аккаунт"
             color={props => props.theme.palette.colors.lightBlue}
             instanceName={instanceName}
-            defaultValue={config?.loader}
+            defaultValue={config?.backend}
+            backend={config?.backend}
             icon={
-              (config?.loader?.loaderVersion || '-') !== '-' ? (
+              (config?.backend?.name || '-') !== '-' ? (
                 <FontAwesomeIcon icon={faCog} />
               ) : null
             }
           >
-            {config?.loader?.loaderType === 'forge'
-              ? config?.loader?.loaderVersion?.split('-')[1]
-              : config?.loader?.loaderVersion || '-'}
+            {config?.backend ? config?.backend : "Mojang"}
           </Card>
         </OverviewCard>
         <OverviewCard

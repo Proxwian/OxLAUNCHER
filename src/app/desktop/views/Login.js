@@ -10,7 +10,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button } from 'antd';
 import { useKey } from 'rooks';
-import { loginOffline, loginMojang, loginElyBy, loginOAuth } from '../../../common/reducers/actions';
+import { loginOffline, loginMojang, loginElyBy, loginOx, loginOAuth } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.mp4';
@@ -172,7 +172,7 @@ const Login = () => {
     if (selectedBackend == 'mojang') {
       loginMojang(email, password)
     } else if (selectedBackend == 'oxauth') {
-      loginOxAUTH(email, password);
+      loginOx(email, password);
     } else if (selectedBackend == 'elyby') {
       loginElyBy(email, password);
     } else if (selectedBackend == 'offline') {
@@ -208,7 +208,7 @@ const Login = () => {
               <a href="https://oxlauncher.ru"><HorizontalLogo size={200} /></a>
             </Header>
             <Form>
-                {selectedBackend != "mojang" ? (
+                {selectedBackend != 'mojang' ? (
                   <div>
                     <Input
                       placeholder="Никнейм"

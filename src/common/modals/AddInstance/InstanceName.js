@@ -177,7 +177,8 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            imageURL ? `background${path.extname(imageURL)}` : null
+            imageURL ? `background${path.extname(imageURL)}` : null,
+            version?.backend ? version?.backend : "Mojang"
           )
         );
       } else if (isFabric) {
@@ -195,7 +196,8 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            imageURL ? `background${path.extname(imageURL)}` : null
+            imageURL ? `background${path.extname(imageURL)}` : null,
+            version?.backend ? version?.backend : "Mojang"
           )
         );
       } else if (isVanilla) {

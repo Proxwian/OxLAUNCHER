@@ -1332,6 +1332,7 @@ export function addToQueue(
   loader,
   manifest,
   background,
+  backend,
   timePlayed,
   settings = {},
   updateOptions,
@@ -1373,6 +1374,7 @@ export function addToQueue(
             ...(prev || {}),
             loader,
             timePlayed: prev.timePlayed || timePlayed || 0,
+            backend: backend,
             background,
             mods: prev.mods || [],
             ...patchedSettings
@@ -2049,7 +2051,7 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest, loader, version } = _getCurrentDownloadItem(state);
+    const { manifest, loader, backend } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
     let mirrorManifest;
 
