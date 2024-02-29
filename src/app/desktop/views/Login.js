@@ -16,7 +16,7 @@ import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.mp4';
 import HorizontalLogo from '../../../ui/HorizontalLogo';
 import { openModal } from '../../../common/reducers/modals/actions';
-import { BACKEND_SERVERS } from '../utils/constants';
+import BACKEND_SERVERS from '../utils/constants';
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
