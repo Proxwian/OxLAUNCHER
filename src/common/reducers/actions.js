@@ -320,7 +320,7 @@ export function switchToFirstValidAccount(id) {
         await dispatch(
           accounts[i].accountType === ACCOUNT_MICROSOFT
             ? loginWithOAuthAccessToken()
-            : login(accounts[i].selectedProfile.name, true, true)
+            : loginWithAccessToken()
         );
         found = accounts[i].selectedProfile.id;
       } catch {
@@ -354,7 +354,7 @@ export function selectFirstValidAccount(id) {
         await dispatch(
           accounts[i].accountType === ACCOUNT_MICROSOFT
             ? loginWithOAuthAccessToken()
-            : login(accounts[i].selectedProfile.name, true, true)
+            : loginWithAccessToken()
         );
         found = accounts[i].selectedProfile.id;
       } catch {
@@ -803,12 +803,12 @@ export function loginWithAccessToken(redirect = true) {
       try {
         let skinUrl = null;
         switch (accountType) {
-          case 'mojang':
+          case ACCOUNT_MOJANG:
             skinUrl = await getPlayerSkinMojang(selectedProfile.id);
-          case 'oxauth':
+          case ACCOUNT_OXAUTH:
             skinUrl = await getPlayerSkinOx(selectedProfile.name);
             break;
-          case 'elyby':
+          case ACCOUNT_ELYBY:
             skinUrl = await getPlayerSkinElyBy(selectedProfile.name);
             break;
           default:
@@ -834,15 +834,19 @@ export function loginWithAccessToken(redirect = true) {
           let data = null;
           let skinUrl = null;
           switch (accountType) {
-            case 'mojang':
+            case ACCOUNT_MOJANG:
               skinUrl = await getPlayerSkinMojang(selectedProfile.id);
               data = await mcRefresh(accessToken, clientToken);
               break;
-            case 'oxauth':
+            case ACCOUNT_MICROSOFT:
+              skinUrl = await getPlayerSkinMojang(selectedProfile.id);
+              data = await mcRefresh(accessToken, clientToken);
+              break;
+            case ACCOUNT_OXAUTH:
               skinUrl = await getPlayerSkinOx(selectedProfile.name);
               data = await oxRefresh(accessToken, clientToken);
               break;
-            case 'elyby':
+            case ACCOUNT_ELYBY:
               skinUrl = await getPlayerSkinElyBy(selectedProfile.name);
               data = await elybyRefresh(accessToken, clientToken);
               break;
