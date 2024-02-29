@@ -10,7 +10,6 @@ import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
-import { getFilteredVersions } from '../../app/desktop/utils';
 
 const BackendChanger = ({ instanceName, defaultValue }) => {
   const config = useSelector(state => _getInstance(state)(instanceName));
@@ -117,7 +116,7 @@ const BackendChanger = ({ instanceName, defaultValue }) => {
   );
 };
 
-export default memo(McVersionChanger);
+export default memo(BackendChanger);
 
 const Container = styled.div`
   width: 100%;
