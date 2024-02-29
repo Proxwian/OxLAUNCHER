@@ -10,12 +10,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button } from 'antd';
 import { useKey } from 'rooks';
-import { login, loginOAuth } from '../../../common/reducers/actions';
+import { loginOffline, loginMojang, loginElyBy, loginOAuth } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.mp4';
 import HorizontalLogo from '../../../ui/HorizontalLogo';
 import { openModal } from '../../../common/reducers/modals/actions';
+import { BACKEND_SERVERS } from '../utils/constants';
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
@@ -144,6 +145,7 @@ const LoginFailMessage = styled.div`
 
 const Login = () => {
   const dispatch = useDispatch();
+  const [selectedBackend, setSelectedBackend] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [version, setVersion] = useState(null);
@@ -157,7 +159,7 @@ const Login = () => {
     dispatch(requesting('accountAuthentication'));
     setTimeout(() => {
       dispatch(
-        load(features.mcAuthentication, dispatch(login(email)))
+        load(features.mcAuthentication, dispatch(authSelectedBackend))
       ).catch(e => {
         console.error(e);
         setLoginFailed(e);
@@ -165,6 +167,18 @@ const Login = () => {
       });
     }, 1000);
   };
+
+  const authSelectedBackend = () => {
+    if (selectedBackend == 'mojang') {
+      loginMojang(email, password)
+    } else if (selectedBackend == 'oxauth') {
+      loginOxAUTH(email, password);
+    } else if (selectedBackend == 'elyby') {
+      loginElyBy(email, password);
+    } else if (selectedBackend == 'offline') {
+      loginOffline(email);
+    }
+  }
 
   const authenticateMicrosoft = () => {
     dispatch(requesting('accountAuthentication'));
@@ -194,38 +208,71 @@ const Login = () => {
               <a href="https://oxlauncher.ru"><HorizontalLogo size={200} /></a>
             </Header>
             <Form>
-              <div>
-                <Input
-                  placeholder="Никнейм"
-                  value={email}
-                  onChange={({ target: { value } }) => setEmail(value)}
-                />
-              </div>
+                {selectedBackend != "mojang" ? (
+                  <div>
+                    <Input
+                      placeholder="Никнейм"
+                      value={email}
+                      onChange={({ target: { value } }) => setEmail(value)}
+                    />
+                    <Input
+                      placeholder="Пароль"
+                      value={password}
+                      onChange={({ target: { value } }) => setPassword(value)}
+                    />
+                    <LoginButton color="primary" onClick={authenticate}>
+                      Войти
+                      <FontAwesomeIcon
+                        css={`
+                          margin-left: 6px;
+                        `}
+                        icon={faArrowRight}
+                      />
+                    </LoginButton>
+                  </div>
+                ) : (
+                  <MicrosoftLoginButton
+                    color="primary"
+                    onClick={authenticateMicrosoft}
+                  >
+                    Авторизоваться
+                    <FontAwesomeIcon
+                      css={`
+                        margin-left: 6px;
+                      `}
+                      icon={faExternalLinkAlt}
+                    />
+                  </MicrosoftLoginButton>
+                )}
+              
               {loginFailed && (
                 <LoginFailMessage>{loginFailed?.message}</LoginFailMessage>
               )}
-              <LoginButton color="primary" onClick={authenticate}>
-                Войти
-                <FontAwesomeIcon
-                  css={`
-                    margin-left: 6px;
-                  `}
-                  icon={faArrowRight}
-                />
-              </LoginButton>
-              <MicrosoftLoginButton
-                color="primary"
-                onClick={authenticateMicrosoft}
+
+              <Select
+                css={`
+                  width: 100px;
+                  margin: 10px;
+                `}
+                onChange={v => {
+                  setSelectedBackend(v);
+                }}
+                placeholder="Авторизация"
+                virtual={false}
               >
-                Microsoft
-                <FontAwesomeIcon
-                  css={`
-                    margin-left: 6px;
-                  `}
-                  icon={faExternalLinkAlt}
-                />
-              </MicrosoftLoginButton>
+                {Object.entries(BACKEND_SERVERS).map(([k, v]) => (
+                  <Select.Option
+                    title={v}
+                    key={k}
+                    value={v}
+                  >
+                    {v}
+                  </Select.Option>
+                ))}
+              </Select>
+              
             </Form>
+            
             <Footer>
               <div
                 css={`
@@ -236,7 +283,7 @@ const Login = () => {
                 `}
               >
                 <center>
-                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.3.6</a>
+                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.3.9</a>
                 </center>
               </div>
               <div

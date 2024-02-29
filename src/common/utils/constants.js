@@ -29,6 +29,8 @@ export const CURSEFORGE = 'curseforge';
 export const FTB = 'ftb';
 
 export const ACCOUNT_OFFLINE = 'ACCOUNT_OFFLINE';
+export const ACCOUNT_OXAUTH = 'ACCOUNT_OXAUTH';
+export const ACCOUNT_ELYBY = 'ACCOUNT_ELYBY';
 export const ACCOUNT_MOJANG = 'ACCOUNT_MOJANG';
 export const ACCOUNT_MICROSOFT = 'ACCOUNT_MICROSOFT';
 export const CURSEFORGE_URL = 'https://www.curseforge.com';
@@ -39,6 +41,13 @@ export const MICROSOFT_OAUTH_CLIENT_ID = 'b9336bf8-c6bb-4344-aabe-63d0bfa8db2e';
 export const MICROSOFT_OAUTH_REDIRECT_URL =
   'https://login.microsoftonline.com/common/oauth2/nativeclient';
 export const MINECRAFT_SERVICES_URL = 'https://api.minecraftservices.com';
+
+export const BACKEND_SERVERS = {
+  oxauth: 'OxAuth',
+  mojang: 'Mojang',
+  elyby: 'ElyBy',
+  offline: 'Offline'
+};
 
 export const MC_STARTUP_METHODS = {
   SYMLINK: 'Symlink',

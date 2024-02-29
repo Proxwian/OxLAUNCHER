@@ -230,6 +230,125 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
   );
 };
 
+// OxAUTH API
+
+export const oxAuthenticate = (username, password, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/authenticate`,
+    {
+      agent: {
+        name: 'Minecraft',
+        version: 1
+      },
+      username,
+      password,
+      clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxValidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/validate`,
+    {
+      accessToken,
+      clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxRefresh = (accessToken, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/refresh`,
+    {
+      accessToken,
+      clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxInvalidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/invalidate`,
+    {
+      accessToken,
+      clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxGetPlayerSkin = nickname => {
+  return axios.get(
+    `http://skinsystem.ely.by/skins?version=2&minecraft_version=1.18.2&name=${nickname}.png`
+  );
+};
+
+
+// Ely.by API
+
+export const elybyAuthenticate = (username, password, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/authenticate`,
+    {
+      agent: {
+        name: 'Minecraft',
+        version: 1
+      },
+      username,
+      password,
+      clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyValidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/validate`,
+    {
+      accessToken,
+      clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyRefresh = (accessToken, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/refresh`,
+    {
+      accessToken,
+      clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyInvalidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/invalidate`,
+    {
+      accessToken,
+      clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyGetPlayerSkin = nickname => {
+  return axios.get(
+    `http://skinsystem.ely.by/skins?version=2&minecraft_version=1.18.2&name=${nickname}.png`
+  );
+};
+
 // FORGE ADDONS
 
 export const getAddon = async projectID => {
