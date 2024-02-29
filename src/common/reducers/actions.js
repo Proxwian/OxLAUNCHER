@@ -2,6 +2,7 @@ import axios from 'axios';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import { v5 as uuid } from 'uuid';
+const { promisify } = require('util');
 import { machineId } from 'node-machine-id';
 import fse, { remove } from 'fs-extra';
 import coerce from 'semver/functions/coerce';
@@ -19,7 +20,7 @@ import crypto from 'crypto';
 import omit from 'lodash/omit';
 import Seven from 'node-7z';
 import { push } from 'connected-react-router';
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 import symlink from 'symlink-dir';
 import fss, { promises as fs } from 'fs';
 import originalFs from 'original-fs';
@@ -2354,7 +2355,7 @@ export function processForgeManifest(instanceName) {
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { loader, manifest, isUpdate, bypassCopy } =
+    const { loader, manifest, isUpdate, backend, bypassCopy } =
       _getCurrentDownloadItem(state);
     const {
       app: {
@@ -2533,6 +2534,11 @@ export function downloadInstance(instanceName) {
         await dispatch(processFTBManifest(instanceName));
       else if (manifest && loader?.source === CURSEFORGE)
         await dispatch(processForgeManifest(instanceName));
+
+      if (backend) {
+        dispatch(updateDownloadStatus(instanceName, 'Настраиваю бэкенд...'));
+        await promisify(exec)(`java -javaagent:../../assets/authlib-injector.jar=ely.by -jar ${mcMainFile.path}`)
+      }
 
       dispatch(updateDownloadProgress(0));
 
