@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../components/Modal';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
-import { login, loginOAuth } from '../reducers/actions';
+import { login, loginElyBy, loginOAuth, loginOffline, loginOx } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
 import { shell } from 'electron';
 import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH, OXAUTH_REGISTER_URL, ELYBY_REGISTER_URL } from '../utils/constants';
@@ -21,7 +21,23 @@ const AddAccount = ({ username }) => {
 
   const addOfflineAccount = () => {
     dispatch(
-      load(features.mcAuthentication, dispatch(login(email, password, false)))
+      load(features.mcAuthentication, dispatch(loginOffline(email, false)))
+    )
+      .then(() => dispatch(closeModal()))
+      .catch(console.error);
+  };
+
+  const addElyByAccount = () => {
+    dispatch(
+      load(features.mcAuthentication, dispatch(loginElyBy(email, password, false)))
+    )
+      .then(() => dispatch(closeModal()))
+      .catch(console.error);
+  };
+
+  const addOxAccount = () => {
+    dispatch(
+      load(features.mcAuthentication, dispatch(loginOx(email, password, false)))
     )
       .then(() => dispatch(closeModal()))
       .catch(console.error);
@@ -83,7 +99,7 @@ const AddAccount = ({ username }) => {
         />
       </FormContainer>
       <FormContainer>
-        <StyledButton onClick={addAccount}>Добавить</StyledButton>
+        <StyledButton onClick={addElyByAccount}>Добавить</StyledButton>
         <StyledButton onClick={shell.openExternal(ELYBY_REGISTER_URL)}>Регистрация</StyledButton>
       </FormContainer>
     </Container>
@@ -113,7 +129,7 @@ const AddAccount = ({ username }) => {
         />
       </FormContainer>
       <FormContainer>
-        <StyledButton onClick={addAccount}>Добавить</StyledButton>
+        <StyledButton onClick={addOxAccount}>Добавить</StyledButton>
         <StyledButton onClick={shell.openExternal(OXAUTH_REGISTER_URL)}>Регистрация</StyledButton>
       </FormContainer>
     </Container>
