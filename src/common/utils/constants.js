@@ -44,6 +44,9 @@ export const MICROSOFT_OAUTH_REDIRECT_URL =
   'https://login.microsoftonline.com/common/oauth2/nativeclient';
 export const MINECRAFT_SERVICES_URL = 'https://api.minecraftservices.com';
 
+export const OXAUTH_REGISTER_URL = 'https://oxlauncher.ru/';
+export const ELYBY_REGISTER_URL = 'https://ely.by/login'
+
 export const BACKEND_SERVERS = {
   oxauth: 'OxAuth',
   mojang: 'Mojang',

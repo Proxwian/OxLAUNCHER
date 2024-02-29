@@ -9,7 +9,8 @@ import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
 import { login, loginOAuth } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
-import { ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE } from '../utils/constants';
+import { shell } from 'electron';
+import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH, OXAUTH_REGISTER_URL, ELYBY_REGISTER_URL } from '../utils/constants';
 
 const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const AddAccount = ({ username }) => {
   const [accountType, setAccountType] = useState(ACCOUNT_OFFLINE);
   const [loginFailed, setloginFailed] = useState();
 
-  const addAccount = () => {
+  const addOfflineAccount = () => {
     dispatch(
       load(features.mcAuthentication, dispatch(login(email, password, false)))
     )
@@ -35,7 +36,7 @@ const AddAccount = ({ username }) => {
       });
   };
 
-  const renderAddMojangAccount = () => (
+  const renderAddOfflineAccount = () => (
     <Container>
       <FormContainer>
         <h1
@@ -53,7 +54,67 @@ const AddAccount = ({ username }) => {
         />
       </FormContainer>
       <FormContainer>
+        <StyledButton onClick={addOfflineAccount}>Добавить</StyledButton>
+      </FormContainer>
+    </Container>
+  );
+
+  const renderAddElyByAccount = () => (
+    <Container>
+      <FormContainer>
+        <h1
+          css={`
+            height: 80px;
+          `}
+        >
+          Ely.by
+        </h1>
+        <StyledInput
+          disabled={!!username}
+          placeholder="Логин"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <StyledInput
+          disabled={!!username}
+          placeholder="Пароль"
+          value={email}
+          onChange={e => setPassword(e.target.value)}
+        />
+      </FormContainer>
+      <FormContainer>
         <StyledButton onClick={addAccount}>Добавить</StyledButton>
+        <StyledButton onClick={shell.openExternal(ELYBY_REGISTER_URL)}>Регистрация</StyledButton>
+      </FormContainer>
+    </Container>
+  );
+
+  const renderAddOxAccount = () => (
+    <Container>
+      <FormContainer>
+        <h1
+          css={`
+            height: 80px;
+          `}
+        >
+          OxAUTH
+        </h1>
+        <StyledInput
+          disabled={!!username}
+          placeholder="Логин"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <StyledInput
+          disabled={!!username}
+          placeholder="Пароль"
+          value={email}
+          onChange={e => setPassword(e.target.value)}
+        />
+      </FormContainer>
+      <FormContainer>
+        <StyledButton onClick={addAccount}>Добавить</StyledButton>
+        <StyledButton onClick={shell.openExternal(OXAUTH_REGISTER_URL)}>Регистрация</StyledButton>
       </FormContainer>
     </Container>
   );
@@ -105,11 +166,18 @@ const AddAccount = ({ username }) => {
           overflowedIndicator={null}
         >
           <StyledAccountMenuItem
-            key={ACCOUNT_OFFLINE}
-            onClick={() => setAccountType(ACCOUNT_OFFLINE)}
+            key={ACCOUNT_OXAUTH}
+            onClick={() => setAccountType(ACCOUNT_OXAUTH)}
           >
-            Без пароля
+            OxAUTH
           </StyledAccountMenuItem>
+          <StyledAccountMenuItem
+            key={ACCOUNT_ELYBY}
+            onClick={() => setAccountType(ACCOUNT_ELYBY)}
+          >
+            Ely.by
+          </StyledAccountMenuItem>
+          
           <StyledAccountMenuItem
             key={ACCOUNT_MICROSOFT}
             onClick={() => {
@@ -119,8 +187,16 @@ const AddAccount = ({ username }) => {
           >
             Microsoft
           </StyledAccountMenuItem>
+          <StyledAccountMenuItem
+            key={ACCOUNT_OFFLINE}
+            onClick={() => setAccountType(ACCOUNT_OFFLINE)}
+          >
+            Без пароля
+          </StyledAccountMenuItem>
         </Menu>
-        {accountType === ACCOUNT_OFFLINE ? renderAddMojangAccount() : null}
+        {accountType === ACCOUNT_OXAUTH ? renderAddOxAccount() : null}
+        {accountType === ACCOUNT_ELYBY ? renderAddElyByAccount() : null}
+        {accountType === ACCOUNT_OFFLINE ? renderAddOfflineAccount() : null}
         {accountType === ACCOUNT_MICROSOFT ? renderAddMicrosoftAccount() : null}
       </Container>
     </Modal>
