@@ -3,6 +3,8 @@ import axios from 'axios';
 import qs from 'querystring';
 import {
   MOJANG_APIS,
+  OXAUTH_APIS,
+  ELYBY_APIS,
   FORGESVC_URL,
   FABRIC_APIS,
   JAVA_MANIFEST_URL,

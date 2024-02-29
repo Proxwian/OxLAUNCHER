@@ -16,7 +16,7 @@ import {
 } from '../reducers/actions';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
-import { ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE } from '../utils/constants';
+import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../utils/constants';
 import { extractFace } from '../../app/desktop/utils';
 
 const ProfileSettings = () => {
@@ -46,6 +46,22 @@ const ProfileSettings = () => {
             if (!account || !currentAccount) return;
             return (
               <AccountContainer key={account.selectedProfile.id}>
+                {(account.accountType === ACCOUNT_MICROSOFT) && (
+                  <FontAwesomeIcon
+                    icon={faSquareM}
+                  />
+                )}
+                {(account.accountType === ACCOUNT_OXAUTH) && (
+                  <FontAwesomeIcon
+                    icon={faSquareO}
+                  />
+                )}
+                {(account.accountType === ACCOUNT_ELYBY) && (
+                  <FontAwesomeIcon
+                    icon={faSquareE}
+                  />
+                )}
+                
                 <AccountItem
                   active={
                     account.selectedProfile.id ===
