@@ -118,7 +118,6 @@ import {
   getPatchedInstanceType,
   getPlayerSkinMojang,
   getPlayerSkinElyBy,
-  getPlayerSkinMojang,
   getPlayerSkinOx,
   isInstanceFolderPath,
   isMod,
