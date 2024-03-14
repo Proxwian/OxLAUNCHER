@@ -222,5 +222,10 @@
     "use-debounce": "^7.0.0",
     "user-agents": "^1.0.1048",
     "uuid": "^8.3.2"
+  },
+  "overrides": {
+    "nsfw": {
+      "node-addon-api": "7.1.0"
+    }
   }
 }
