@@ -26,6 +26,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
+      - name: Clean up npm
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          rm -rf node_modules && npm cache clean -f
       - name: Use Node.js 16.17.0
         uses: actions/setup-node@v1
         with:
