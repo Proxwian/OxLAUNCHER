@@ -31,10 +31,6 @@ jobs:
         with:
           node-version: '16.17.0'
 
-      - name: Install jimp
-        run: |
-          npm install jimp/es
-
       - name: Install Nightly
         run: |
           rustup toolchain install nightly
