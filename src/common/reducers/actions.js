@@ -37,6 +37,7 @@ import {
   ACCOUNT_MOJANG,
   ACCOUNT_OFFLINE,
   ACCOUNT_OXAUTH,
+  AUTHLIB_DOWNLOAD_URL,
   CURSEFORGE,
   FABRIC,
   FMLLIBS_FORGE_BASE_URL,
@@ -571,10 +572,11 @@ export function loginOx(username, password, redirect = true) {
       app: { isNewUser, clientToken }
     } = getState();
     if (!username || !password) {
-      throw new Error('Не указан ник или пароль');
+      throw new Error('Не указан логин или пароль');
     }
     try {
       let data = null;
+      let clientToken = generateRandomString(128);
       try {
         ({ data } = await oxAuthenticate(username, password, clientToken));
         data.accountType = ACCOUNT_OXAUTH;
@@ -583,9 +585,9 @@ export function loginOx(username, password, redirect = true) {
         throw new Error('Неправильный логин или пароль.');
       }
 
-      if (!data?.selectedProfile?.id) {
-        throw new Error("Похоже, что вы не приобрели игру.");
-      }
+      // if (!data?.selectedProfile?.id) {
+      //   throw new Error("Похоже, что вы не приобрели игру.");
+      // }
       const skinUrl = await getPlayerSkinOx(data.selectedProfile.name);
       if (skinUrl) {
         data.skin = skinUrl;
@@ -616,7 +618,7 @@ export function loginElyBy(username, password, redirect = true) {
       app: { isNewUser, clientToken }
     } = getState();
     if (!username || !password) {
-      throw new Error('Не указан ник или пароль');
+      throw new Error('Не указан логин или пароль');
     }
     try {
       let data = null;
@@ -799,12 +801,27 @@ export function loginWithAccessToken(redirect = true) {
     const { accessToken, accountType, clientToken, selectedProfile } = currentAccount;
     if (!accessToken) throw new Error();
     try {
-      await mcValidate(accessToken, clientToken);
+      console.log(accountType)
+      switch (accountType) {
+        case ACCOUNT_MOJANG:
+          await mcValidate(accessToken, clientToken);
+          break;
+        case ACCOUNT_OXAUTH:
+          await oxValidate(accessToken, clientToken);
+          break;
+        case ACCOUNT_ELYBY:
+          await elybyValidate(accessToken, clientToken);
+          break;
+        default:
+          console.log("offline profile: skip validating")
+      }
+      
       try {
         let skinUrl = null;
         switch (accountType) {
           case ACCOUNT_MOJANG:
             skinUrl = await getPlayerSkinMojang(selectedProfile.id);
+            break;
           case ACCOUNT_OXAUTH:
             skinUrl = await getPlayerSkinOx(selectedProfile.name);
             break;
@@ -2532,17 +2549,23 @@ export function downloadInstance(instanceName) {
         await dispatch(downloadForge(instanceName));
       }
 
+      dispatch(updateDownloadStatus(instanceName, 'Устанавливаю authlib...'));
+
+      await downloadFile(
+        path.join(
+          _getInstancesPath(state),
+          instanceName,
+          `authlib-inj.jar`
+        ),
+        AUTHLIB_DOWNLOAD_URL
+      );
+
       // analyze source and do it for ftb and forge
 
       if (manifest && loader?.source === FTB)
         await dispatch(processFTBManifest(instanceName));
       else if (manifest && loader?.source === CURSEFORGE)
         await dispatch(processForgeManifest(instanceName));
-
-      if (backend) {
-        dispatch(updateDownloadStatus(instanceName, 'Настраиваю бэкенд...'));
-        await promisify(exec)(`java -javaagent:../../assets/authlib-injector.jar=ely.by -jar ${mcMainFile.path}`)
-      }
 
       dispatch(updateDownloadProgress(0));
 

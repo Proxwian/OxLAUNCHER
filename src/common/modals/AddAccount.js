@@ -16,7 +16,7 @@ const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState(username || '');
   const [password, setPassword] = useState('');
-  const [accountType, setAccountType] = useState(ACCOUNT_OFFLINE);
+  const [accountType, setAccountType] = useState(ACCOUNT_OXAUTH);
   const [loginFailed, setloginFailed] = useState();
 
   const addOfflineAccount = () => {
@@ -51,6 +51,14 @@ const AddAccount = ({ username }) => {
         setloginFailed(error);
       });
   };
+
+  const registerElyByAccount = () => {
+    shell.openExternal(ELYBY_REGISTER_URL)
+  }
+
+  const registerOxAccount = () => {
+    shell.openExternal(OXAUTH_REGISTER_URL)
+  }
 
   const renderAddOfflineAccount = () => (
     <Container>
@@ -93,14 +101,15 @@ const AddAccount = ({ username }) => {
         />
         <StyledInput
           disabled={!!username}
+          type="password"
           placeholder="Пароль"
-          value={email}
+          value={password}
           onChange={e => setPassword(e.target.value)}
         />
       </FormContainer>
       <FormContainer>
         <StyledButton onClick={addElyByAccount}>Добавить</StyledButton>
-        <StyledButton onClick={shell.openExternal(ELYBY_REGISTER_URL)}>Регистрация</StyledButton>
+        <StyledButton onClick={registerElyByAccount}>Регистрация</StyledButton>
       </FormContainer>
     </Container>
   );
@@ -123,14 +132,15 @@ const AddAccount = ({ username }) => {
         />
         <StyledInput
           disabled={!!username}
+          type="password"
           placeholder="Пароль"
-          value={email}
+          value={password}
           onChange={e => setPassword(e.target.value)}
         />
       </FormContainer>
       <FormContainer>
         <StyledButton onClick={addOxAccount}>Добавить</StyledButton>
-        <StyledButton onClick={shell.openExternal(OXAUTH_REGISTER_URL)}>Регистрация</StyledButton>
+        <StyledButton onClick={registerOxAccount}>Регистрация</StyledButton>
       </FormContainer>
     </Container>
   );
@@ -171,7 +181,7 @@ const AddAccount = ({ username }) => {
     <Modal
       css={`
         height: 450px;
-        width: 420px;
+        width: 500px;
       `}
       title=" "
     >
@@ -223,10 +233,11 @@ export default AddAccount;
 
 const StyledButton = styled(Button)`
   width: 40%;
+  margin-top: 5px;
 `;
 
 const StyledInput = styled(Input)`
-  margin-bottom: 20px !important;
+  margin-bottom: 10px !important;
 `;
 
 const LoginFailMessage = styled.div`

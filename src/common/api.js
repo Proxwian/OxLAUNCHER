@@ -244,7 +244,7 @@ export const oxAuthenticate = (username, password, clientToken) => {
       },
       username,
       password,
-      clientToken,
+      clientToken: clientToken,
       requestUser: true
     },
     { headers: { 'Content-Type': 'application/json' } }
@@ -256,7 +256,7 @@ export const oxValidate = (accessToken, clientToken) => {
     `${OXAUTH_APIS}/validate`,
     {
       accessToken,
-      clientToken
+      clientToken: clientToken
     },
     { headers: { 'Content-Type': 'application/json' } }
   );
@@ -276,7 +276,7 @@ export const oxRefresh = (accessToken, clientToken) => {
 
 export const oxInvalidate = (accessToken, clientToken) => {
   return axios.post(
-    `${OXAUTH_APIS}/invalidate`,
+    `${OXAUTH_APIS}/invalidatesd`,
     {
       accessToken,
       clientToken
@@ -287,7 +287,7 @@ export const oxInvalidate = (accessToken, clientToken) => {
 
 export const oxGetPlayerSkin = nickname => {
   return axios.get(
-    `http://skinsystem.ely.by/skins?version=2&minecraft_version=1.18.2&name=${nickname}.png`
+    `https://s.namemc.com/i/1dbf93bef2b95e0c.png`
   );
 };
 
@@ -347,7 +347,7 @@ export const elybyInvalidate = (accessToken, clientToken) => {
 
 export const elybyGetPlayerSkin = nickname => {
   return axios.get(
-    `http://skinsystem.ely.by/skins?version=2&minecraft_version=1.18.2&name=${nickname}.png`
+    `https://s.namemc.com/i/d96b3d3f72a9fa57.png`
   );
 };
 

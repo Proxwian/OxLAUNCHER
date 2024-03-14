@@ -13,7 +13,9 @@ import {
   MC_LIBRARIES_URL,
   FABRIC,
   FORGE,
-  LATEST_JAVA_VERSION
+  LATEST_JAVA_VERSION,
+  ACCOUNT_OXAUTH,
+  ACCOUNT_ELYBY
 } from '../../../common/utils/constants';
 
 import {
@@ -521,6 +523,7 @@ export const getJVMArguments112 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(...REQUIRED_JAVA_ARGS.split(' '));
+  args.push('-javaagent:authlib-inj.jar=oxlauncher.com')
   if (javaArgs.length > 0) args.push(...javaArgs);
   args.push(...jvmOptions);
   args.push(
@@ -635,6 +638,15 @@ export const getJVMArguments113 = (
     args.push(mcJson?.logging?.client?.argument || '');
   }
   args.push(...REQUIRED_JAVA_ARGS.split(' '));
+  switch (account.accountType) {
+    case ACCOUNT_OXAUTH:
+      args.push('-javaagent:authlib-inj.jar=oxlauncher.com');
+      break;
+    case ACCOUNT_ELYBY:
+      args.push('-javaagent:authlib-inj.jar=ely.by');
+      break;
+  }
+  
   if (javaArgs.length > 0) args.push(...javaArgs);
 
   // Eventually inject additional arguments (from 1.17 (?))
@@ -900,6 +912,7 @@ export const getPlayerSkinMojang = async (uuid) => {
 };
 
 export const getPlayerSkinOx = async (nickname) => {
+  return oxGetPlayerSkin(nickname);
   const playerSkin = await oxGetPlayerSkin(nickname);
   const { data } = playerSkin;
   const base64 = data.properties[0].value;
@@ -908,6 +921,7 @@ export const getPlayerSkinOx = async (nickname) => {
 };
 
 export const getPlayerSkinElyBy = async (nickname) => {
+  return elybyGetPlayerSkin(nickname);
   const playerSkin = await elybyGetPlayerSkin(nickname);
   const { data } = playerSkin;
   const base64 = data.properties[0].value;

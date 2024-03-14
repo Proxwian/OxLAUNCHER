@@ -19,6 +19,8 @@ import HorizontalLogo from '../../../ui/HorizontalLogo';
 import { openModal } from '../../../common/reducers/modals/actions';
 import { BACKEND_SERVERS, OXAUTH_REGISTER_URL, ELYBY_REGISTER_URL } from '../../../common/utils/constants';
 
+const { shell } = require('electron');
+
 const LoginButton = styled(Button)`
   border-radius: 4px;
   font-size: 22px;
@@ -64,10 +66,12 @@ const LeftSide = styled.div`
   );
   background: ${props => props.theme.palette.secondary.main};
   & div {
-    margin: 10px 0;
+    margin: 5px 0;
   }
   p {
-    margin-top: 1em;
+    padding-left: 5px;
+    margin-bottom: 2px;
+    margin-top: 10px;
     color: ${props => props.theme.palette.text.third};
   }
 `;
@@ -169,15 +173,43 @@ const Login = () => {
     }, 1000);
   };
 
+  const registerOx = () => {
+    shell.openExternal(OXAUTH_REGISTER_URL)
+  }
+
+  const registerElyBy = () => {
+    shell.openExternal(ELYBY_REGISTER_URL)
+  }
+
   const authSelectedBackend = () => {
-    if (selectedBackend == 'OxAUTH') {
-      loginOx(email, password);
+    if (selectedBackend == 'OxAuth') {
+      dispatch(loginOx(email, password)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
     } else if (selectedBackend == 'ElyBy') {
-      loginElyBy(email, password);
+      dispatch(loginElyBy(email, password)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
     } else if (selectedBackend == 'Offline') {
-      loginOffline(email);
+      dispatch(loginOffline(email)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
     } else {
-      loginMojang(email, password)
+      dispatch(loginMojang(email, password)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
     }
   }
 
@@ -194,9 +226,9 @@ const Login = () => {
     }, 1000);
   };
 
-  useKey(['Enter'], authenticate);
+  if (selectedBackend == null) setSelectedBackend("OxAuth");
 
-  setSelectedBackend('Mojang');
+  useKey(['Enter'], authenticate);
 
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
@@ -208,30 +240,70 @@ const Login = () => {
         <Container>
           <LeftSide transitionState={transitionState}>
             <Header>
-              <a href="https://oxlauncher.ru"><HorizontalLogo size={200} /></a>
+              <a href="https://oxlauncher.com"><HorizontalLogo size={200} /></a>
             </Header>
             <Form>
+            
+
+            <Select
+              css={`
+                margin: 0px;
+                width: 200px;
+              `}
+              onChange={v => {
+                setSelectedBackend(v);
+              }}
+              placeholder="OxAUTH"
+              virtual={false}
+            >
+              {Object.entries(BACKEND_SERVERS).map(([k, v]) => (
+                <Select.Option
+                  title={v}
+                  key={k}
+                  value={v}
+                >
+                  {v}
+                </Select.Option>
+              ))}
+            </Select>
+
+            {selectedBackend != 'Mojang' && (
+              <p>Авторизация</p> 
+            )}
+
               <div>
-                {selectedBackend != 'Mojang' ? (
+                {selectedBackend != 'Mojang' && (
                     <Input
                       placeholder="Никнейм"
                       value={email}
                       onChange={({ target: { value } }) => setEmail(value)}
                     />
-                ) : null }
+                )}
 
                 <br />
 
-                {selectedBackend != 'Offline' ? (
-                    <Input
-                      placeholder="Пароль"
-                      value={password}
-                      onChange={({ target: { value } }) => setPassword(value)}
-                    />
-                ) : null }
+                {selectedBackend != 'Offline' & selectedBackend != 'Mojang' ? (
+                    <div>
+                      <Input
+                        type="password"
+                        placeholder="Пароль"
+                        value={password}
+                        css={`
+                          margin-top: 6px;
+                        `}
+                        onChange={({ target: { value } }) => setPassword(value)}
+                      />
+                    </div>
+                ) : (null)}
 
                 {selectedBackend != 'Mojang' ? (
-                    <LoginButton color="primary" onClick={authenticate}>
+                    <LoginButton 
+                      color="primary" 
+                      onClick={authenticate}
+                      css={`
+                          margin-top: 6px;
+                        `}
+                    >
                       Войти
                       <FontAwesomeIcon
                         css={`
@@ -244,6 +316,9 @@ const Login = () => {
                   <MicrosoftLoginButton
                     color="primary"
                     onClick={authenticateMicrosoft}
+                    css={`
+                          margin-top: 0px;
+                        `}
                   >
                     Авторизоваться
                     <FontAwesomeIcon
@@ -254,33 +329,47 @@ const Login = () => {
                     />
                   </MicrosoftLoginButton>
                 )}
+
+                {selectedBackend == 'OxAuth' ? (
+                  <LoginButton 
+                      color="primary" 
+                      onClick={registerOx}
+                      css={`
+                          margin-top: 2px;
+                        `}
+                    >
+                      Регистрация
+                      <FontAwesomeIcon
+                        css={`
+                          margin-left: 6px;
+                        `}
+                        icon={faExternalLinkAlt}
+                      />
+                    </LoginButton>
+                ) : (null)}
+
+                {selectedBackend == 'ElyBy' ? (
+                  <LoginButton 
+                      color="primary" 
+                      onClick={registerElyBy}
+                      css={`
+                          margin-top: 2px;
+                        `}
+                    >
+                      Регистрация
+                      <FontAwesomeIcon
+                        css={`
+                          margin-left: 6px;
+                        `}
+                        icon={faExternalLinkAlt}
+                      />
+                    </LoginButton>
+                ) : (null)}
                 </div>
               
               {loginFailed && (
                 <LoginFailMessage>{loginFailed?.message}</LoginFailMessage>
               )}
-
-              <Select
-                css={`
-                  width: 200px;
-                  margin: 10px;
-                `}
-                onChange={v => {
-                  setSelectedBackend(v);
-                }}
-                placeholder="Mojang"
-                virtual={false}
-              >
-                {Object.entries(BACKEND_SERVERS).map(([k, v]) => (
-                  <Select.Option
-                    title={v}
-                    key={k}
-                    value={v}
-                  >
-                    {v}
-                  </Select.Option>
-                ))}
-              </Select>
               
             </Form>
             
@@ -294,7 +383,7 @@ const Login = () => {
                 `}
               >
                 <center>
-                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.3.9</a>
+                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.4.0</a>
                 </center>
               </div>
               <div

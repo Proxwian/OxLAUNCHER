@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Spin, message } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faOtter, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import { _getAccounts, _getCurrentAccount } from '../utils/selectors';
 import { openModal, closeModal } from '../reducers/modals/actions';
@@ -16,8 +16,9 @@ import {
 } from '../reducers/actions';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
-import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../utils/constants';
+import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_MOJANG, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../utils/constants';
 import { extractFace } from '../../app/desktop/utils';
+import { faEarlybirds } from '@fortawesome/free-brands-svg-icons';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     accounts.map(async account => {
+      if (account.skin == "") account.skinFace = ""; return;
       account.skinFace = await extractFace(account.skin);
     })
   }, [accounts]);
@@ -46,22 +48,7 @@ const ProfileSettings = () => {
             if (!account || !currentAccount) return;
             return (
               <AccountContainer key={account.selectedProfile.id}>
-                {(account.accountType === ACCOUNT_MICROSOFT) && (
-                  <FontAwesomeIcon
-                    icon={faSquareM}
-                  />
-                )}
-                {(account.accountType === ACCOUNT_OXAUTH) && (
-                  <FontAwesomeIcon
-                    icon={faSquareO}
-                  />
-                )}
-                {(account.accountType === ACCOUNT_ELYBY) && (
-                  <FontAwesomeIcon
-                    icon={faSquareE}
-                  />
-                )}
-                
+
                 <AccountItem
                   active={
                     account.selectedProfile.id ===
@@ -118,6 +105,50 @@ const ProfileSettings = () => {
                    )}
                     {account.selectedProfile.name}   
                   </div>
+                  {(account.accountType === ACCOUNT_OXAUTH) && (
+                    <div
+                      css={`
+                        margin-right: 10px;
+                        font-size: 16px;
+                        transition: color 0.1s ease-in-out;
+                      `}
+                    >
+                      OxAUTH
+                    </div>
+                  )}
+                  {(account.accountType === ACCOUNT_MOJANG) && (
+                    <div
+                      css={`
+                        margin-right: 10px;
+                        font-size: 16px;
+                        transition: color 0.1s ease-in-out;
+                      `}
+                    >
+                      Mojang
+                    </div>
+                  )}
+                  {(account.accountType === ACCOUNT_MICROSOFT) && (
+                    <div
+                      css={`
+                        margin-right: 10px;
+                        font-size: 16px;
+                        transition: color 0.1s ease-in-out;
+                      `}
+                    >
+                      Microsoft
+                    </div>
+                  )}
+                  {(account.accountType === ACCOUNT_ELYBY) && (
+                    <div
+                      css={`
+                        margin-right: 10px;
+                        font-size: 16px;
+                        transition: color 0.1s ease-in-out;
+                      `}
+                    >
+                      Ely.by
+                    </div>
+                  )}
                   {account.selectedProfile.id ===
                     currentAccount.selectedProfile.id && (
                     <Spin spinning={isLoading.isRequesting} />
