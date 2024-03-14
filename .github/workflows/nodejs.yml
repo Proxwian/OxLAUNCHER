@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Context
@@ -26,10 +26,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: Use Node.js 18.18.1
+      - name: Use Node.js 16.17.0
         uses: actions/setup-node@v1
         with:
-          node-version: '18.18.1'
+          node-version: '16.17.0'
 
       - name: Install Nightly
         run: |
