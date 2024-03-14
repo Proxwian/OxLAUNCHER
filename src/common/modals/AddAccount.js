@@ -7,20 +7,37 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../components/Modal';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
-import { login, loginOAuth } from '../reducers/actions';
+import { login, loginElyBy, loginOAuth, loginOffline, loginOx } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
-import { ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE } from '../utils/constants';
+import { shell } from 'electron';
+import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH, OXAUTH_REGISTER_URL, ELYBY_REGISTER_URL } from '../utils/constants';
 
 const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState(username || '');
   const [password, setPassword] = useState('');
-  const [accountType, setAccountType] = useState(ACCOUNT_OFFLINE);
+  const [accountType, setAccountType] = useState(ACCOUNT_OXAUTH);
   const [loginFailed, setloginFailed] = useState();
 
-  const addAccount = () => {
+  const addOfflineAccount = () => {
     dispatch(
-      load(features.mcAuthentication, dispatch(login(email, password, false)))
+      load(features.mcAuthentication, dispatch(loginOffline(email, false)))
+    )
+      .then(() => dispatch(closeModal()))
+      .catch(console.error);
+  };
+
+  const addElyByAccount = () => {
+    dispatch(
+      load(features.mcAuthentication, dispatch(loginElyBy(email, password, false)))
+    )
+      .then(() => dispatch(closeModal()))
+      .catch(console.error);
+  };
+
+  const addOxAccount = () => {
+    dispatch(
+      load(features.mcAuthentication, dispatch(loginOx(email, password, false)))
     )
       .then(() => dispatch(closeModal()))
       .catch(console.error);
@@ -35,7 +52,15 @@ const AddAccount = ({ username }) => {
       });
   };
 
-  const renderAddMojangAccount = () => (
+  const registerElyByAccount = () => {
+    shell.openExternal(ELYBY_REGISTER_URL)
+  }
+
+  const registerOxAccount = () => {
+    shell.openExternal(OXAUTH_REGISTER_URL)
+  }
+
+  const renderAddOfflineAccount = () => (
     <Container>
       <FormContainer>
         <h1
@@ -53,7 +78,69 @@ const AddAccount = ({ username }) => {
         />
       </FormContainer>
       <FormContainer>
-        <StyledButton onClick={addAccount}>Добавить</StyledButton>
+        <StyledButton onClick={addOfflineAccount}>Добавить</StyledButton>
+      </FormContainer>
+    </Container>
+  );
+
+  const renderAddElyByAccount = () => (
+    <Container>
+      <FormContainer>
+        <h1
+          css={`
+            height: 80px;
+          `}
+        >
+          Ely.by
+        </h1>
+        <StyledInput
+          disabled={!!username}
+          placeholder="Логин"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <StyledInput
+          disabled={!!username}
+          type="password"
+          placeholder="Пароль"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+      </FormContainer>
+      <FormContainer>
+        <StyledButton onClick={addElyByAccount}>Добавить</StyledButton>
+        <StyledButton onClick={registerElyByAccount}>Регистрация</StyledButton>
+      </FormContainer>
+    </Container>
+  );
+
+  const renderAddOxAccount = () => (
+    <Container>
+      <FormContainer>
+        <h1
+          css={`
+            height: 80px;
+          `}
+        >
+          OxAUTH
+        </h1>
+        <StyledInput
+          disabled={!!username}
+          placeholder="Логин"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <StyledInput
+          disabled={!!username}
+          type="password"
+          placeholder="Пароль"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+      </FormContainer>
+      <FormContainer>
+        <StyledButton onClick={addOxAccount}>Добавить</StyledButton>
+        <StyledButton onClick={registerOxAccount}>Регистрация</StyledButton>
       </FormContainer>
     </Container>
   );
@@ -94,7 +181,7 @@ const AddAccount = ({ username }) => {
     <Modal
       css={`
         height: 450px;
-        width: 420px;
+        width: 500px;
       `}
       title=" "
     >
@@ -105,11 +192,18 @@ const AddAccount = ({ username }) => {
           overflowedIndicator={null}
         >
           <StyledAccountMenuItem
-            key={ACCOUNT_OFFLINE}
-            onClick={() => setAccountType(ACCOUNT_OFFLINE)}
+            key={ACCOUNT_OXAUTH}
+            onClick={() => setAccountType(ACCOUNT_OXAUTH)}
           >
-            Без пароля
+            OxAUTH
           </StyledAccountMenuItem>
+          <StyledAccountMenuItem
+            key={ACCOUNT_ELYBY}
+            onClick={() => setAccountType(ACCOUNT_ELYBY)}
+          >
+            Ely.by
+          </StyledAccountMenuItem>
+          
           <StyledAccountMenuItem
             key={ACCOUNT_MICROSOFT}
             onClick={() => {
@@ -119,8 +213,16 @@ const AddAccount = ({ username }) => {
           >
             Microsoft
           </StyledAccountMenuItem>
+          <StyledAccountMenuItem
+            key={ACCOUNT_OFFLINE}
+            onClick={() => setAccountType(ACCOUNT_OFFLINE)}
+          >
+            Без пароля
+          </StyledAccountMenuItem>
         </Menu>
-        {accountType === ACCOUNT_OFFLINE ? renderAddMojangAccount() : null}
+        {accountType === ACCOUNT_OXAUTH ? renderAddOxAccount() : null}
+        {accountType === ACCOUNT_ELYBY ? renderAddElyByAccount() : null}
+        {accountType === ACCOUNT_OFFLINE ? renderAddOfflineAccount() : null}
         {accountType === ACCOUNT_MICROSOFT ? renderAddMicrosoftAccount() : null}
       </Container>
     </Modal>
@@ -131,10 +233,11 @@ export default AddAccount;
 
 const StyledButton = styled(Button)`
   width: 40%;
+  margin-top: 5px;
 `;
 
 const StyledInput = styled(Input)`
-  margin-bottom: 20px !important;
+  margin-bottom: 10px !important;
 `;
 
 const LoginFailMessage = styled.div`

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
+import { Select } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
@@ -10,12 +11,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button } from 'antd';
 import { useKey } from 'rooks';
-import { login, loginOAuth } from '../../../common/reducers/actions';
+import { loginOffline, loginMojang, loginElyBy, loginOx, loginOAuth } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.mp4';
 import HorizontalLogo from '../../../ui/HorizontalLogo';
 import { openModal } from '../../../common/reducers/modals/actions';
+import { BACKEND_SERVERS, OXAUTH_REGISTER_URL, ELYBY_REGISTER_URL } from '../../../common/utils/constants';
+
+const { shell } = require('electron');
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
@@ -62,10 +66,12 @@ const LeftSide = styled.div`
   );
   background: ${props => props.theme.palette.secondary.main};
   & div {
-    margin: 10px 0;
+    margin: 5px 0;
   }
   p {
-    margin-top: 1em;
+    padding-left: 5px;
+    margin-bottom: 2px;
+    margin-top: 10px;
     color: ${props => props.theme.palette.text.third};
   }
 `;
@@ -144,6 +150,7 @@ const LoginFailMessage = styled.div`
 
 const Login = () => {
   const dispatch = useDispatch();
+  const [selectedBackend, setSelectedBackend] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [version, setVersion] = useState(null);
@@ -157,7 +164,7 @@ const Login = () => {
     dispatch(requesting('accountAuthentication'));
     setTimeout(() => {
       dispatch(
-        load(features.mcAuthentication, dispatch(login(email)))
+        load(features.mcAuthentication, dispatch(authSelectedBackend))
       ).catch(e => {
         console.error(e);
         setLoginFailed(e);
@@ -165,6 +172,46 @@ const Login = () => {
       });
     }, 1000);
   };
+
+  const registerOx = () => {
+    shell.openExternal(OXAUTH_REGISTER_URL)
+  }
+
+  const registerElyBy = () => {
+    shell.openExternal(ELYBY_REGISTER_URL)
+  }
+
+  const authSelectedBackend = () => {
+    if (selectedBackend == 'OxAuth') {
+      dispatch(loginOx(email, password)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
+    } else if (selectedBackend == 'ElyBy') {
+      dispatch(loginElyBy(email, password)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
+    } else if (selectedBackend == 'Offline') {
+      dispatch(loginOffline(email)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
+    } else {
+      dispatch(loginMojang(email, password)).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
+    }
+  }
 
   const authenticateMicrosoft = () => {
     dispatch(requesting('accountAuthentication'));
@@ -179,6 +226,8 @@ const Login = () => {
     }, 1000);
   };
 
+  if (selectedBackend == null) setSelectedBackend("OxAuth");
+
   useKey(['Enter'], authenticate);
 
   useEffect(() => {
@@ -191,41 +240,139 @@ const Login = () => {
         <Container>
           <LeftSide transitionState={transitionState}>
             <Header>
-              <a href="https://oxlauncher.ru"><HorizontalLogo size={200} /></a>
+              <a href="https://oxlauncher.com"><HorizontalLogo size={200} /></a>
             </Header>
             <Form>
+            
+
+            <Select
+              css={`
+                margin: 0px;
+                width: 200px;
+              `}
+              onChange={v => {
+                setSelectedBackend(v);
+              }}
+              placeholder="OxAUTH"
+              virtual={false}
+            >
+              {Object.entries(BACKEND_SERVERS).map(([k, v]) => (
+                <Select.Option
+                  title={v}
+                  key={k}
+                  value={v}
+                >
+                  {v}
+                </Select.Option>
+              ))}
+            </Select>
+
+            {selectedBackend != 'Mojang' && (
+              <p>Авторизация</p> 
+            )}
+
               <div>
-                <Input
-                  placeholder="Никнейм"
-                  value={email}
-                  onChange={({ target: { value } }) => setEmail(value)}
-                />
-              </div>
+                {selectedBackend != 'Mojang' && (
+                    <Input
+                      placeholder="Никнейм"
+                      value={email}
+                      onChange={({ target: { value } }) => setEmail(value)}
+                    />
+                )}
+
+                <br />
+
+                {selectedBackend != 'Offline' & selectedBackend != 'Mojang' ? (
+                    <div>
+                      <Input
+                        type="password"
+                        placeholder="Пароль"
+                        value={password}
+                        css={`
+                          margin-top: 6px;
+                        `}
+                        onChange={({ target: { value } }) => setPassword(value)}
+                      />
+                    </div>
+                ) : (null)}
+
+                {selectedBackend != 'Mojang' ? (
+                    <LoginButton 
+                      color="primary" 
+                      onClick={authenticate}
+                      css={`
+                          margin-top: 6px;
+                        `}
+                    >
+                      Войти
+                      <FontAwesomeIcon
+                        css={`
+                          margin-left: 6px;
+                        `}
+                        icon={faArrowRight}
+                      />
+                    </LoginButton>
+                ) : (
+                  <MicrosoftLoginButton
+                    color="primary"
+                    onClick={authenticateMicrosoft}
+                    css={`
+                          margin-top: 0px;
+                        `}
+                  >
+                    Авторизоваться
+                    <FontAwesomeIcon
+                      css={`
+                        margin-left: 6px;
+                      `}
+                      icon={faExternalLinkAlt}
+                    />
+                  </MicrosoftLoginButton>
+                )}
+
+                {selectedBackend == 'OxAuth' ? (
+                  <LoginButton 
+                      color="primary" 
+                      onClick={registerOx}
+                      css={`
+                          margin-top: 2px;
+                        `}
+                    >
+                      Регистрация
+                      <FontAwesomeIcon
+                        css={`
+                          margin-left: 6px;
+                        `}
+                        icon={faExternalLinkAlt}
+                      />
+                    </LoginButton>
+                ) : (null)}
+
+                {selectedBackend == 'ElyBy' ? (
+                  <LoginButton 
+                      color="primary" 
+                      onClick={registerElyBy}
+                      css={`
+                          margin-top: 2px;
+                        `}
+                    >
+                      Регистрация
+                      <FontAwesomeIcon
+                        css={`
+                          margin-left: 6px;
+                        `}
+                        icon={faExternalLinkAlt}
+                      />
+                    </LoginButton>
+                ) : (null)}
+                </div>
+              
               {loginFailed && (
                 <LoginFailMessage>{loginFailed?.message}</LoginFailMessage>
               )}
-              <LoginButton color="primary" onClick={authenticate}>
-                Войти
-                <FontAwesomeIcon
-                  css={`
-                    margin-left: 6px;
-                  `}
-                  icon={faArrowRight}
-                />
-              </LoginButton>
-              <MicrosoftLoginButton
-                color="primary"
-                onClick={authenticateMicrosoft}
-              >
-                Microsoft
-                <FontAwesomeIcon
-                  css={`
-                    margin-left: 6px;
-                  `}
-                  icon={faExternalLinkAlt}
-                />
-              </MicrosoftLoginButton>
+              
             </Form>
+            
             <Footer>
               <div
                 css={`
@@ -236,7 +383,7 @@ const Login = () => {
                 `}
               >
                 <center>
-                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.3.6</a>
+                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.4.0</a>
                 </center>
               </div>
               <div

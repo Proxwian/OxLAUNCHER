@@ -3,6 +3,8 @@ import axios from 'axios';
 import qs from 'querystring';
 import {
   MOJANG_APIS,
+  OXAUTH_APIS,
+  ELYBY_APIS,
   FORGESVC_URL,
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
@@ -227,6 +229,125 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
     `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
       mcVersion
     )}/${encodeURIComponent(loaderVersion)}/profile/json`
+  );
+};
+
+// OxAUTH API
+
+export const oxAuthenticate = (username, password, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/authenticate`,
+    {
+      agent: {
+        name: 'Minecraft',
+        version: 1
+      },
+      username,
+      password,
+      clientToken: clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxValidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/validate`,
+    {
+      accessToken,
+      clientToken: clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxRefresh = (accessToken, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/refresh`,
+    {
+      accessToken,
+      clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxInvalidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${OXAUTH_APIS}/invalidatesd`,
+    {
+      accessToken,
+      clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const oxGetPlayerSkin = nickname => {
+  return axios.get(
+    `https://s.namemc.com/i/1dbf93bef2b95e0c.png`
+  );
+};
+
+
+// Ely.by API
+
+export const elybyAuthenticate = (username, password, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/authenticate`,
+    {
+      agent: {
+        name: 'Minecraft',
+        version: 1
+      },
+      username,
+      password,
+      clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyValidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/validate`,
+    {
+      accessToken,
+      clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyRefresh = (accessToken, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/refresh`,
+    {
+      accessToken,
+      clientToken,
+      requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyInvalidate = (accessToken, clientToken) => {
+  return axios.post(
+    `${ELYBY_APIS}/invalidate`,
+    {
+      accessToken,
+      clientToken
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const elybyGetPlayerSkin = nickname => {
+  return axios.get(
+    `https://s.namemc.com/i/d96b3d3f72a9fa57.png`
   );
 };
 

@@ -103,7 +103,8 @@ const ModpacksListWrapper = ({
               setVersion({
                 projectID: modpack.id,
                 fileID: modpack.latestFiles[modpack.latestFiles.length - 1].id,
-                source: CURSEFORGE
+                source: CURSEFORGE,
+                backend: 'OxAUTH'
               });
               setModpack(modpack);
               setStep(1);

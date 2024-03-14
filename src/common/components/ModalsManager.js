@@ -78,6 +78,9 @@ const modalsComponentLookupTable = {
   McVersionChanger: AsyncComponent(
     lazy(() => import('../modals/McVersionChanger'))
   ),
+  BackendChanger: AsyncComponent(
+    lazy(() => import('../modals/BackendChanger'))
+  ),
   PolicyModal: AsyncComponent(lazy(() => import('../modals/PolicyModal'))),
   InstanceStartupAd: AsyncComponent(
     lazy(() => import('../modals/InstanceStartupAd'))

@@ -3,6 +3,8 @@ export const FABRIC_APIS = 'https://meta.fabricmc.net/v2';
 export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';
 export const MOJANG_APIS = 'https://authserver.mojang.com';
+export const OXAUTH_APIS = 'https://oxlauncher.com/auth';
+export const ELYBY_APIS = 'http://minecraft.ely.by/auth';
 export const JAVA_MANIFEST_URL = 'https://cdn.gdlauncher.com/openjdk8.json';
 export const LATEST_JAVA_VERSION = 17;
 export const JAVA_LATEST_MANIFEST_URL =
@@ -29,6 +31,8 @@ export const CURSEFORGE = 'curseforge';
 export const FTB = 'ftb';
 
 export const ACCOUNT_OFFLINE = 'ACCOUNT_OFFLINE';
+export const ACCOUNT_OXAUTH = 'ACCOUNT_OXAUTH';
+export const ACCOUNT_ELYBY = 'ACCOUNT_ELYBY';
 export const ACCOUNT_MOJANG = 'ACCOUNT_MOJANG';
 export const ACCOUNT_MICROSOFT = 'ACCOUNT_MICROSOFT';
 export const CURSEFORGE_URL = 'https://www.curseforge.com';
@@ -39,6 +43,18 @@ export const MICROSOFT_OAUTH_CLIENT_ID = 'b9336bf8-c6bb-4344-aabe-63d0bfa8db2e';
 export const MICROSOFT_OAUTH_REDIRECT_URL =
   'https://login.microsoftonline.com/common/oauth2/nativeclient';
 export const MINECRAFT_SERVICES_URL = 'https://api.minecraftservices.com';
+
+export const OXAUTH_REGISTER_URL = 'https://oxlauncher.com/';
+export const ELYBY_REGISTER_URL = 'https://ely.by/login';
+
+export const AUTHLIB_DOWNLOAD_URL = 'https://github.com/yushijinhun/authlib-injector/releases/download/v1.2.5/authlib-injector-1.2.5.jar';
+
+export const BACKEND_SERVERS = {
+  OXAUTH: 'OxAuth',
+  MOJANG: 'Mojang',
+  ELYBY: 'ElyBy',
+  OFFLINE: 'Offline'
+};
 
 export const MC_STARTUP_METHODS = {
   SYMLINK: 'Symlink',

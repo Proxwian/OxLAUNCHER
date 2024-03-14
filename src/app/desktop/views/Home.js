@@ -67,7 +67,7 @@ const Home = () => {
         const { data } = await axios.get(
           'https://raw.githubusercontent.com/Proxwian/OxLAUNCHER/master/announcement.md'
         );
-        setAnnoucement(data || null);
+        setAnnoucement(null);
       } catch (e) {
         console.log('No announcement to show');
       }

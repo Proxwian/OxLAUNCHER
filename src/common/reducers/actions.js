@@ -2,6 +2,7 @@ import axios from 'axios';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import { v5 as uuid } from 'uuid';
+const { promisify } = require('util');
 import { machineId } from 'node-machine-id';
 import fse, { remove } from 'fs-extra';
 import coerce from 'semver/functions/coerce';
@@ -19,7 +20,7 @@ import crypto from 'crypto';
 import omit from 'lodash/omit';
 import Seven from 'node-7z';
 import { push } from 'connected-react-router';
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 import symlink from 'symlink-dir';
 import fss, { promises as fs } from 'fs';
 import originalFs from 'original-fs';
@@ -31,9 +32,12 @@ import { XMLParser } from 'fast-xml-parser';
 import getInstances from '../../app/desktop/utils/getInstances';
 import * as ActionTypes from './actionTypes';
 import {
+  ACCOUNT_ELYBY,
   ACCOUNT_MICROSOFT,
   ACCOUNT_MOJANG,
   ACCOUNT_OFFLINE,
+  ACCOUNT_OXAUTH,
+  AUTHLIB_DOWNLOAD_URL,
   CURSEFORGE,
   FABRIC,
   FMLLIBS_FORGE_BASE_URL,
@@ -69,6 +73,14 @@ import {
   mcInvalidate,
   mcRefresh,
   mcValidate,
+  oxAuthenticate,
+  oxValidate,
+  oxRefresh,
+  oxInvalidate,
+  elybyAuthenticate,
+  elybyValidate,
+  elybyRefresh,
+  elybyInvalidate,
   msAuthenticateMinecraft,
   msAuthenticateXBL,
   msAuthenticateXSTS,
@@ -106,7 +118,9 @@ import {
   getJVMArguments112,
   getJVMArguments113,
   getPatchedInstanceType,
-  getPlayerSkin,
+  getPlayerSkinMojang,
+  getPlayerSkinElyBy,
+  getPlayerSkinOx,
   isInstanceFolderPath,
   isMod,
   librariesMapper,
@@ -307,7 +321,7 @@ export function switchToFirstValidAccount(id) {
         await dispatch(
           accounts[i].accountType === ACCOUNT_MICROSOFT
             ? loginWithOAuthAccessToken()
-            : login(accounts[i].selectedProfile.name, true, true)
+            : loginWithAccessToken()
         );
         found = accounts[i].selectedProfile.id;
       } catch {
@@ -341,7 +355,7 @@ export function selectFirstValidAccount(id) {
         await dispatch(
           accounts[i].accountType === ACCOUNT_MICROSOFT
             ? loginWithOAuthAccessToken()
-            : login(accounts[i].selectedProfile.name, true, true)
+            : loginWithAccessToken()
         );
         found = accounts[i].selectedProfile.id;
       } catch {
@@ -458,7 +472,7 @@ function lettersNumbersDashes(str) {
   return /^[A-Za-z0-9_]*$/.test(str);
 }
 
-export function login(username, redirect = true, pushHome = false) {
+export function loginOffline(username, redirect = true, pushHome = false) {
   return async (dispatch, getState) => {
     const {
       app: { isNewUser, clientToken }
@@ -471,23 +485,7 @@ export function login(username, redirect = true, pushHome = false) {
     }
     try {
       let data = null;
-      /*try {
-        ({ data } = await mcAuthenticate(username, password, clientToken));
-        data.accountType = ACCOUNT_MOJANG;
-      } catch (err) {
-        console.error(err);
-        throw new Error('Invalid username or password.');
-      }
-
-      if (!data?.selectedProfile?.id) {
-        throw new Error("It looks like you didn't buy the game.");
-      }
-      const skinUrl = await getPlayerSkin(data.selectedProfile.id);
-      if (skinUrl) {
-        data.skin = skinUrl;
-      }*/
-	  
-	  // how does minecraft generate offline UUIDs:
+	      // how does minecraft generate offline UUIDs:
         // https://forums.spongepowered.org/t/why-are-the-uuids-changing-in-offline-mode/20237/2
         // how to do it in javascript:
         // https://stackoverflow.com/questions/47505620/javas-uuid-nameuuidfrombytes-to-written-in-javascript
@@ -516,6 +514,142 @@ export function login(username, redirect = true, pushHome = false) {
       }  
 
 
+    } catch (err) {
+      console.error(err);
+      throw new Error(err);
+    }
+  };
+}
+
+export function loginMojang(username, password, redirect = true) {
+  return async (dispatch, getState) => {
+    const {
+      app: { isNewUser, clientToken }
+    } = getState();
+    if (!username || !password) {
+      throw new Error('Не указан ник или пароль');
+    }
+    try {
+      let data = null;
+      try {
+        ({ data } = await mcAuthenticate(username, password, clientToken));
+        data.accountType = ACCOUNT_MOJANG;
+      } catch (err) {
+        console.error(err);
+        throw new Error('Неправильный логин или пароль.');
+      }
+
+      if (!data?.selectedProfile?.id) {
+        throw new Error("Похоже, что вы не приобрели игру.");
+      }
+      const skinUrl = await getPlayerSkinMojang(data.selectedProfile.id);
+      if (skinUrl) {
+        data.skin = skinUrl;
+      }
+      dispatch(updateAccount(data.selectedProfile.id, data));
+      dispatch(updateCurrentAccountId(data.selectedProfile.id));
+
+      if (!isNewUser) {
+        if (redirect) {
+          dispatch(push('/home'));
+        }
+      } else {
+        dispatch(updateIsNewUser(false));
+        if (redirect) {
+          dispatch(push('/onboarding'));
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      throw new Error(err);
+    }
+  };
+}
+
+export function loginOx(username, password, redirect = true) {
+  return async (dispatch, getState) => {
+    const {
+      app: { isNewUser, clientToken }
+    } = getState();
+    if (!username || !password) {
+      throw new Error('Не указан логин или пароль');
+    }
+    try {
+      let data = null;
+      let clientToken = generateRandomString(128);
+      try {
+        ({ data } = await oxAuthenticate(username, password, clientToken));
+        data.accountType = ACCOUNT_OXAUTH;
+      } catch (err) {
+        console.error(err);
+        throw new Error('Неправильный логин или пароль.');
+      }
+
+      // if (!data?.selectedProfile?.id) {
+      //   throw new Error("Похоже, что вы не приобрели игру.");
+      // }
+      const skinUrl = await getPlayerSkinOx(data.selectedProfile.name);
+      if (skinUrl) {
+        data.skin = skinUrl;
+      }
+      dispatch(updateAccount(data.selectedProfile.id, data));
+      dispatch(updateCurrentAccountId(data.selectedProfile.id));
+
+      if (!isNewUser) {
+        if (redirect) {
+          dispatch(push('/home'));
+        }
+      } else {
+        dispatch(updateIsNewUser(false));
+        if (redirect) {
+          dispatch(push('/onboarding'));
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      throw new Error(err);
+    }
+  };
+}
+
+export function loginElyBy(username, password, redirect = true) {
+  return async (dispatch, getState) => {
+    const {
+      app: { isNewUser, clientToken }
+    } = getState();
+    if (!username || !password) {
+      throw new Error('Не указан логин или пароль');
+    }
+    try {
+      let data = null;
+      try {
+        ({ data } = await elybyAuthenticate(username, password, clientToken));
+        data.accountType = ACCOUNT_ELYBY;
+      } catch (err) {
+        console.error(err);
+        throw new Error('Неправильный логин или пароль.');
+      }
+
+      // if (!data?.selectedProfile?.id) {
+      //   throw new Error("Похоже, что вы не приобрели игру.");
+      // }
+      const skinUrl = await getPlayerSkinElyBy(data.selectedProfile.name);
+      if (skinUrl) {
+        data.skin = skinUrl;
+      }
+      dispatch(updateAccount(data.selectedProfile.id, data));
+      dispatch(updateCurrentAccountId(data.selectedProfile.id));
+
+      if (!isNewUser) {
+        if (redirect) {
+          dispatch(push('/home'));
+        }
+      } else {
+        dispatch(updateIsNewUser(false));
+        if (redirect) {
+          dispatch(push('/onboarding'));
+        }
+      }
     } catch (err) {
       console.error(err);
       throw new Error(err);
@@ -603,7 +737,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
           throw new Error('Произошла ошибка авторизации Minecraft.');
         }
 
-        const skinUrl = await getPlayerSkin(selectedProfile.id);
+        const skinUrl = await getPlayerSkinMojang(selectedProfile.id);
 
         const account = {
           accountType: ACCOUNT_MICROSOFT,
@@ -640,7 +774,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
     } else {
       // Only reload skin
       try {
-        const skinUrl = await getPlayerSkin(selectedProfile.id);
+        const skinUrl = await getPlayerSkinMojang(selectedProfile.id);
         if (skinUrl) {
           dispatch(
             updateAccount(selectedProfile.id, {
@@ -664,12 +798,39 @@ export function loginWithAccessToken(redirect = true) {
   return async (dispatch, getState) => {
     const state = getState();
     const currentAccount = _getCurrentAccount(state);
-    const { accessToken, clientToken, selectedProfile } = currentAccount;
+    const { accessToken, accountType, clientToken, selectedProfile } = currentAccount;
     if (!accessToken) throw new Error();
     try {
-      await mcValidate(accessToken, clientToken);
+      console.log(accountType)
+      switch (accountType) {
+        case ACCOUNT_MOJANG:
+          await mcValidate(accessToken, clientToken);
+          break;
+        case ACCOUNT_OXAUTH:
+          await oxValidate(accessToken, clientToken);
+          break;
+        case ACCOUNT_ELYBY:
+          await elybyValidate(accessToken, clientToken);
+          break;
+        default:
+          console.log("offline profile: skip validating")
+      }
+      
       try {
-        const skinUrl = await getPlayerSkin(selectedProfile.id);
+        let skinUrl = null;
+        switch (accountType) {
+          case ACCOUNT_MOJANG:
+            skinUrl = await getPlayerSkinMojang(selectedProfile.id);
+            break;
+          case ACCOUNT_OXAUTH:
+            skinUrl = await getPlayerSkinOx(selectedProfile.name);
+            break;
+          case ACCOUNT_ELYBY:
+            skinUrl = await getPlayerSkinElyBy(selectedProfile.name);
+            break;
+          default:
+            skinUrl = 'https://s.namemc.com/i/12b92a9206470fe2.png';
+        }
         if (skinUrl) {
           dispatch(
             updateAccount(selectedProfile.id, {
@@ -687,8 +848,29 @@ export function loginWithAccessToken(redirect = true) {
       // Trying refreshing the stored access token
       if (error.response && error.response.status === 403) {
         try {
-          const { data } = await mcRefresh(accessToken, clientToken);
-          const skinUrl = await getPlayerSkin(data.selectedProfile.id);
+          let data = null;
+          let skinUrl = null;
+          switch (accountType) {
+            case ACCOUNT_MOJANG:
+              skinUrl = await getPlayerSkinMojang(selectedProfile.id);
+              data = await mcRefresh(accessToken, clientToken);
+              break;
+            case ACCOUNT_MICROSOFT:
+              skinUrl = await getPlayerSkinMojang(selectedProfile.id);
+              data = await mcRefresh(accessToken, clientToken);
+              break;
+            case ACCOUNT_OXAUTH:
+              skinUrl = await getPlayerSkinOx(selectedProfile.name);
+              data = await oxRefresh(accessToken, clientToken);
+              break;
+            case ACCOUNT_ELYBY:
+              skinUrl = await getPlayerSkinElyBy(selectedProfile.name);
+              data = await elybyRefresh(accessToken, clientToken);
+              break;
+            default:
+              skinUrl = 'https://s.namemc.com/i/12b92a9206470fe2.png';
+              data = {};
+          }
           if (skinUrl) {
             data.skin = skinUrl;
           }
@@ -736,7 +918,7 @@ export function loginThroughNativeLauncher() {
 
       const { data } = await mcRefresh(accessToken, clientToken);
       data.accountType = ACCOUNT_MOJANG;
-      const skinUrl = await getPlayerSkin(data.selectedProfile.id);
+      const skinUrl = await getPlayerSkinMojang(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
       }
@@ -864,7 +1046,7 @@ export function loginOAuth(redirect = true) {
         throw new Error('Произошла ошибка при попытке подключения аккаунта Minecraft.');
       }
 
-      const skinUrl = await getPlayerSkin(mcUserId);
+      const skinUrl = await getPlayerSkinMojang(mcUserId);
 
       const account = {
         accountType: ACCOUNT_MICROSOFT,
@@ -1172,6 +1354,7 @@ export function addToQueue(
   loader,
   manifest,
   background,
+  backend,
   timePlayed,
   settings = {},
   updateOptions,
@@ -1213,6 +1396,7 @@ export function addToQueue(
             ...(prev || {}),
             loader,
             timePlayed: prev.timePlayed || timePlayed || 0,
+            backend: backend,
             background,
             mods: prev.mods || [],
             ...patchedSettings
@@ -1889,7 +2073,7 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest, loader, version } = _getCurrentDownloadItem(state);
+    const { manifest, loader, backend } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
     let mirrorManifest;
 
@@ -2192,7 +2376,7 @@ export function processForgeManifest(instanceName) {
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { loader, manifest, isUpdate, bypassCopy } =
+    const { loader, manifest, isUpdate, backend, bypassCopy } =
       _getCurrentDownloadItem(state);
     const {
       app: {
@@ -2364,6 +2548,17 @@ export function downloadInstance(instanceName) {
       } else if (loader?.loaderType === FORGE) {
         await dispatch(downloadForge(instanceName));
       }
+
+      dispatch(updateDownloadStatus(instanceName, 'Устанавливаю authlib...'));
+
+      await downloadFile(
+        path.join(
+          _getInstancesPath(state),
+          instanceName,
+          `authlib-inj.jar`
+        ),
+        AUTHLIB_DOWNLOAD_URL
+      );
 
       // analyze source and do it for ftb and forge
 
