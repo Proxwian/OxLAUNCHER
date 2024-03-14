@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import fse from 'fs-extra';
 import { extractFull } from 'node-7z';
-import jimp from 'jimp/es';
+import jimp from 'jimp';
 import makeDir from 'make-dir';
 import { promisify } from 'util';
 import { ipcRenderer } from 'electron';
