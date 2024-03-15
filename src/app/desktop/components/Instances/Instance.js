@@ -18,7 +18,8 @@ import {
   faBoxOpen,
   faCopy,
   faServer,
-  faHammer
+  faHammer,
+  faImage
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -250,11 +251,8 @@ const Instance = ({ instanceName }) => {
     finallyUpdate;  
     setNeedUpdate(false);  
   }
-  const updatePack = () => {
-    dispatch(openModal('InstanceManager', { instanceName: instanceName, openUpdater: true }));
-  };
-  const openBisectModal = () => {
-    dispatch(openModal('BisectHosting'));
+  const openScreenshots = () => {
+    dispatch(openModal('InstanceManager', { instanceName: instanceName, openScreenshots: true }));
   };
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
@@ -392,21 +390,21 @@ const Instance = ({ instanceName }) => {
             </MenuItem>
           )}
           {Boolean(isNeedUpdate) && (
-          <MenuItem disabled={Boolean(isInQueue)}
-            css={`
-                  color: #6D4D52;
-                  `}
-            onClick={updateDatapack}>
-            <FontAwesomeIcon
-              icon={faSpinner}
+            <MenuItem disabled={Boolean(isInQueue)}
               css={`
-                color: #6D4D52;
-                margin-right: 10px;
-                width: 25px !important;
-              `}
-            />
-            Обновить
-          </MenuItem>
+                    color: #6D4D52;
+                    `}
+              onClick={updateDatapack}>
+              <FontAwesomeIcon
+                icon={faSpinner}
+                css={`
+                  color: #6D4D52;
+                  margin-right: 10px;
+                  width: 25px !important;
+                `}
+              />
+              Обновить
+            </MenuItem>
           )}
           <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
             <FontAwesomeIcon
@@ -416,7 +414,17 @@ const Instance = ({ instanceName }) => {
                 width: 25px !important;
               `}
             />
-            Настройки
+            Управление
+          </MenuItem>
+          <MenuItem disabled={Boolean(isInQueue)} onClick={openScreenshots}>
+            <FontAwesomeIcon
+              icon={faImage}
+              css={`
+                margin-right: 10px;
+                width: 25px !important;
+              `}
+            />
+            Скриншоты
           </MenuItem>
           <MenuItem onClick={openFolder}>
             <FontAwesomeIcon

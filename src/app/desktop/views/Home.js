@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faImages, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
@@ -21,12 +21,18 @@ import { updateLastUpdateVersion } from '../../../common/reducers/actions';
 import { _getInstances, _getInstancesPath, _getTempPath } from '../../../common/utils/selectors';
 
 import { useDebouncedCallback } from 'use-debounce';
-import { ACCOUNT_MICROSOFT } from '../../../common/utils/constants';
+import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../../../common/utils/constants';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
   bottom: 20px;
   left: 20px;
+`;
+
+const ShowScreenshotsIcon = styled(Button)`
+  position: fixed;
+  bottom: 20px;
+  left: 80px;
 `;
 
 const AccountContainer = styled(Button)`
@@ -112,16 +118,26 @@ const Home = () => {
           {annoucement}
         </div>
       ) : null}
-      <Instances 
-      css={`
-        bottom: 20px;
-        left: 20px;`
-      }/>
+      <Instances
+        css={`
+          bottom: 20px;
+          left: 20px;`
+        }/>
       <AddInstanceIcon type="primary" onClick={() => openAddInstanceModal(0)}>
         <FontAwesomeIcon icon={faPlus} />
       </AddInstanceIcon>
-      <AccountContainer type="primary" onClick={openAccountModal}>
-        {profileImage && account.accountType === ACCOUNT_MICROSOFT ? (
+      <ShowScreenshotsIcon type="primary" onClick={() => dispatch(openModal('ScreenshotManager'))}>
+        <FontAwesomeIcon icon={faImages} />
+      </ShowScreenshotsIcon>
+      <AccountContainer
+        type="primary"
+        onClick={openAccountModal}
+        css={`
+          background-color: ${account.accountType == ACCOUNT_OFFLINE ? (`#545454`) : account.accountType == ACCOUNT_OXAUTH ? (`#3c6a5b`) : account.accountType == ACCOUNT_ELYBY ? (`#187c41`) : (`#830d0d`)};
+          border-color: ${account.accountType == ACCOUNT_OFFLINE ? (`#545454`) : account.accountType == ACCOUNT_OXAUTH ? (`#3c6a5b`) : account.accountType == ACCOUNT_ELYBY ? (`#187c41`) : (`#830d0d`)};
+        `}
+      >
+        {profileImage && account.accountType !== ACCOUNT_OFFLINE ? (
           <img
             src={`data:image/jpeg;base64,${profileImage}`}
             css={`

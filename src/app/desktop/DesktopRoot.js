@@ -81,25 +81,25 @@ function DesktopRoot({ store }) {
 
     const manifests = await dispatch(initManifests());
 
-    let isJava8OK = javaPath;
-    let isJavaLatestOk = javaLatestPath;
+    let isJava8OK = true;
+    let isJavaLatestOk = true;
 
-    if (!javaPath) {
-      ({ isValid: isJava8OK } = await isLatestJavaDownloaded(
-        manifests,
-        userData,
-        true
-      ));
-    }
+    // if (!javaPath) {
+    //   ({ isValid: isJava8OK } = await isLatestJavaDownloaded(
+    //     manifests,
+    //     userData,
+    //     true
+    //   ));
+    // }
 
-    if (!isJavaLatestOk) {
-      ({ isValid: isJavaLatestOk } = await isLatestJavaDownloaded(
-        manifests,
-        userData,
-        true,
-        LATEST_JAVA_VERSION
-      ));
-    }
+    // if (!isJavaLatestOk) {
+    //   ({ isValid: isJavaLatestOk } = await isLatestJavaDownloaded(
+    //     manifests,
+    //     userData,
+    //     true,
+    //     LATEST_JAVA_VERSION
+    //   ));
+    // }
 
     if (!isJava8OK || !isJavaLatestOk) {
       dispatch(openModal('JavaSetup', { preventClose: true }));

@@ -65,6 +65,7 @@ const modalsComponentLookupTable = {
     lazy(() => import('../modals/OptedOutModsList'))
   ),
   BisectHosting: AsyncComponent(lazy(() => import('../modals/BisectHosting'))),
+  ScreenshotManager: AsyncComponent(lazy(() => import('../modals/ScreenshotManager'))),
   Onboarding: AsyncComponent(lazy(() => import('../modals/Onboarding'))),
   ModOverview: AsyncComponent(lazy(() => import('../modals/ModOverview'))),
   ModChangelog: AsyncComponent(lazy(() => import('../modals/ModChangelog'))),

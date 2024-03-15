@@ -10,10 +10,10 @@ const InfoModal = ({ modName, error, preventClose }) => {
         overflow-x: hidden;
       `}
       preventClose={preventClose}
-      title="Mod failed to download"
+      title="Не удалось загрузить модификацию"
     >
       <div>
-        The mod ${modName || ''} failed to download
+        Модификацию ${modName || ''} не удалось загрузить
         <div
           css={`
             background: ${props => props.theme.palette.grey[900]};

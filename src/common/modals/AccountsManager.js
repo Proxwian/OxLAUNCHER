@@ -28,7 +28,11 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     accounts.map(async account => {
-      if (account.skin == "") account.skinFace = ""; return;
+      console.log("123" + account.skin)
+      if (account.skin == "" || account.skin == undefined) { 
+        account.skinFace = ""; 
+        return; 
+      }
       account.skinFace = await extractFace(account.skin);
     })
   }, [accounts]);
@@ -40,7 +44,7 @@ const ProfileSettings = () => {
         width: 400px;
         max-height: 700px;
       `}
-      title="Менеджер профилей"
+      title="Менеджер аккаунтов"
     >
       <Container>
         <AccountsContainer>
@@ -90,8 +94,7 @@ const ProfileSettings = () => {
                   }}
                 >
                   <div>
-                   {(account.accountType === ACCOUNT_MICROSOFT) && (
-                    
+                   {(account.accountType != ACCOUNT_OFFLINE) && (
                     <img
                       src={`data:image/jpeg;base64,${account.skinFace}`}
                       css={`
@@ -183,7 +186,7 @@ const ProfileSettings = () => {
         </AccountsContainer>
         <AccountContainer>
           <AccountItem onClick={() => dispatch(openModal('AddAccount'))}>
-            Добавить профиль
+            Добавить аккаунт
           </AccountItem>
         </AccountContainer>
       </Container>

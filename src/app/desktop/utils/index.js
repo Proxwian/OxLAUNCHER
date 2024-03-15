@@ -911,18 +911,16 @@ export const getPlayerSkinMojang = async (uuid) => {
   return decoded?.textures?.SKIN?.url;
 };
 
-export const getPlayerSkinOx = async (nickname) => {
-  return oxGetPlayerSkin(nickname);
-  const playerSkin = await oxGetPlayerSkin(nickname);
+export const getPlayerSkinOx = async (uuid) => {
+  const playerSkin = await oxGetPlayerSkin(uuid);
   const { data } = playerSkin;
   const base64 = data.properties[0].value;
   const decoded = JSON.parse(Buffer.from(base64, 'base64').toString());
   return decoded?.textures?.SKIN?.url;
 };
 
-export const getPlayerSkinElyBy = async (nickname) => {
-  return elybyGetPlayerSkin(nickname);
-  const playerSkin = await elybyGetPlayerSkin(nickname);
+export const getPlayerSkinElyBy = async (uuid) => {
+  const playerSkin = await elybyGetPlayerSkin(uuid);
   const { data } = playerSkin;
   const base64 = data.properties[0].value;
   const decoded = JSON.parse(Buffer.from(base64, 'base64').toString());

@@ -588,7 +588,7 @@ export function loginOx(username, password, redirect = true) {
       // if (!data?.selectedProfile?.id) {
       //   throw new Error("Похоже, что вы не приобрели игру.");
       // }
-      const skinUrl = await getPlayerSkinOx(data.selectedProfile.name);
+      const skinUrl = await getPlayerSkinOx(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
       }
@@ -633,7 +633,7 @@ export function loginElyBy(username, password, redirect = true) {
       // if (!data?.selectedProfile?.id) {
       //   throw new Error("Похоже, что вы не приобрели игру.");
       // }
-      const skinUrl = await getPlayerSkinElyBy(data.selectedProfile.name);
+      const skinUrl = await getPlayerSkinElyBy(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
       }

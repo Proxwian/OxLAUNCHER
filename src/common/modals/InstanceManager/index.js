@@ -165,6 +165,10 @@ const menuEntries = {
     name: 'Описание',
     component: AsyncComponent(lazy(() => import('./Overview')))
   },
+  screenshots: {
+    name: 'Скриншоты',
+    component: AsyncComponent(lazy(() => import('./Screenshots')))
+  },
   mods: {
     name: 'Модификации',
     component: AsyncComponent(lazy(() => import('./Mods')))
@@ -180,21 +184,18 @@ const menuEntries = {
   resourcePacks: {
     name: 'Ресурспаки',
     component: AsyncComponent(lazy(() => import('./ResourcePacks')))
-  },
+  }
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
-  screenshots: {
-    name: 'Скриншоты',
-    component: AsyncComponent(lazy(() => import('./Screenshots')))
-  }
   // settings: { name: "Settings", component: Overview },
   // servers: { name: "Servers", component: Overview }
 };
 
-const InstanceManager = ({ instanceName, openUpdater }) => {
+const InstanceManager = ({ instanceName, openScreenshots }) => {
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
-  const [page, setPage] = useState(Object.keys(menuEntries)[0]);
+  const startIndex = openScreenshots ? 1 : 0;
+  const [page, setPage] = useState(Object.keys(menuEntries)[startIndex]);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const startedInstances = useSelector(state => state.startedInstances);
   const [background, setBackground] = useState(instance?.background);
