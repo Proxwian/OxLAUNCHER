@@ -68,14 +68,14 @@ export default function ActionConfirmation({
               applyChoice('abort', abortCallback, fileName, dispatch, delay);
             }}
           >
-            Abort
+            Отмена
           </Button>
           <Button
             onClick={() =>
               applyChoice('confirm', confirmCallback, fileName, dispatch, delay)
             }
           >
-            Confirm
+            Подтвердить
           </Button>
         </Buttons>
       </Container>

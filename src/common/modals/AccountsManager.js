@@ -1,9 +1,10 @@
-import React, { useState, useEffect, memo, useMemo } from 'react';
+import React, { useEffect } from 'react';
+import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { Spin, message } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faOtter, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import { _getAccounts, _getCurrentAccount } from '../utils/selectors';
 import { openModal, closeModal } from '../reducers/modals/actions';
@@ -18,7 +19,6 @@ import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
 import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_MOJANG, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../utils/constants';
 import { extractFace } from '../../app/desktop/utils';
-import { faEarlybirds } from '@fortawesome/free-brands-svg-icons';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -27,8 +27,13 @@ const ProfileSettings = () => {
   const isLoading = useSelector(state => state.loading.accountAuthentication);
 
   useEffect(() => {
+    const discordRPCDetails = `Смотрит список профилей`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     accounts.map(async account => {
-      if (account.skin == "") account.skinFace = ""; return;
+      if (account.skin == "" || account.skin == undefined) { 
+        account.skinFace = ""; 
+        return; 
+      }
       account.skinFace = await extractFace(account.skin);
     })
   }, [accounts]);
@@ -40,7 +45,7 @@ const ProfileSettings = () => {
         width: 400px;
         max-height: 700px;
       `}
-      title="Менеджер профилей"
+      title="Менеджер аккаунтов"
     >
       <Container>
         <AccountsContainer>
@@ -90,8 +95,7 @@ const ProfileSettings = () => {
                   }}
                 >
                   <div>
-                   {(account.accountType === ACCOUNT_MICROSOFT) && (
-                    
+                   {(account.accountType != ACCOUNT_OFFLINE) && (
                     <img
                       src={`data:image/jpeg;base64,${account.skinFace}`}
                       css={`
@@ -183,7 +187,7 @@ const ProfileSettings = () => {
         </AccountsContainer>
         <AccountContainer>
           <AccountItem onClick={() => dispatch(openModal('AddAccount'))}>
-            Добавить профиль
+            Добавить аккаунт
           </AccountItem>
         </AccountContainer>
       </Container>

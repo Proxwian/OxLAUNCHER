@@ -588,7 +588,7 @@ export function loginOx(username, password, redirect = true) {
       // if (!data?.selectedProfile?.id) {
       //   throw new Error("Похоже, что вы не приобрели игру.");
       // }
-      const skinUrl = await getPlayerSkinOx(data.selectedProfile.name);
+      const skinUrl = await getPlayerSkinOx(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
       }
@@ -633,7 +633,7 @@ export function loginElyBy(username, password, redirect = true) {
       // if (!data?.selectedProfile?.id) {
       //   throw new Error("Похоже, что вы не приобрели игру.");
       // }
-      const skinUrl = await getPlayerSkinElyBy(data.selectedProfile.name);
+      const skinUrl = await getPlayerSkinElyBy(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
       }
@@ -3231,13 +3231,11 @@ export function launchInstance(instanceName, forceQuit = false) {
       `${loader?.mcVersion}.json`
     );
 
-    let discordRPCDetails = `Minecraft ${loader?.mcVersion}`;
+    let discordRPCDetails = `Играет в Minecraft ${loader?.mcVersion}`;
 
     if (loader.source && loader.sourceName) {
-      discordRPCDetails = `${loader.sourceName}`;
+      discordRPCDetails = `Играет в ${loader.sourceName}`;
     }
-
-    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 
     ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 

@@ -32,7 +32,7 @@ const InstanceStartupAd = ({ instanceName }) => {
             margin-top: 20px;
           `}
         >
-          Запускаю Minecraft....
+          Запускаю {instanceName}...
         </span>
       </div>
     </Modal>

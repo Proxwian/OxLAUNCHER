@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import groupBy from 'lodash/groupBy';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
+import Modal from '../components/Modal';
 import {
   ContextMenuTrigger,
   ContextMenu,
@@ -24,14 +25,15 @@ import {
   faTrash,
   faCopy,
   faLink,
-  faFolder,
   faImage
 } from '@fortawesome/free-solid-svg-icons';
-import { _getInstancesPath } from '../../utils/selectors';
-import { openModal } from '../../reducers/modals/actions';
-import { imgurPost } from '../../api';
+import { _getInstancesPath, _getInstances } from '../utils/selectors';
+import { openModal } from '../reducers/modals/actions';
+import { imgurPost } from '../api';
 
-const getScreenshots = async screenshotsPath => {
+const getScreenshots = async (instancesPath, instance) => {
+  const screenshotsPath = path.join(instancesPath, instance.name, 'screenshots');
+  await makeDir(screenshotsPath);
   const files = await fs.readdir(screenshotsPath);
   const screenshots = [];
   try {
@@ -41,8 +43,10 @@ const getScreenshots = async screenshotsPath => {
         const fileBirthdate = new Date(stats.birthtimeMs);
         const timeDiff = Date.now() - fileBirthdate;
         const days = parseInt(Math.floor(timeDiff / 1000) / 60 / 60 / 24, 10);
+        
         screenshots.push({
           name: element,
+          screenshotsPath: screenshotsPath,
           days,
           timestamp: fileBirthdate,
           size: stats.size
@@ -68,16 +72,14 @@ const getImgurLink = async (imagePath, fileSize, setProgressUpdate) => {
   const base64String = await getStream(b64s);
 
   if (fileSize < 10485760) {
+    console.log(imagePath)
+    console.log(base64String)
     const res = await imgurPost(base64String, updateProgress);
 
     if (res.status == 200) {
       clipboard.writeText(res.data.data.link);
     }
   }
-};
-
-const openFolder = screenshotsPath => {
-  ipcRenderer.invoke('openFolder', screenshotsPath);
 };
 
 const getTitle = days => {
@@ -98,11 +100,12 @@ const getScreenshotsList = groups =>
 
 let watcher;
 
-const Screenshots = ({ instanceName }) => {
+const ScreenshotManager = () => {
   const instancesPath = useSelector(_getInstancesPath);
-  const screenshotsPath = path.join(instancesPath, instanceName, 'screenshots');
+  const instances = useSelector(_getInstances);
   const [dateGroups, setDateGroups] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemsPath, setSelectedItemsPath] = useState([]);
   const [progressUpdate, setProgressUpdate] = useState(null);
   const [uploadingFileName, setUploadingFileName] = useState(null);
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
@@ -119,7 +122,7 @@ const Screenshots = ({ instanceName }) => {
       uploadingFileName != null &&
       selectedItems[0] != uploadingFileName
     ) {
-      return 'Занято! Подождите загрузки предыдущего изображения';
+      return 'Подождите загрузки предыдущего изображения';
     } else return 'Поделиться ссылкой на изображение';
   };
 
@@ -133,49 +136,62 @@ const Screenshots = ({ instanceName }) => {
       )
     ) {
       setSelectedItems([]);
+      setSelectedItemsPath([]);
     } else {
       setSelectedItems(getScreenshotsList(dateGroups).map(x => x.name));
+      setSelectedPath(getScreenshotsList(dateGroups).map(x => x.screenshotsPath));
     }
-  }, [selectedItems, dateGroups, setSelectedItems]);
+  }, [selectedItems, selectedItemsPath, dateGroups, setSelectedItems, setSelectedItemsPath]);
 
   const deleteFile = useCallback(
     async fileName => {
       if (selectedItems.length === 1) {
+        console.log(selectedItemsPath[0])
         await fse.remove(
           path.join(
-            instancesPath,
-            instanceName,
-            'screenshots',
+            selectedItemsPath[0],
             selectedItems[0]
           )
         );
       } else if (selectedItems.length > 1) {
         await Promise.all(
-          selectedItems.map(async screenShot => {
-            await fse.remove(
-              path.join(instancesPath, instanceName, 'screenshots', screenShot)
-            );
+          selectedItems.map(screenFolder => {
+            selectedItems.map(async screenShot => {
+                    await fse.remove(
+                    path.join(screenFolder, screenShot)
+                );
+            })
           })
         );
       }
-    },
-    [selectedItems, instancesPath, instanceName]
+    }
   );
 
   const startListener = async () => {
-    await makeDir(screenshotsPath);
-    const screenshots = await getScreenshots(screenshotsPath);
+    var screenshots = [];
+    console.log(instances)
+    instances.forEach(async(instance) => {
+        const screenshotsPath = path.join(instancesPath, instance.name, 'screenshots');
+        await makeDir(screenshotsPath);
+        const instanceScreenshots = await getScreenshots(instancesPath, instance);
+        screenshots = screenshots.concat(instanceScreenshots);
+        console.log(screenshotsPath)
+        setDateGroups(groupBy(screenshots, 'days'));
+        watcher = watch(screenshotsPath, async (event, filename) => {
+            if (filename) {
+                setDateGroups(groupBy(screenshots, 'days'));
+            }
+        });
+    })
+    console.log(screenshots)
     setDateGroups(groupBy(screenshots, 'days'));
-    watcher = watch(screenshotsPath, async (event, filename) => {
-      if (filename) {
-        const sortedScreens = await getScreenshots(screenshotsPath);
-        setDateGroups(groupBy(sortedScreens, 'days'));
-      }
-    });
   };
 
   useEffect(() => {
     startListener();
+
+    const discordRPCDetails = `Любуется скриншотами`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 
     return () => watcher?.close();
   }, []);
@@ -195,42 +211,15 @@ const Screenshots = ({ instanceName }) => {
   }, [containerRef.current, contextMenuOpen]);
 
   return (
+    <Modal
+      css={`
+        height: 85%;
+        width: 85%;
+        max-width: 1500px;
+      `}
+      title="Менеджер скриншотов"
+    >
     <ExternalContainer ref={containerRef}>
-      <Bar>
-        <GlobalCheckbox
-          onChange={selectAll}
-          indeterminate={
-            selectedItems.length > 0 &&
-            selectedItems.length < getScreenshotsCount(dateGroups)
-          }
-          checked={
-            getScreenshotsCount(dateGroups) > 0 &&
-            getScreenshotsCount(dateGroups) === selectedItems.length
-          }
-        >
-          {`${selectedItems.length} выбрано`}
-        </GlobalCheckbox>
-
-        <DeleteButton
-          onClick={() => {
-            if (selectedItems.length) {
-              dispatch(
-                openModal('ActionConfirmation', {
-                  message: 'Вы уверены, что хотите удалить эти изображения?',
-                  confirmCallback: deleteFile,
-                  title: 'Подтвердить'
-                })
-              );
-            }
-          }}
-          selectedItems={selectedItems}
-          icon={faTrash}
-        />
-        <OpenFolderButton
-          onClick={() => openFolder(screenshotsPath)}
-          icon={faFolder}
-        />
-      </Bar>
       <Container groupsCount={Object.entries(dateGroups).length}>
         {Object.entries(dateGroups).length > 0 ? (
           Object.entries(dateGroups).map(([key, group]) => {
@@ -253,6 +242,11 @@ const Screenshots = ({ instanceName }) => {
                                     ? selectedItems.filter(x => x != file.name)
                                     : selectedItems.concat([file.name])
                                 );
+                                setSelectedItemsPath(
+                                    selectedItemsPath.indexOf(file.screenshotsPath) > -1
+                                      ? selectedItemsPath.filter(x => x != file.screenshotsPath)
+                                      : selectedItemsPath.concat([file.screenshotsPath])
+                                  );
                               }}
                               checked={selectedItems.indexOf(file.name) > -1}
                               selected={selectedItems.indexOf(file.name) > -1}
@@ -262,14 +256,14 @@ const Screenshots = ({ instanceName }) => {
                             onClick={() =>
                               dispatch(
                                 openModal('Screenshot', {
-                                  screenshotsPath,
-                                  file
+                                  screenshotsPath: file.screenshotsPath,
+                                  file: file
                                 })
                               )
                             }
                             selected={selectedItems.indexOf(file.name) > -1}
                             src={`file:///${path.join(
-                              screenshotsPath,
+                              file.screenshotsPath,
                               file.name
                             )}`}
                           />
@@ -284,17 +278,20 @@ const Screenshots = ({ instanceName }) => {
                             !selectedItems.includes(file.name)
                           ) {
                             setSelectedItems([file.name]);
+                            setSelectedItemsPath([file.screenshotsPath]);
                           } else if (
                             selectedItems.length === 1 &&
                             !selectedItems.includes(file.name)
                           ) {
                             setSelectedItems([...selectedItems, file.name]);
+                            setSelectedItemsPath([...selectedItemsPath, file.screenshotsPath]);
                           }
                         }}
                         onHide={() => {
                           setContextMenuOpen(false);
                           if (!selectedItems.includes(file.name)) {
                             setSelectedItems([file.name]);
+                            setSelectedItemsPath([file.screenshotsPath]);
                           }
                         }}
                       >
@@ -307,7 +304,7 @@ const Screenshots = ({ instanceName }) => {
                                 openModal('ActionConfirmation', {
                                   message:
                                     'Вы уверены, что хотите удалить этот скриншот?',
-                                  fileName: file.name,
+                                  screenshotsPath: file.screenshotsPath,
                                   confirmCallback: deleteFile,
                                   title: 'Подтвердить'
                                 })
@@ -327,7 +324,7 @@ const Screenshots = ({ instanceName }) => {
                                   openModal('ActionConfirmation', {
                                     message:
                                       'Вы уверены, что хотите удалить этот скриншот?',
-                                    fileName: file.name,
+                                    screenshotsPath: file.screenshotsPath,
                                     confirmCallback: deleteFile,
                                     title: 'Подтвердить'
                                   })
@@ -345,8 +342,8 @@ const Screenshots = ({ instanceName }) => {
                             <MenuItem
                               onClick={() =>
                                 dispatch(
-                                  openModal('ActionConfirmation', {
-                                    screenshotsPath,
+                                  openModal('Screenshot', {
+                                    screenshotsPath: file.screenshotsPath,
                                     file
                                   })
                                 )
@@ -358,7 +355,7 @@ const Screenshots = ({ instanceName }) => {
                             <MenuItem
                               onClick={() => {
                                 clipboard.writeImage(
-                                  path.join(screenshotsPath, file.name)
+                                  path.join(file.screenshotsPath, file.name)
                                 );
                               }}
                             >
@@ -376,7 +373,7 @@ const Screenshots = ({ instanceName }) => {
                                   setUploadingFileName(file.name);
                                   try {
                                     await getImgurLink(
-                                      path.join(screenshotsPath, file.name),
+                                      path.join(file.screenshotsPath, file.name),
                                       file.size,
                                       setProgressUpdate
                                     );
@@ -418,7 +415,7 @@ const Screenshots = ({ instanceName }) => {
                                   openModal('ActionConfirmation', {
                                     message:
                                       'Вы уверены, что хотите удалить это изображение?',
-                                    fileName: file.name,
+                                    screenshotsPath: file.screenshotsPath,
                                     confirmCallback: deleteFile,
                                     title: 'Подтвердить'
                                   })
@@ -442,10 +439,11 @@ const Screenshots = ({ instanceName }) => {
         )}
       </Container>
     </ExternalContainer>
+    </Modal>
   );
 };
 
-export default Screenshots;
+export default ScreenshotManager;
 
 const ExternalContainer = styled.div`
   display: flex;
@@ -517,20 +515,6 @@ const DeleteButton = styled(({ selectedItems, ...props }) => (
   cursor: ${props => (props.selectedItems.length > 0 ? 'pointer' : '')};
 `;
 
-const OpenFolderButton = styled(FontAwesomeIcon)`
-  transition: color 0.1s ease-in-out;
-  cursor: pointer;
-  margin: 0 10px;
-  &:hover {
-    cursor: pointer;
-    path {
-      cursor: pointer;
-      transition: color 0.1s ease-in-out;
-      color: ${props => props.theme.palette.primary.main};
-    }
-  }
-`;
-
 const DataSectionContainer = styled.span`
   &:first-child {
     margin-top: -45px;
@@ -558,10 +542,10 @@ const LoadingSlider = styled.div`
 `;
 
 const Photo = styled.img`
-  height: 108px;
-  max-height: 108px;
-  width: 192px;
-  max-width: 192px;
+  height: 144px;
+  max-height: 144px;
+  width: 256px;
+  max-width: 256px;
   margin: 10px;
   object-fit: cover;
   background: ${props => props.theme.palette.secondary.light};
@@ -604,10 +588,10 @@ const MenuShareLink = styled.div`
 `;
 const PhotoContainer = styled.div`
   position: relative;
-  height: 108px;
-  max-height: 108px;
-  width: 192px;
-  max-width: 192px;
+  height: 144px;
+  max-height: 144px;
+  width: 256px;
+  max-width: 256px;
   margin: 10px;
   background: transparent;
   border-radius: 5px;

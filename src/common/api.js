@@ -285,9 +285,9 @@ export const oxInvalidate = (accessToken, clientToken) => {
   );
 };
 
-export const oxGetPlayerSkin = nickname => {
+export const oxGetPlayerSkin = uuid => {
   return axios.get(
-    `https://s.namemc.com/i/1dbf93bef2b95e0c.png`
+    `https://oxlauncher.com/session/minecraft/profile/${uuid}`
   );
 };
 
@@ -345,9 +345,9 @@ export const elybyInvalidate = (accessToken, clientToken) => {
   );
 };
 
-export const elybyGetPlayerSkin = nickname => {
+export const elybyGetPlayerSkin = uuid => {
   return axios.get(
-    `https://s.namemc.com/i/d96b3d3f72a9fa57.png`
+    `http://minecraft.ely.by/session/minecraft/profile/${uuid}`
   );
 };
 

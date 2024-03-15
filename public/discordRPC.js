@@ -7,7 +7,7 @@ let activity;
 const initialAppStartup = Math.floor(Date.now() / 1000);
 
 const defaultValue = {
-  details: 'Смотрит сборки',
+  details: 'На главном экране',
   startTimestamp: initialAppStartup,
   largeImageKey: 'default_big',
   largeImageText: 'OxLAUNCHER - Лучший Minecraft лаунчер для установки сборок с модификациями и не только',
@@ -38,7 +38,7 @@ exports.update = details => {
   activity = {
     ...activity,
     startTimestamp: Math.floor(Date.now() / 1000),
-    details: `Играет в ${details}`
+    details: `${details}`
   };
   client.setActivity(activity);
 };

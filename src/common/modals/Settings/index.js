@@ -1,12 +1,13 @@
 import React, { useState, lazy } from 'react';
 import styled from 'styled-components';
+import { ipcRenderer } from 'electron';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
 import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
 import SocialButtons from '../../components/SocialButtons';
-import { closeModal, openModal } from '../../reducers/modals/actions';
+import { closeModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
 
 const Container = styled.div`
@@ -105,6 +106,9 @@ export default function Settings() {
   const dispatch = useDispatch();
   const ContentComponent = pages[page].component;
 
+  const discordRPCDetails = `Настраивает лаунчер`;
+  ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
+
   return (
     <Modal
       css={`
@@ -156,7 +160,7 @@ export default function Settings() {
                 font-size: 16px;
               `}
             >
-              OxLAUNCHER 1.4.0
+              OxLAUNCHER 1.4.1
             </span>
 			<p>by Proxwian</p>
             <div
