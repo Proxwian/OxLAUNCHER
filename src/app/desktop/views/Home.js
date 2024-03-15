@@ -61,6 +61,8 @@ const Home = () => {
   const [annoucement, setAnnoucement] = useState(null);
 
   useEffect(() => {
+    const discordRPCDetails = `На главной`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     const init = async () => {
 		// setInstalling(false);
 		// setInitinstall(false);
@@ -85,23 +87,6 @@ const Home = () => {
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
-  
-  const getInstances = (instances, sortOrder) => {
-  // Data normalization for missing fields
-  const inst = instances.map(instance => {
-    return {
-      ...instance,
-      timePlayed: instance.timePlayed || 0,
-      lastPlayed: instance.lastPlayed || 0
-    };
-  });
-
-  switch (sortOrder) {
-    default:
-      return inst;
-  }
-  };
-
 
   return (
     <div>

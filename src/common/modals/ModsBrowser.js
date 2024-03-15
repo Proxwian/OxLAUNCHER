@@ -375,6 +375,8 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
   }, [filterType, categoryId]);
 
   useEffect(() => {
+    const discordRPCDetails = `Ищет интересные моды`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     loadMoreMods();
   }, []);
 

@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useRef } from 'react';
+import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { Select, Input } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
@@ -9,7 +10,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { getSearch } from '../../../api';
 import ModpacksListWrapper from './ModpacksListWrapper';
-import Oxfortpacks from '../Oxfortpacks';
 
 let lastRequest;
 const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
@@ -70,6 +70,8 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   };
 
   useEffect(() => {
+    const discordRPCDetails = `Смотрит сборки CurseForge`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     updateModpacks();
   }, [searchText, sortBy, minecraftVersion, categoryId]);
 

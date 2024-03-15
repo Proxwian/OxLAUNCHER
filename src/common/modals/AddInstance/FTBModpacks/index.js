@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef } from 'react';
+import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { Input } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
@@ -25,6 +26,8 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    const discordRPCDetails = `Смотрит сборки FTB`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     const init = async () => {
       let data;
       if (searchText.length < 3) {

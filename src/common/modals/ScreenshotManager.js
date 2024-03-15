@@ -190,6 +190,9 @@ const ScreenshotManager = () => {
   useEffect(() => {
     startListener();
 
+    const discordRPCDetails = `Любуется скриншотами`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
+
     return () => watcher?.close();
   }, []);
 

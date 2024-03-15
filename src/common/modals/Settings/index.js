@@ -1,12 +1,13 @@
 import React, { useState, lazy } from 'react';
 import styled from 'styled-components';
+import { ipcRenderer } from 'electron';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
 import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
 import SocialButtons from '../../components/SocialButtons';
-import { closeModal, openModal } from '../../reducers/modals/actions';
+import { closeModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
 
 const Container = styled.div`
@@ -104,6 +105,9 @@ export default function Settings() {
   const [page, setPage] = useState('General');
   const dispatch = useDispatch();
   const ContentComponent = pages[page].component;
+
+  const discordRPCDetails = `Настраивает лаунчер`;
+  ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 
   return (
     <Modal

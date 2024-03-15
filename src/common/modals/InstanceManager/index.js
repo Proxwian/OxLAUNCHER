@@ -250,6 +250,9 @@ const InstanceManager = ({ instanceName, openScreenshots }) => {
   }, []);
 
   useEffect(() => {
+    const discordRPCDetails = `Настраивает сборку ${instanceName}`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
+
     if (instance?.loader.source === CURSEFORGE) {
       fse
         .readJson(path.join(instancesPath, instanceName, 'manifest.json'))

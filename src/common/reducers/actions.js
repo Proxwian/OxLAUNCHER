@@ -3231,13 +3231,11 @@ export function launchInstance(instanceName, forceQuit = false) {
       `${loader?.mcVersion}.json`
     );
 
-    let discordRPCDetails = `Minecraft ${loader?.mcVersion}`;
+    let discordRPCDetails = `Играет в Minecraft ${loader?.mcVersion}`;
 
     if (loader.source && loader.sourceName) {
-      discordRPCDetails = `${loader.sourceName}`;
+      discordRPCDetails = `Играет в ${loader.sourceName}`;
     }
-
-    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 
     ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 

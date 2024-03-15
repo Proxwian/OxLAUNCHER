@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useRef } from 'react';
+import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { Select, Input } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
@@ -69,6 +70,8 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
   };
 
   useEffect(() => {
+    const discordRPCDetails = `Смотрит сборки OxFORTPACK`;
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     updateModpacks();
   }, [searchText, sortBy, minecraftVersion, categoryId]);
 
