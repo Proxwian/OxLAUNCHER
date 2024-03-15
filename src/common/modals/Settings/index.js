@@ -160,7 +160,7 @@ export default function Settings() {
                 font-size: 16px;
               `}
             >
-              OxLAUNCHER 1.4.0
+              OxLAUNCHER 1.4.1
             </span>
 			<p>by Proxwian</p>
             <div
