@@ -4,7 +4,7 @@ export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';
 export const MOJANG_APIS = 'https://authserver.mojang.com';
 export const OXAUTH_APIS = 'https://oxlauncher.com/auth';
-export const ELYBY_APIS = 'http://minecraft.ely.by/auth';
+export const ELYBY_APIS = 'https://authserver.ely.by/auth';
 export const JAVA_MANIFEST_URL = 'https://cdn.gdlauncher.com/openjdk8.json';
 export const LATEST_JAVA_VERSION = 17;
 export const JAVA_LATEST_MANIFEST_URL =

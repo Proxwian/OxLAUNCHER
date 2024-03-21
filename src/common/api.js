@@ -347,7 +347,7 @@ export const elybyInvalidate = (accessToken, clientToken) => {
 
 export const elybyGetPlayerSkin = uuid => {
   return axios.get(
-    `http://minecraft.ely.by/session/minecraft/profile/${uuid}`
+    `https://authserver.ely.by/session/profile/${uuid}`
   );
 };
 

@@ -81,25 +81,25 @@ function DesktopRoot({ store }) {
 
     const manifests = await dispatch(initManifests());
 
-    let isJava8OK = true;
-    let isJavaLatestOk = true;
+    let isJava8OK = false;
+    let isJavaLatestOk = false;
 
-    // if (!javaPath) {
-    //   ({ isValid: isJava8OK } = await isLatestJavaDownloaded(
-    //     manifests,
-    //     userData,
-    //     true
-    //   ));
-    // }
+    if (!javaPath) {
+      ({ isValid: isJava8OK } = await isLatestJavaDownloaded(
+        manifests,
+        userData,
+        true
+      ));
+    }
 
-    // if (!isJavaLatestOk) {
-    //   ({ isValid: isJavaLatestOk } = await isLatestJavaDownloaded(
-    //     manifests,
-    //     userData,
-    //     true,
-    //     LATEST_JAVA_VERSION
-    //   ));
-    // }
+    if (!isJavaLatestOk) {
+      ({ isValid: isJavaLatestOk } = await isLatestJavaDownloaded(
+        manifests,
+        userData,
+        true,
+        LATEST_JAVA_VERSION
+      ));
+    }
 
     if (!isJava8OK || !isJavaLatestOk) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
@@ -127,8 +127,6 @@ function DesktopRoot({ store }) {
       });
     }
 
-    console.log("current account is " + currentAccount);
-
     if (currentAccount) {
       dispatch(
         load(
@@ -150,9 +148,9 @@ function DesktopRoot({ store }) {
       });
     }
 
-    //if (shouldShowDiscordRPC) {
+    if (shouldShowDiscordRPC) {
       ipcRenderer.invoke('init-discord-rpc');
-    //}
+    }
 
     ipcRenderer.on('custom-protocol-event', (e, data) => {
       console.log(data);
