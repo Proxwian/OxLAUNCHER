@@ -38,7 +38,7 @@ import {
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
-import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
+import { FABRIC, FORGE, VANILLA, QUILT } from '../../../../common/utils/constants';
 import { getAddonFileChangelog, getAddonFiles, getAddon } from '../../../../common/api';
 
 const Container = styled.div`
@@ -445,6 +445,7 @@ const Instance = ({ instanceName }) => {
               !(
                 instance.loader?.loaderType === FORGE ||
                 instance.loader?.loaderType === FABRIC ||
+                instance.loader?.loaderType === QUILT ||
                 instance.loader?.loaderType === VANILLA
               )
             }

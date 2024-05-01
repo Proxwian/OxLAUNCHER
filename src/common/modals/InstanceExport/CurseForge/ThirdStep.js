@@ -12,7 +12,7 @@ import { Transition } from 'react-transition-group';
 import styled from 'styled-components';
 import pMap from 'p-map';
 import { get7zPath } from '../../../../app/desktop/utils';
-import { FABRIC, VANILLA, FORGE } from '../../../utils/constants';
+import { FABRIC, VANILLA, FORGE, QUILT } from '../../../utils/constants';
 import { getAddon } from '../../../api';
 
 /**
@@ -88,6 +88,13 @@ export default function ThirdStep({
           primary: true
         };
         break;
+      case QUILT:
+          loaderObj = {
+            id: `${modloaderName}-${loader?.loaderVersion}`,
+            loader: loader?.fileID,
+            primary: true
+          };
+          break;
       case VANILLA:
         loaderObj = {
           id: modloaderName,
