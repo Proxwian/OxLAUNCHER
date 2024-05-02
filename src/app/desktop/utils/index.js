@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import fse from 'fs-extra';
-import { extractFull } from 'node-7z';
+import * as Seven from 'node-7z';
 import jimp from 'jimp';
 import makeDir from 'make-dir';
 import { promisify } from 'util';
@@ -20,7 +20,6 @@ import {
 } from '../../../common/utils/constants';
 
 import {
-  addQuotes,
   removeDuplicates,
   sortByForgeVersionDesc
 } from '../../../common/utils';
@@ -450,6 +449,38 @@ export const get7zPath = async () => {
 
 get7zPath();
 
+export const extract = async (source, destination, args = {}, funcs = {}) => {
+  const sevenZipPath = await get7zPath();
+  const extraction = Seven.extract(source, destination, {
+    ...args,
+    yes: true,
+    $bin: sevenZipPath,
+    $spawnOptions: { shell: true }
+  });
+  let extractedParentDir = null;
+  await new Promise((resolve, reject) => {
+    if (funcs.progress) {
+      extraction.on('progress', ({ percent }) => {
+        funcs.progress(percent);
+      });
+    }
+    extraction.on('data', data => {
+      if (!extractedParentDir) {
+        [extractedParentDir] = data.file.split('/');
+      }
+    });
+    extraction.on('end', () => {
+      funcs.end?.();
+      resolve(extractedParentDir);
+    });
+    extraction.on('error', err => {
+      funcs.error?.();
+      reject(err);
+    });
+  });
+  return { extraction, extractedParentDir };
+};
+
 export const extractAll = async (
   source,
   destination,
@@ -457,7 +488,7 @@ export const extractAll = async (
   funcs = {}
 ) => {
   const sevenZipPath = await get7zPath();
-  const extraction = extractFull(source, destination, {
+  const extraction = Seven.extractFull(source, destination, {
     ...args,
     yes: true,
     $bin: sevenZipPath,
@@ -539,14 +570,13 @@ export const getJVMArguments112 = (
   hideAccessToken,
   jvmOptions = []
 ) => {
-  const needsQuote = process.platform !== 'win32';
   const args = [];
   args.push('-cp');
 
   args.push(
     [...libraries, mcjar]
       .filter(l => !l.natives)
-      .map(l => `${addQuotes(needsQuote, l.path)}`)
+      .map(l => `"${l.path}"`)
       .join(process.platform === 'win32' ? ';' : ':')
   );
 
@@ -562,15 +592,8 @@ export const getJVMArguments112 = (
   args.push('-javaagent:authlib-inj.jar=oxlauncher.com')
   if (javaArgs.length > 0) args.push(...javaArgs);
   args.push(...jvmOptions);
-  args.push(
-    `-Djava.library.path=${addQuotes(
-      needsQuote,
-      path.join(instancePath, 'natives')
-    )}`
-  );
-  args.push(
-    `-Dminecraft.applet.TargetDirectory=${addQuotes(needsQuote, instancePath)}`
-  );
+  args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
+  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   if (mcJson.logging) {
     args.push(mcJson?.logging?.client?.argument || '');
   }
@@ -592,13 +615,13 @@ export const getJVMArguments112 = (
           val = mcJson.id;
           break;
         case 'game_directory':
-          val = `${addQuotes(needsQuote, instancePath)}`;
+          val = `"${instancePath}"`;
           break;
         case 'assets_root':
-          val = `${addQuotes(needsQuote, assetsPath)}`;
+          val = `"${assetsPath}"`;
           break;
         case 'game_assets':
-          val = `${path.join(assetsPath, 'virtual', 'legacy')}`;
+          val = `"${path.join(assetsPath, 'virtual', 'legacy')}"`;
           break;
         case 'assets_index_name':
           val = mcJson.assets;
@@ -627,9 +650,6 @@ export const getJVMArguments112 = (
       if (val != null) {
         mcArgs[i] = val;
       }
-      if (typeof args[i] === 'string' && !needsQuote) {
-        args[i] = args[i].replaceAll('"', '');
-      }
     }
   }
 
@@ -657,7 +677,6 @@ export const getJVMArguments113 = (
 ) => {
   const argDiscovery = /\${*(.*)}/;
   let args = mcJson.arguments.jvm.filter(v => !skipLibrary(v));
-  const needsQuote = process.platform !== 'win32';
 
   const javaArgs = jvmOptions.filter(Boolean);
   // if (process.platform === "darwin") {
@@ -667,9 +686,7 @@ export const getJVMArguments113 = (
 
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
-  args.push(
-    `-Dminecraft.applet.TargetDirectory=${addQuotes(needsQuote, instancePath)}`
-  );
+  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   if (mcJson.logging) {
     args.push(mcJson?.logging?.client?.argument || '');
   }
@@ -697,9 +714,9 @@ export const getJVMArguments113 = (
   for (let i = 0; i < args.length; i += 1) {
     if (typeof args[i] === 'object' && args[i].rules) {
       if (typeof args[i].value === 'string') {
-        args[i] = `${addQuotes(needsQuote, args[i].value)}`;
+        args[i] = `"${args[i].value}"`;
       } else if (typeof args[i].value === 'object') {
-        args.splice(i, 1, ...args[i].value.map(v => `${v}`));
+        args.splice(i, 1, ...args[i].value.map(v => `"${v}"`));
       }
       i -= 1;
     } else if (typeof args[i] === 'string') {
@@ -714,10 +731,10 @@ export const getJVMArguments113 = (
             val = mcJson.id;
             break;
           case 'game_directory':
-            val = `${addQuotes(needsQuote, instancePath)}`;
+            val = `"${instancePath}"`;
             break;
           case 'assets_root':
-            val = `${addQuotes(needsQuote, assetsPath)}`;
+            val = `"${assetsPath}"`;
             break;
           case 'assets_index_name':
             val = mcJson.assets;
@@ -743,7 +760,7 @@ export const getJVMArguments113 = (
           case 'natives_directory':
             val = args[i].replace(
               argDiscovery,
-              `${addQuotes(needsQuote, path.join(instancePath, 'natives'))}`
+              `"${path.join(instancePath, 'natives')}"`
             );
             break;
           case 'launcher_name':
@@ -755,7 +772,7 @@ export const getJVMArguments113 = (
           case 'classpath':
             val = [...libraries, mcjar]
               .filter(l => !l.natives)
-              .map(l => `${addQuotes(needsQuote, l.path)}`)
+              .map(l => `"${l.path}"`)
               .join(process.platform === 'win32' ? ';' : ':');
             break;
           default:
@@ -765,7 +782,6 @@ export const getJVMArguments113 = (
           args[i] = val;
         }
       }
-      if (!needsQuote && args[i] != undefined) args[i] = args[i].replaceAll('"', '');
     }
   }
 

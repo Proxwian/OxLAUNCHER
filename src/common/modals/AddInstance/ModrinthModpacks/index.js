@@ -1,27 +1,32 @@
-/* eslint-disable no-nested-ternary */
+/* eslint-disable */
 import React, { useState, useEffect, useRef } from 'react';
-import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
-import { Select, Input } from 'antd';
+import { Input } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { getCurseForgeSearch } from '../../../api';
 import ModpacksListWrapper from './ModpacksListWrapper';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ipcRenderer } from 'electron';
+import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  getModrinthMostPlayedModpacks,
+  getModrinthSearchResults
+} from '../../../api';
 
-let lastRequest;
-const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
+const ModrinthModpacks = ({ setStep, setModpack, setVersion }) => {
   const infiniteLoaderRef = useRef(null);
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [minecraftVersion, setMinecraftVersion] = useState(null);
-  const [categoryId, setCategoryId] = useState(null);
-  const [sortBy, setSortBy] = useState('Featured');
   const [searchText, setSearchText] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
   const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const init = async () => {
+      updateModpacks();
+    };
+    init();
+  }, [searchText]);
 
   const updateModpacks = useDebouncedCallback(() => {
     if (infiniteLoaderRef?.current?.scrollToItem) {
@@ -31,53 +36,67 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
   }, 250);
 
   const loadMoreModpacks = async (reset = false) => {
-    const reqObj = {};
-    lastRequest = reqObj;
-    if (!loading) {
-      setLoading(true);
-    }
-    if (reset && (modpacks.length !== 0 || hasNextPage)) {
+    const searchResult =
+      searchText.length < 3
+        ? await getModrinthMostPlayedModpacks()
+        : await getModrinthSearchResults(searchText, 'MODPACK');
+
+    if (!searchResult || modpacks.length == searchResult.total_hits) return;
+
+    setLoading(true);
+
+    if (reset) {
       setModpacks([]);
       setHasNextPage(false);
     }
     let data = null;
     try {
-      if (error) {
-        setError(false);
-      }
-      data = await getCurseForgeSearch(
-        'modpacks',
-        'oxmodpack',
-        8,
-        reset ? 0 : modpacks.length,
-        'LastUpdated',
-        true,
-        minecraftVersion,
-        categoryId
-      );
+      setError(false);
+
+      const offset = reset ? 0 : modpacks.length || 0;
+      data =
+        searchText.length < 3
+          ? await getModrinthMostPlayedModpacks(offset)
+          : await getModrinthSearchResults(
+              searchText,
+              'MODPACK',
+              null,
+              [],
+              null,
+              offset
+            );
     } catch (err) {
       setError(err);
       return;
     }
-    const newModpacks = reset ? data : [...modpacks, ...data];
-    if (lastRequest === reqObj) {
-      setLoading(false);
-      setHasNextPage(newModpacks.length % 40 === 0 && newModpacks.length !== 0);
-      setModpacks(newModpacks);
-    }
+
+    const newModpacks = reset ? data.hits : [...modpacks, ...data.hits];
+
+    setHasNextPage(newModpacks.length < searchResult.total_hits);
+    setModpacks(newModpacks);
+
+    setLoading(false);
   };
 
   useEffect(() => {
-    const discordRPCDetails = `Смотрит сборки OxFORTPACK`;
+    const discordRPCDetails = `Смотрит сборки Modrinth`;
     ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     updateModpacks();
-  }, [searchText, sortBy, minecraftVersion, categoryId]);
+  }, [searchText]);
 
   return (
     <Container>
+      <HeaderContainer>
+        <StyledInput
+          placeholder="Поиск..."
+          onSearch={setSearchText}
+          onChange={e => setSearchText(e.target.value)}
+          style={{ width: 200 }}
+        />
+      </HeaderContainer>
       <ModpacksContainer>
         {!error ? (
-          !loading && modpacks.length === 0 ? (
+          !loading && modpacks.length == 0 ? (
             <div
               css={`
                 margin-top: 120px;
@@ -94,7 +113,7 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
                   margin-top: 70px;
                 `}
               >
-                я ничего не нашёл по заданным фильтрам...
+                Ничего не найдено по указанному запросу.
               </div>
             </div>
           ) : (
@@ -108,8 +127,8 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
                   width={width}
                   height={height}
                   setStep={setStep}
-                  setVersion={setVersion}
                   setModpack={setModpack}
+                  setVersion={setVersion}
                   infiniteLoaderRef={infiniteLoaderRef}
                 />
               )}
@@ -132,7 +151,7 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
                 margin-top: 70px;
               `}
             >
-              Произошла ошибка при загрузке списка модификаций...
+              Произошла ошибка при загрузке списка сборок...
             </div>
           </div>
         )}
@@ -141,16 +160,11 @@ const Oxfortpacks = ({ setStep, setVersion, setModpack }) => {
   );
 };
 
-export default React.memo(Oxfortpacks);
+export default React.memo(ModrinthModpacks);
 
 const Container = styled.div`
   width: 100%;
   height: 100%;
-`;
-
-const StyledSelect = styled(Select)`
-  width: 170px;
-  margin-right: 20px;
 `;
 
 const StyledInput = styled(Input.Search)``;
