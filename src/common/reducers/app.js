@@ -128,6 +128,15 @@ function lastUpdateVersion(state = null, action) {
   }
 }
 
+function modrinthCategories(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_MODRINTH_CATEGORIES:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 export default combineReducers({
   accounts,
   currentAccountId,
@@ -141,5 +150,6 @@ export default combineReducers({
   clientToken,
   isNewUser,
   lastUpdateVersion,
-  curseforgeVersionIds
+  curseforgeVersionIds,
+  modrinthCategories
 });

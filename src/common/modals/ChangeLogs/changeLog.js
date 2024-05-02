@@ -1,10 +1,12 @@
 module.exports = {
   new: [
-    // {
-    //   header: 'Менеджер скриншотов со всех сборок',
-    //   content: "на главном экране лаунчера"
-    //   //  content: 'модпаков CurseForge для OxMIRROR',
-    // }
+    {
+      header: 'Поддержка Quilt'
+      //content: "на главном экране лаунчера"
+    },
+    {
+      header: 'Каталог модов и сборок Modrinth'
+    }
     // {
     //   header: 'Поддержка Discord RPC',
     //   content: '(отображение активности в лаунчере)',
@@ -47,12 +49,12 @@ module.exports = {
     // }
   ],
   bugfixes: [
-    {
-      header: 'Авторизация через Ely.by'
-    },
-    {
-      header: 'Автоматическая установка Java'
-    }
+    // {
+    //   header: 'Авторизация через Ely.by'
+    // },
+    // {
+    //   header: 'Автоматическая установка Java'
+    // }
     //{
      // header: 'Исправлено удаление изображений',
       // content: 'без папки overrides.'

@@ -367,16 +367,22 @@ const Row = memo(({ index, style, data }) => {
           </div>
           <div
             onClick={() => {
-              if (!item.fileID) return;
-              dispatch(
-                openModal('ModOverview', {
-                  projectID: item.projectID,
-                  fileID: item.fileID,
-                  fileName: item.fileName,
-                  gameVersions,
-                  instanceName
-                })
-              );
+              if (item.fileID) {
+                dispatch(
+                  openModal('ModOverview', {
+                    source: item.source,
+                    projectID: item.projectID,
+                    fileID: item.fileID,
+                    fileName: item.fileName,
+                    gameVersions,
+                    instanceName
+                  })
+                );
+              } else {
+                console.error(
+                  `Mod "${name}" does not have a valid file/version ID. Cannot open Mod Overview.`
+                );
+              }
             }}
             className="rowCenterContent"
           >
@@ -686,24 +692,18 @@ const Mods = ({ instanceName }) => {
   };
 
   const menu = (
-    <Menu
-      items={[
-        {
-          key: '0',
-          disabled: !hasModUpdates,
-          label: (
-            <div
-              onClick={() => {
-                dispatch(openModal('ModsUpdater', { instanceName }));
-                setIsMenuOpen(false);
-              }}
-            >
-              Обновить все модификации
-            </div>
-          )
-        }
-      ]}
-    />
+    <Menu>
+      <Menu.Item
+        key="0"
+        disabled={!hasModUpdates}
+        onClick={() => {
+          dispatch(openModal('ModsUpdater', { instanceName }));
+          setIsMenuOpen(false);
+        }}
+      >
+        Обновить все моды
+      </Menu.Item>
+    </Menu>
   );
 
   return (

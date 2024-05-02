@@ -16,6 +16,8 @@ import Import from './Import';
 import NewInstance from './NewInstance';
 import minecraftIcon from '../../assets/minecraftIcon.png';
 import curseForgeIcon from '../../assets/curseforgeIcon.webp';
+import modrinthIcon from '../../assets/modrinthIcon.webp';
+import ModrinthModpacks from './ModrinthModpacks';
 import ftbIcon from '../../assets/ftbIcon.webp';
 
 const Content = ({
@@ -40,6 +42,11 @@ const Content = ({
     />,
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
     <CurseForgeModpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
+    />,
+    <ModrinthModpacks
       setVersion={setVersion}
       setStep={setStep}
       setModpack={setModpack}
@@ -112,9 +119,18 @@ const Content = ({
                     />
                     CurseForge
                   </Radio.Button>
-                  {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
-                  <Radio.Button value={4} disabled>Technic</Radio.Button> */}
                   <Radio.Button value={3}>
+                    <img
+                      src={modrinthIcon}
+                      css={`
+                        margin-right: 4px;
+                        cursor: pointer;
+                        width: 20px;
+                      `}
+                    />
+                    Modrinth
+                  </Radio.Button>
+                  <Radio.Button value={4}>
                     <img
                       src={ftbIcon}
                       css={`
@@ -125,7 +141,7 @@ const Content = ({
                     />
                     FTB
                   </Radio.Button>
-                  <Radio.Button value={4}>
+                  <Radio.Button value={5}>
                     <FontAwesomeIcon
                       icon={faArchive}
                       css={`
