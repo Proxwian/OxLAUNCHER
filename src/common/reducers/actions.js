@@ -43,6 +43,7 @@ import {
   FMLLIBS_FORGE_BASE_URL,
   FMLLIBS_OUR_BASE_URL,
   FORGE,
+  QUILT,
   FTB,
   GDL_LEGACYJAVAFIXER_MOD_URL,
   LATEST_JAVA_VERSION,
@@ -61,6 +62,8 @@ import {
   getCFVersionIds,
   getFabricJson,
   getFabricManifest,
+  getQuiltJson,
+  getQuiltManifest,
   getForgeManifest,
   getFTBModpackVersionData,
   getJavaLatestManifest,
@@ -112,6 +115,7 @@ import {
   extractNatives,
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
+  filterQuiltFilesByVersion,
   get7zPath,
   getFileHash,
   getFilesRecursive,
@@ -172,6 +176,16 @@ export function initManifests() {
       });
       return fabric;
     };
+    
+    const getQuiltVersions = async () => {
+      const quilt = (await getQuiltManifest()).data
+      dispatch({
+        type: ActionTypes.UPDATE_QUILT_MANIFEST,
+        data: quilt
+      });
+      return quilt;
+    }
+
     const getJavaManifestVersions = async () => {
       const java = (await getJavaManifest()).data;
       dispatch({
@@ -180,6 +194,7 @@ export function initManifests() {
       });
       return java;
     };
+
     const getJavaLatestManifestVersions = async () => {
       const java = (await getJavaLatestManifest()).data;
       dispatch({
@@ -188,6 +203,7 @@ export function initManifests() {
       });
       return java;
     };
+
     const getAddonCategoriesVersions = async () => {
       const curseforgeCategories = await getAddonCategories();
       dispatch({
@@ -196,6 +212,7 @@ export function initManifests() {
       });
       return curseforgeCategories;
     };
+
     const getCurseForgeVersionIds = async () => {
       const versionIds = await getCFVersionIds();
       const hm = {};
@@ -211,6 +228,7 @@ export function initManifests() {
       });
       return hm;
     };
+
     const getForgeVersions = async () => {
       const forge = (await getForgeManifest()).data;
       const forgeVersions = {};
@@ -232,18 +250,20 @@ export function initManifests() {
       });
       return omitBy(forgeVersions, v => v.length === 0);
     };
+
     // Using reflect to avoid rejection
-    const [fabric, java, javaLatest, categories, forge, CFVersionIds] =
+    const [fabric, java, javaLatest, categories, forge, quilt, CFVersionIds] =
       await Promise.all([
         reflect(getFabricVersions()),
         reflect(getJavaManifestVersions()),
         reflect(getJavaLatestManifestVersions()),
         reflect(getAddonCategoriesVersions()),
         reflect(getForgeVersions()),
+        reflect(getQuiltVersions()),
         reflect(getCurseForgeVersionIds())
       ]);
 
-    if (fabric.e || java.e || categories.e || forge.e || CFVersionIds.e) {
+    if (fabric.e || java.e || categories.e || forge.e || CFVersionIds.e || quilt.e) {
       console.error(fabric, java, categories, forge);
     }
 
@@ -254,6 +274,7 @@ export function initManifests() {
       javaLatest: javaLatest.status ? javaLatest.v : app.javaLatestManifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,
       forge: forge.status ? forge.v : app.forgeManifest,
+      quilt: quilt.status ? quilt.v : app.quiltManifest,
       curseforgeVersionIds: CFVersionIds.status
         ? CFVersionIds.v
         : app.curseforgeVersionIds
@@ -1470,6 +1491,52 @@ export function downloadFabric(instanceName) {
   };
 }
 
+export function downloadQuilt(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { loader } = _getCurrentDownloadItem(state);
+
+    dispatch(updateDownloadStatus(instanceName, 'Скачиваю файлы Quilt...'));
+
+    let quiltJson;
+    const quiltJsonPath = path.join(
+      _getLibrariesPath(state),
+      'org',
+      'quiltmc',
+      loader?.mcVersion,
+      loader?.loaderVersion,
+      'quilt.json'
+    );
+    try {
+      quiltJson = await fse.readJson(quiltJsonPath);
+    } catch (err) {
+      quiltJson = (await getQuiltJson(loader)).data;
+      await fse.outputJson(quiltJsonPath, quiltJson);
+    }
+
+    const libraries = librariesMapper(
+      quiltJson.libraries,
+      _getLibrariesPath(state)
+    );
+
+    let prev = 0;
+    const updatePercentage = downloaded => {
+      const percentage = (downloaded * 100) / libraries.length;
+      const progress = parseInt(percentage, 10);
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+      }
+    };
+
+    await downloadInstanceFiles(
+      libraries,
+      updatePercentage,
+      state.settings.concurrentDownloads
+    );
+  };
+}
+
 export function downloadForge(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -2547,6 +2614,8 @@ export function downloadInstance(instanceName) {
         await dispatch(downloadFabric(instanceName));
       } else if (loader?.loaderType === FORGE) {
         await dispatch(downloadForge(instanceName));
+      } else if (loader?.loaderType === QUILT) {
+        await dispatch(downloadQuilt(instanceName));
       }
 
       dispatch(updateDownloadStatus(instanceName, 'Устанавливаю authlib...'));
@@ -3378,6 +3447,27 @@ export function launchInstance(instanceName, forceQuit = false) {
       libraries = libraries.concat(fabricLibraries);
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
+    } else if (loader && loader?.loaderType === 'quilt') {
+      const quiltJsonPath = path.join(
+        _getLibrariesPath(state),
+        'org',
+        'quiltmc',
+        loader?.mcVersion,
+        loader?.loaderVersion,
+        'quilt.json'
+      );
+
+      verified = await verifyResource(quiltJsonPath);
+      if (!verified) return;
+
+      const quiltJson = await fse.readJson(quiltJsonPath);
+      const quiltLibraries = librariesMapper(
+        quiltJson.libraries,
+        librariesPath
+      );
+      libraries = libraries.concat(quiltLibraries);
+      // Replace classname
+      mcJson.mainClass = quiltJson.mainClass;
     } else if (loader && loader?.loaderType === 'forge') {
       const forgeJsonPath = path.join(
         _getLibrariesPath(state),
@@ -3929,14 +4019,25 @@ export const initLatestMods = instanceName => {
       { concurrency: 40 }
     );
     const manifestsObj = {};
+    const getLatestMod = v => {
+      if (
+        getPatchedInstanceType(instance) === FORGE ||
+        v.projectID === 361988
+      ) {
+        return filterForgeFilesByVersion(v.data, instance.loader?.mcVersion);
+      }
+      if (getPatchedInstanceType(instance) === FABRIC) {
+        return filterFabricFilesByVersion(v.data, instance.loader?.mcVersion);
+      }
+      if (getPatchedInstanceType(instance) === QUILT) {
+        return filterQuiltFilesByVersion(v.data, instance.loader?.mcVersion);
+      }
+    };
     manifests
       .filter(v => v.data)
       .map(v => {
         // Find latest version for each mod
-        const [latestMod] =
-          getPatchedInstanceType(instance) === FORGE || v.projectID === 361988
-            ? filterForgeFilesByVersion(v.data, instance.loader?.mcVersion)
-            : filterFabricFilesByVersion(v.data, instance.loader?.mcVersion);
+        const [latestMod] = getLatestMod(v);
         if (latestMod) {
           manifestsObj[v.projectID] = latestMod;
         }

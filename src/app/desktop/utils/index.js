@@ -13,6 +13,7 @@ import {
   MC_LIBRARIES_URL,
   FABRIC,
   FORGE,
+  QUILT,
   LATEST_JAVA_VERSION,
   ACCOUNT_OXAUTH,
   ACCOUNT_ELYBY
@@ -232,7 +233,8 @@ export const librariesMapper = (libraries, librariesPath) => {
 export const getFilteredVersions = (
   vanillaManifest,
   forgeManifest,
-  fabricManifest
+  fabricManifest,
+  quiltManifest
 ) => {
   const versions = [
     {
@@ -320,6 +322,40 @@ export const getFilteredVersions = (
               value: v.version,
               label: v.version,
               children: fabricManifest.loader.map(c => ({
+                value: c.version,
+                label: c.version
+              }))
+            }))
+        }
+      ]
+    },
+    {
+      value: 'quilt',
+      label: 'Quilt',
+      children: [
+        {
+          value: 'release',
+          label: 'Релизы',
+          children: quiltManifest.game
+            .filter(v => v.stable)
+            .map(v => ({
+              value: v.version,
+              label: v.version,
+              children: quiltManifest.loader.map(c => ({
+                value: c.version,
+                label: c.version
+              }))
+            }))
+        },
+        {
+          value: 'snapshot',
+          label: 'Снапшоты',
+          children: quiltManifest.game
+            .filter(v => !v.stable)
+            .map(v => ({
+              value: v.version,
+              label: v.version,
+              children: quiltManifest.loader.map(c => ({
                 value: c.version,
                 label: c.version
               }))
@@ -981,14 +1017,41 @@ export const isFileModFabric = file => {
   return (
     (file.gameVersions.includes('Fabric') ||
       file.modules.find(v => v.foldername === 'fabric.mod.json')) &&
-    !file.gameVersions.includes('Forge')
+      !file.gameVersions.includes('Forge') &&
+      !file.gameVersions.includes('Quilt')
+    );
+  };
+
+export const isFileModQuilt = file => {
+  return (
+    (file.gameVersions.includes('Quilt') ||
+    file.modules.find(v => v.foldername === 'quilt.mod.json')) &&
+    !file.gameVersions.includes('Forge') &&
+    !file.gameVersions.includes('Fabric')
   );
 };
 
 export const filterFabricFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
-      return v.gameVersions.includes(version) && isFileModFabric(v);
+      return (
+        v.gameVersions.includes(version) &&
+        isFileModFabric(v) &&
+        !isFileModQuilt(v)
+      );
+    }
+    return v.gameVersions === version;
+  });
+};
+
+export const filterQuiltFilesByVersion = (files, version) => {
+  return files.filter(v => {
+    if (Array.isArray(v.gameVersions)) {
+      return (
+        v.gameVersions.includes(version) &&
+        isFileModQuilt(v) &&
+        !isFileModFabric(v)
+      );
     }
     return v.gameVersions === version;
   });
@@ -997,7 +1060,11 @@ export const filterFabricFilesByVersion = (files, version) => {
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
-      return v.gameVersions.includes(version) && !isFileModFabric(v);
+      return (
+        v.gameVersions.includes(version) &&
+        !isFileModFabric(v) &&
+        !isFileModQuilt(v)
+      );
     }
     return v.gameVersions === version;
   });
@@ -1076,6 +1143,12 @@ export const getPatchedInstanceType = instance => {
   const hasJumpLoader = (instance.mods || []).find(v => v.projectID === 361988);
   if (isForge && !hasJumpLoader) {
     return FORGE;
+  }
+  if (instance.loader?.loaderType === FABRIC) {
+    return FABRIC;
+  }
+  if (instance.loader?.loaderType === QUILT) {
+    return QUILT;
   }
   return FABRIC;
 };

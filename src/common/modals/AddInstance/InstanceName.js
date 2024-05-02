@@ -24,7 +24,7 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, VANILLA, FORGE, FTB, CURSEFORGE } from '../../utils/constants';
+import { FABRIC, VANILLA, FORGE, QUILT, FTB, CURSEFORGE } from '../../utils/constants';
 import { getFTBModpackVersionData } from '../../api';
 
 const InstanceName = ({
@@ -132,10 +132,16 @@ const InstanceName = ({
         v => v.id.includes(FABRIC) && v.primary
       );
 
+      const isQuiltModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(QUILT) && v.primary
+      );
+
       if (isForgeModpack) {
         version.loaderType = FORGE;
       } else if (isFabricModpack) {
         version.loaderType = FABRIC;
+      } else if (isQuiltModpack) {
+        version.loaderType = QUILT;
       } else {
         version.loaderType = VANILLA;
       }
@@ -144,6 +150,7 @@ const InstanceName = ({
     const isVanilla = version?.loaderType === VANILLA;
     const isFabric = version?.loaderType === FABRIC;
     const isForge = version?.loaderType === FORGE;
+    const isQuilt = version?.loaderType === QUILT;
 
     if (isCurseForgeModpack) {
       if (imageURL) {
@@ -208,6 +215,24 @@ const InstanceName = ({
           fileID: version?.fileID
         };
 
+        dispatch(
+          addToQueue(
+            localInstanceName,
+            loader,
+            manifest,
+            imageURL ? `background${path.extname(imageURL)}` : null
+          )
+        );
+      } else if (isQuilt) {
+        const loader = {
+          loaderType: QUILT,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: extractFabricVersionFromManifest(manifest),
+          fileID: version?.fileID,
+          projectID: version?.projectID,
+          source: version?.source,
+          sourceName: manifest.name
+        };
         dispatch(
           addToQueue(
             localInstanceName,
@@ -328,6 +353,13 @@ const InstanceName = ({
         });
 
         dispatch(addToQueue(localInstanceName, loader, manifest));
+      } else if (version?.loaderType === QUILT) {
+        Object.assign(loader, {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: manifest.minecraft.modLoaders[0].yarn,
+          fileID: manifest.minecraft.modLoaders[0].loader
+        });
       }
     } else if (isVanilla) {
       dispatch(
@@ -340,6 +372,14 @@ const InstanceName = ({
       dispatch(
         addToQueue(localInstanceName, {
           loaderType: FABRIC,
+          mcVersion: version?.mcVersion,
+          loaderVersion: version?.loaderVersion
+        })
+      );
+    } else if (isQuilt) {
+      dispatch(
+        addToQueue(localInstanceName, {
+          loaderType: QUILT,
           mcVersion: version?.mcVersion,
           loaderVersion: version?.loaderVersion
         })

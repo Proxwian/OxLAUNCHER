@@ -15,7 +15,8 @@ import {
   MINECRAFT_SERVICES_URL,
   FTB_API_URL,
   MIRROR_API_URL,
-  JAVA_LATEST_MANIFEST_URL
+  JAVA_LATEST_MANIFEST_URL,
+  QUILT_APIS
 } from './utils/constants';
 import { sortByDate, getMcManifestUrl } from './utils';
 import ga from './utils/analytics';
@@ -214,6 +215,11 @@ export const getFabricManifest = () => {
   return axios.get(url);
 };
 
+export const getQuiltManifest = () => {
+  const url = `${QUILT_APIS}/versions`;
+  return axios.get(url);
+}
+
 export const getJavaManifest = () => {
   const url = JAVA_MANIFEST_URL;
   return axios.get(url);
@@ -227,6 +233,14 @@ export const getJavaLatestManifest = () => {
 export const getFabricJson = ({ mcVersion, loaderVersion }) => {
   return axios.get(
     `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
+      mcVersion
+    )}/${encodeURIComponent(loaderVersion)}/profile/json`
+  );
+};
+
+export const getQuiltJson = ({ mcVersion, loaderVersion }) => {
+  return axios.get(
+    `${QUILT_APIS}/versions/loader/${encodeURIComponent(
       mcVersion
     )}/${encodeURIComponent(loaderVersion)}/profile/json`
   );
@@ -479,7 +493,8 @@ export const getSearch = async (
     sortField,
     sortOrder: isSortDescending ? 'desc' : 'asc',
     gameVersion: gameVersion || '',
-    ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
+    // ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
+    ...(modLoaderType === 'quilt' && { modLoaderType: 'Quilt' }),
     classId: type === 'mods' ? 6 : 4471,
     searchFilter
   };
