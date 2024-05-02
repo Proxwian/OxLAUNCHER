@@ -111,6 +111,7 @@ import {
   _getTempPath
 } from '../utils/selectors';
 import {
+  addQuotes,
   convertCompletePathToInstance,
   convertcurseForgeToCanonical,
   copyAssetsToLegacy,
@@ -146,11 +147,11 @@ import {
   downloadInstanceFilesWithFallbacks
 } from '../../app/desktop/utils/downloader';
 import {
-  addQuotes,
   getFileMurmurHash2,
   getSize,
   makeInstanceRestorePoint,
-  removeDuplicates
+  removeDuplicates,
+  replaceLibraryDirectory
 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
@@ -3501,6 +3502,8 @@ export function launchInstance(instanceName, forceQuit = false) {
       resolution: instanceResolution
     } = instanceState;
 
+    const needsQuote = process.platform !== 'win32';
+
     const mcJsonPath = path.join(
       _getMinecraftVersionsPath(state),
       `${loader?.mcVersion}.json`
@@ -3725,20 +3728,18 @@ export function launchInstance(instanceName, forceQuit = false) {
             mcJson.forge = { arguments: {} };
             mcJson.forge.arguments.jvm = forgeJson.version.arguments.jvm.map(
               arg => {
-                return arg
-                  .replace(/\${version_name}/g, mcJson.id)
-                  .replace(
-                    /=\${library_directory}/g,
-                    `="${_getLibrariesPath(state)}"`
-                  )
-                  .replace(
-                    /\${library_directory}/g,
-                    `${_getLibrariesPath(state)}`
-                  )
-                  .replace(
-                    /\${classpath_separator}/g,
-                    process.platform === 'win32' ? ';' : ':'
-                  );
+                return replaceLibraryDirectory(
+                  arg
+                    .replace(/\${version_name}/g, mcJson.id)
+                    .replace(
+                      /=\${library_directory}/g,
+                      `="${_getLibrariesPath(state)}"`
+                    ),
+                  _getLibrariesPath(state)
+                ).replace(
+                  /\${classpath_separator}/g,
+                  process.platform === 'win32' ? '";' : '":'
+                );
               }
             );
           }
@@ -3869,7 +3870,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     let closed = false;
 
     const ps = spawn(
-      `"${javaPath}"`,
+      `${addQuotes(needsQuote, javaPath)}`,
       jvmArguments.map(v =>
         v
           .toString()
@@ -3877,12 +3878,12 @@ export function launchInstance(instanceName, forceQuit = false) {
           .replace(
             // eslint-disable-next-line no-template-curly-in-string
             '-Dlog4j.configurationFile=${path}',
-            `-Dlog4j.configurationFile="${loggingPath}"`
+            `-Dlog4j.configurationFile=${addQuotes(needsQuote, loggingPath)}`
           )
       ),
       {
         cwd: instancePath,
-        shell: true
+        shell: process.platform !== 'win32'
       }
     );
 
