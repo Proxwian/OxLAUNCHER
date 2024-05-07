@@ -383,7 +383,7 @@ const Login = () => {
                 `}
               >
                 <center>
-                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.4.3</a>
+                  <a onClick={() => dispatch(openModal('ChangeLogs'))}>v. 1.4.4</a>
                 </center>
               </div>
               <div
