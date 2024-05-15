@@ -378,6 +378,7 @@ export function switchToFirstValidAccount(id) {
     const accounts = _getAccounts(state);
     const currentAccountId = id || state.app.currentAccountId;
     let found = null;
+    let offline = null;
     for (let i = 0; i < accounts.length; i += 1) {
       if (found || accounts[i].selectedProfile.id === currentAccountId)
         continue; //eslint-disable-line
@@ -865,7 +866,7 @@ export function loginWithAccessToken(redirect = true) {
     const state = getState();
     const currentAccount = _getCurrentAccount(state);
     const { accessToken, accountType, clientToken, selectedProfile } = currentAccount;
-    if (!accessToken) throw new Error();
+    //if (!accessToken) throw new Error();
     try {
       console.log(accountType)
       switch (accountType) {

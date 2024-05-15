@@ -51,11 +51,6 @@ const Content = ({
       setStep={setStep}
       setModpack={setModpack}
     />,
-    <FTBModpacks
-      setVersion={setVersion}
-      setStep={setStep}
-      setModpack={setModpack}
-    />,
     <Import
       setVersion={setVersion}
       setModpack={setModpack}
@@ -131,17 +126,6 @@ const Content = ({
                     Modrinth
                   </Radio.Button>
                   <Radio.Button value={4}>
-                    <img
-                      src={ftbIcon}
-                      css={`
-                        margin-right: 4px;
-                        cursor: pointer;
-                        width: 20px;
-                      `}
-                    />
-                    FTB
-                  </Radio.Button>
-                  <Radio.Button value={5}>
                     <FontAwesomeIcon
                       icon={faArchive}
                       css={`
@@ -149,7 +133,7 @@ const Content = ({
                         cursor: pointer;
                       `}
                     />
-                    Zip
+                    Импорт
                   </Radio.Button>
                 </Radio.Group>
               </div>
