@@ -1,6 +1,6 @@
 # OxLAUNCHER [![OxLAUNCHER CI](https://github.com/Proxwian/OxLAUNCHER/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Proxwian/OxLAUNCHER/actions/workflows/nodejs.yml)
 
-Latest version: 1.4.4
+Latest version: 1.4.6
 
 ## 💾 Compilation
 
