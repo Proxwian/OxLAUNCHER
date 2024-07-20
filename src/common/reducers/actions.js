@@ -67,8 +67,9 @@ import {
   getQuiltManifest,
   getForgeManifest,
   getFTBModpackVersionData,
-  getJavaLatestManifest,
-  getJavaManifest,
+  getJava21Manifest,
+  getJava17Manifest,
+  getJava8Manifest,
   getMcManifest,
   getModrinthCategories,
   getModrinthProject,
@@ -193,19 +194,28 @@ export function initManifests() {
       return quilt;
     }
 
-    const getJavaManifestVersions = async () => {
-      const java = (await getJavaManifest()).data;
+    const getJava8ManifestVersions = async () => {
+      const java = (await getJava8Manifest()).data;
       dispatch({
-        type: ActionTypes.UPDATE_JAVA_MANIFEST,
+        type: ActionTypes.UPDATE_JAVA_8_MANIFEST,
         data: java
       });
       return java;
     };
 
-    const getJavaLatestManifestVersions = async () => {
-      const java = (await getJavaLatestManifest()).data;
+    const getJava17ManifestVersions = async () => {
+      const java = (await getJava17Manifest()).data;
       dispatch({
-        type: ActionTypes.UPDATE_JAVA_LATEST_MANIFEST,
+        type: ActionTypes.UPDATE_JAVA_17_MANIFEST,
+        data: java
+      });
+      return java;
+    };
+
+    const getJava21ManifestVersions = async () => {
+      const java = (await getJava21Manifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_JAVA_21_MANIFEST,
         data: java
       });
       return java;
@@ -281,8 +291,9 @@ export function initManifests() {
       CFVersionIds
     ] = await Promise.all([
       reflect(getFabricVersions()),
-      reflect(getJavaManifestVersions()),
-      reflect(getJavaLatestManifestVersions()),
+      reflect(getJava8ManifestVersions()),
+      reflect(getJava17ManifestVersions()),
+      reflect(getJava21ManifestVersions()),
       reflect(getCurseForgeCategoriesVersions()),
       reflect(getModrinthCategoriesList()),
       reflect(getForgeVersions()),
@@ -3474,9 +3485,12 @@ export function getJavaVersionForMCVersion(mcVersion) {
     const { versions } = app?.vanillaManifest || {};
     if (versions) {
       const version = versions.find(v => v.id === mcVersion);
-      const javaLatestInitialDate = new Date('2021-05-27T09:39:21+00:00');
-      if (new Date(version?.releaseTime) < javaLatestInitialDate) {
+      const java17InitialDate = new Date('2021-05-27T09:39:21+00:00');
+      const java21InitialDate = new Date('2024-05-27T09:39:21+00:00');
+      if (new Date(version?.releaseTime) < java17InitialDate) {
         return 8;
+      } else if (new Date(version?.releaseTime) < java21InitialDate) {
+        return 17;
       }
     }
     return LATEST_JAVA_VERSION;

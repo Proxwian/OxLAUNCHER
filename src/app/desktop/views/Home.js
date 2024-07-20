@@ -21,7 +21,11 @@ import { updateLastUpdateVersion } from '../../../common/reducers/actions';
 import { _getInstances, _getInstancesPath, _getTempPath } from '../../../common/utils/selectors';
 
 import { useDebouncedCallback } from 'use-debounce';
-import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../../../common/utils/constants';
+import { ACCOUNT_ELYBY, BOOSTY_PAGE_URL, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../../../common/utils/constants';
+
+
+
+const { shell } = require('electron');
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -32,7 +36,14 @@ const AddInstanceIcon = styled(Button)`
 const ShowScreenshotsIcon = styled(Button)`
   position: fixed;
   bottom: 20px;
-  left: 80px;
+  left: 75px;
+`;
+
+const SupportIcon = styled(Button)`
+  position: fixed;
+  bottom: 20px;
+  background-color: #f15f2c;
+  left: 140px;
 `;
 
 const AccountContainer = styled(Button)`
@@ -88,6 +99,10 @@ const Home = () => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
 
+  const openBoosty = () => {
+    shell.openExternal(BOOSTY_PAGE_URL)
+  }
+
   return (
     <div>
       {/* <News news={news} /> */}
@@ -114,6 +129,9 @@ const Home = () => {
       <ShowScreenshotsIcon type="primary" onClick={() => dispatch(openModal('ScreenshotManager'))}>
         <FontAwesomeIcon icon={faImages} />
       </ShowScreenshotsIcon>
+      <SupportIcon type="primary" onClick={openBoosty}>
+        Boosty
+      </SupportIcon>
       <AccountContainer
         type="primary"
         onClick={openAccountModal}

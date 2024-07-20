@@ -15,10 +15,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
-  updateJavaLatestPath,
+  updateJava17Path,
+  updateJava21Path,
   updateJavaArguments,
   updateJavaMemory,
-  updateJavaPath,
+  updateJava8Path,
   updateMcStartupMethod,
   updateResolution
 } from '../../../reducers/settings/actions';
@@ -29,7 +30,6 @@ import {
 import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
 import {
-  LATEST_JAVA_VERSION,
   MC_STARTUP_METHODS
 } from '../../../utils/constants';
 import { marks, scaleMem, scaleMemInv, sysMemScaled } from '../../../utils';
@@ -121,14 +121,12 @@ export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
-  const javaPath = useSelector(state => _getJavaPath(state)(8));
-  const javaLatestPath = useSelector(state =>
-    _getJavaPath(state)(LATEST_JAVA_VERSION)
-  );
-  const customJavaPath = useSelector(state => state.settings.java.path);
-  const customJavaLatestPath = useSelector(
-    state => state.settings.java.pathLatest
-  );
+  const java8Path = useSelector(state => _getJavaPath(state)(8));
+  const java17Path = useSelector(state => _getJavaPath(state)(17));
+  const java21Path = useSelector(state => _getJavaPath(state)(21));
+  const customJava8Path = useSelector(state => state.settings.java.path8);
+  const customJava17Path = useSelector(state => state.settings.java.path17);
+  const customJava21Path = useSelector(state => state.settings.java.path21);
   const mcStartupMethod = useSelector(state => state.settings.mcStartupMethod);
   const mcResolution = useSelector(
     state => state.settings.minecraftSettings.resolution
@@ -177,17 +175,19 @@ export default function MyAccountPreferences() {
           color="primary"
           onChange={c => {
             if (c) {
-              dispatch(updateJavaPath(null));
-              dispatch(updateJavaLatestPath(null));
+              dispatch(updateJava8Path(null));
+              dispatch(updateJava17Path(null));
+              dispatch(updateJava21Path(null));
             } else {
-              dispatch(updateJavaPath(javaPath));
-              dispatch(updateJavaLatestPath(javaLatestPath));
+              dispatch(updateJava8Path(java8Path));
+              dispatch(updateJava17Path(java17Path));
+              dispatch(updateJava21Path(java21Path));
             }
           }}
-          checked={!customJavaPath && !customJavaLatestPath}
+          checked={!customJava8Path && !customJava17Path && !customJava21Path}
         />
       </AutodetectPath>
-      {customJavaPath && customJavaLatestPath && (
+      {customJava8Path && customJava17Path && customJava21Path && (
         <>
           <div
             css={`
@@ -219,22 +219,22 @@ export default function MyAccountPreferences() {
                 `}
                 onChange={e =>
                   dispatch(
-                    updateJavaPath(
+                    updateJava8Path(
                       e.target.value === '' ? null : e.target.value
                     )
                   )
                 }
-                value={customJavaPath}
+                value={customJava8Path}
               />
               <StyledButtons
                 color="primary"
                 onClick={async () => {
                   const { filePaths, canceled } = await ipcRenderer.invoke(
                     'openFileDialog',
-                    javaPath
+                    java8Path
                   );
                   if (!filePaths[0] || canceled) return;
-                  dispatch(updateJavaPath(filePaths[0]));
+                  dispatch(updateJava8Path(filePaths[0]));
                 }}
               >
                 <FontAwesomeIcon icon={faFolder} />
@@ -252,7 +252,7 @@ export default function MyAccountPreferences() {
                 text-align: left;
               `}
             >
-              Java {LATEST_JAVA_VERSION}
+              Java 17
             </h3>
             <div
               css={`
@@ -271,12 +271,12 @@ export default function MyAccountPreferences() {
                 `}
                 onChange={e => {
                   dispatch(
-                    updateJavaLatestPath(
+                    updateJava17Path(
                       e.target.value === '' ? null : e.target.value
                     )
                   );
                 }}
-                value={customJavaLatestPath}
+                value={customJava17Path}
               />
               <StyledButtons
                 color="primary"
@@ -286,7 +286,59 @@ export default function MyAccountPreferences() {
                     javaPath
                   );
                   if (!filePaths[0] || canceled) return;
-                  dispatch(updateJavaLatestPath(filePaths[0]));
+                  dispatch(updateJava17Path(filePaths[0]));
+                }}
+              >
+                <FontAwesomeIcon icon={faFolder} />
+              </StyledButtons>
+            </div>
+          </div>
+          <div
+            css={`
+              height: 50px;
+              margin: 30px 0;
+            `}
+          >
+            <h3
+              css={`
+                text-align: left;
+              `}
+            >
+              Java 21
+            </h3>
+            <div
+              css={`
+                width: 100%;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faLevelDownAlt}
+                flip="horizontal"
+                transform={{ rotate: 90 }}
+              />
+              <Input
+                css={`
+                  width: 75% !important;
+                  margin: 0 10px !important;
+                `}
+                onChange={e => {
+                  dispatch(
+                    updateJava21Path(
+                      e.target.value === '' ? null : e.target.value
+                    )
+                  );
+                }}
+                value={customJava21Path}
+              />
+              <StyledButtons
+                color="primary"
+                onClick={async () => {
+                  const { filePaths, canceled } = await ipcRenderer.invoke(
+                    'openFileDialog',
+                    javaPath
+                  );
+                  if (!filePaths[0] || canceled) return;
+                  dispatch(updateJava21Path(filePaths[0]));
                 }}
               >
                 <FontAwesomeIcon icon={faFolder} />

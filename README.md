@@ -1,7 +1,6 @@
 # OxLAUNCHER [![OxLAUNCHER CI](https://github.com/Proxwian/OxLAUNCHER/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Proxwian/OxLAUNCHER/actions/workflows/nodejs.yml)
 
-Latest version: 1.4.4
-
+Latest version: 1.4.6
 
 ## 💾 Compilation
 
@@ -12,8 +11,8 @@ These are the steps to compile it yourself.
 You need the following software installed:
 
 - [NodeJS](https://nodejs.org/en/download/) (16.17.0 x64)
-- [Rust Nightly](https://www.rust-lang.org/)
-- [Python2](https://www.python.org/)(Mac and linux)
+- [Rust Nightly](https://www.rust-lang.org/tools/install)
+- [Python3](https://www.python.org/) (3.6.0)
 - C++ compiler (g++ or windows build tools)
 
 ### ▶️ Steps
@@ -22,7 +21,7 @@ Install the dependencies and devDependencies.
 
 ```sh
 $ cd GDLauncher
-$ npm i
+$ npm i --legacy-peer-deps
 ```
 
 Start the development environment

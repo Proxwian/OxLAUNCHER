@@ -6,8 +6,9 @@ export const UPDATE_CONCURRENT_DOWNLOADS =
 
 export const UPDATE_MINECRAFT_RESOLUTION =
   'settings/UPDATE_MINECRAFT_RESOLUTION';
-export const UPDATE_JAVA_PATH = 'settings/UPDATE_JAVA_PATH';
-export const UPDATE_JAVA_LATEST_PATH = 'settings/UPDATE_JAVA_LATEST_PATH';
+export const UPDATE_JAVA_8_PATH = 'settings/UPDATE_JAVA_8_PATH';
+export const UPDATE_JAVA_17_PATH = 'settings/UPDATE_JAVA_17_PATH';
+export const UPDATE_JAVA_21_PATH = 'settings/UPDATE_JAVA_21_PATH';
 export const UPDATE_JAVA_MEMORY = 'settings/UPDATE_JAVA_MEMORY';
 export const UPDATE_JAVA_ARGUMENTS = 'settings/UPDATE_JAVA_ARGUMENTS';
 export const UPDATE_DISCORD_RPC = 'settings/UPDATE_DISCORD_RPC';

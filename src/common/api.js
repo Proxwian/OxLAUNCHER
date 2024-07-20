@@ -11,7 +11,6 @@ import {
   ELYBY_APIS,
   FORGESVC_URL,
   FABRIC_APIS,
-  JAVA_MANIFEST_URL,
   IMGUR_CLIENT_ID,
   MICROSOFT_LIVE_LOGIN_URL,
   MICROSOFT_XBOX_LOGIN_URL,
@@ -20,8 +19,10 @@ import {
   FTB_API_URL,
   MODRINTH_API_URL,
   MIRROR_API_URL,
-  JAVA_LATEST_MANIFEST_URL,
-  QUILT_APIS
+  QUILT_APIS,
+  JAVA_8_MANIFEST_URL,
+  JAVA_17_MANIFEST_URL,
+  JAVA_21_MANIFEST_URL
 } from './utils/constants';
 import { sortByDate, getMcManifestUrl } from './utils';
 import ga from './utils/analytics';
@@ -239,13 +240,18 @@ export const getQuiltManifest = () => {
   return axios.get(url);
 }
 
-export const getJavaManifest = () => {
-  const url = JAVA_MANIFEST_URL;
+export const getJava8Manifest = () => {
+  const url = JAVA_8_MANIFEST_URL;
   return axios.get(url);
 };
 
-export const getJavaLatestManifest = () => {
-  const url = JAVA_LATEST_MANIFEST_URL;
+export const getJava17Manifest = () => {
+  const url = JAVA_17_MANIFEST_URL;
+  return axios.get(url);
+};
+
+export const getJava21Manifest = () => {
+  const url = JAVA_21_MANIFEST_URL;
   return axios.get(url);
 };
 

@@ -53,13 +53,16 @@ export const _getJavaPath = createSelector(
   (javaManifest, java, userData) => {
     // version
     return memoize((ver = 8) => {
-      const isVersionLatest = ver === LATEST_JAVA_VERSION;
-      const manifest = isVersionLatest
-        ? javaManifest.javaLatestManifest
-        : javaManifest.javaManifest;
+      let manifest = javaManifest.java8Manifest;
+      let customJava = java.path8;
 
-      const customJava =
-        ver === LATEST_JAVA_VERSION ? java.pathLatest : java.path;
+      if (ver === 17) {
+        manifest = javaManifest.java17Manifest
+        customJava = java.path17
+      } else if (ver === 21) {
+        manifest = javaManifest.java21Manifest
+        customJava = java.path21
+      }
 
       const javaOs = convertOSToJavaFormat(process.platform);
       const javaArch = convertArchToJavaFormat(process.arch);

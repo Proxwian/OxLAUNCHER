@@ -35,8 +35,7 @@ import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
 import Message from './components/Message';
 import {
-  ACCOUNT_MICROSOFT,
-  LATEST_JAVA_VERSION
+  ACCOUNT_MICROSOFT
 } from '../../common/utils/constants';
 
 const Wrapper = styled.div`
@@ -60,8 +59,9 @@ function DesktopRoot({ store }) {
   const dispatch = useDispatch();
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
-  const javaPath = useSelector(state => state.settings.java.path);
-  const javaLatestPath = useSelector(state => state.settings.java.pathLatest);
+  const java8Path = useSelector(state => state.settings.java.path8);
+  const java17Path = useSelector(state => state.settings.java.path17);
+  const java21Path = useSelector(state => state.settings.java.path21);
   const location = useSelector(state => state.router.location);
   // const modals = useSelector(state => state.modals);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
@@ -82,9 +82,10 @@ function DesktopRoot({ store }) {
     const manifests = await dispatch(initManifests());
 
     let isJava8OK = false;
-    let isJavaLatestOk = false;
+    let isJava17OK = false;
+    let isJava21OK = false;
 
-    if (!javaPath) {
+    if (!java8Path) {
       ({ isValid: isJava8OK } = await isLatestJavaDownloaded(
         manifests,
         userData,
@@ -92,16 +93,25 @@ function DesktopRoot({ store }) {
       ));
     }
 
-    if (!isJavaLatestOk) {
-      ({ isValid: isJavaLatestOk } = await isLatestJavaDownloaded(
+    if (!isJava17OK) {
+      ({ isValid: isJava17OK } = await isLatestJavaDownloaded(
         manifests,
         userData,
         true,
-        LATEST_JAVA_VERSION
+        17
       ));
     }
 
-    if (!isJava8OK || !isJavaLatestOk) {
+    if (!isJava21OK) {
+      ({ isValid: isJava21OK } = await isLatestJavaDownloaded(
+        manifests,
+        userData,
+        true,
+        21
+      ));
+    }
+
+    if (!isJava8OK || !isJava17OK) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
 
       // Super duper hacky solution to await the modal to be closed...
