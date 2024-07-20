@@ -240,13 +240,13 @@ export const getQuiltManifest = () => {
   return axios.get(url);
 }
 
-export const getJava7Manifest = () => {
+export const getJava8Manifest = () => {
   const url = JAVA_8_MANIFEST_URL;
   return axios.get(url);
 };
 
 export const getJava17Manifest = () => {
-  const url = JAVA_21_MANIFEST_URL;
+  const url = JAVA_17_MANIFEST_URL;
   return axios.get(url);
 };
 

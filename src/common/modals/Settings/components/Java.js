@@ -16,6 +16,7 @@ import {
 import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
   updateJava17Path,
+  updateJava21Path,
   updateJavaArguments,
   updateJavaMemory,
   updateJava8Path,
