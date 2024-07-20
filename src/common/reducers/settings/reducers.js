@@ -117,8 +117,9 @@ function mcStartupMethod(state = MC_STARTUP_METHODS.DEFAULT, action) {
 
 function java(
   state = {
-    path: null,
-    pathLatest: null,
+    path8: null,
+    path17: null,
+    path21: null,
     memory: DEFAULT_MEMORY,
     args: DEFAULT_JAVA_ARGS
   },
@@ -129,11 +130,14 @@ function java(
       return { ...state, args: action.args };
     case ActionTypes.UPDATE_JAVA_MEMORY:
       return { ...state, memory: action.memory };
-    case ActionTypes.UPDATE_JAVA_PATH: {
-      return { ...state, path: action.path };
+    case ActionTypes.UPDATE_JAVA_8_PATH: {
+      return { ...state, path8: action.path };
     }
-    case ActionTypes.UPDATE_JAVA_LATEST_PATH: {
-      return { ...state, pathLatest: action.path };
+    case ActionTypes.UPDATE_JAVA_17_PATH: {
+      return { ...state, path17: action.path };
+    }
+    case ActionTypes.UPDATE_JAVA_21_PATH: {
+      return{ ...state, path21: action.path}
     }
     default:
       return state;

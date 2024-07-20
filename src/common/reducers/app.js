@@ -83,18 +83,27 @@ function curseforgeVersionIds(state = {}, action) {
   }
 }
 
-function javaManifest(state = {}, action) {
+function java8Manifest(state = {}, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_JAVA_MANIFEST:
+    case ActionTypes.UPDATE_JAVA_8_MANIFEST:
       return action.data;
     default:
       return state;
   }
 }
 
-function javaLatestManifest(state = {}, action) {
+function java17Manifest(state = {}, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_JAVA_LATEST_MANIFEST:
+    case ActionTypes.UPDATE_JAVA_17_MANIFEST:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
+function java21Manifest(state = {}, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_JAVA_21_MANIFEST:
       return action.data;
     default:
       return state;
@@ -144,8 +153,9 @@ export default combineReducers({
   forgeManifest,
   fabricManifest,
   quiltManifest,
-  javaManifest,
-  javaLatestManifest,
+  java8Manifest,
+  java17Manifest,
+  java21Manifest,
   curseforgeCategories,
   clientToken,
   isNewUser,

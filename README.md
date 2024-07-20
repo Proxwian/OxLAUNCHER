@@ -2,7 +2,6 @@
 
 Latest version: 1.4.4
 
-
 ## 💾 Compilation
 
 These are the steps to compile it yourself.
@@ -12,7 +11,7 @@ These are the steps to compile it yourself.
 You need the following software installed:
 
 - [NodeJS](https://nodejs.org/en/download/) (16.17.0 x64)
-- [Rust Nightly](https://www.rust-lang.org/)
+- [Rust Nightly](https://www.rust-lang.org/tools/install)
 - [Python2](https://www.python.org/)(Mac and linux)
 - C++ compiler (g++ or windows build tools)
 

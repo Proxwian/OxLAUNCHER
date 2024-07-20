@@ -376,9 +376,13 @@ export const isLatestJavaDownloaded = async (
   const javaArch = convertArchToJavaFormat(process.arch);
   let log = null;
 
-  const isJavaLatest = version === LATEST_JAVA_VERSION;
+  let manifest = meta.java8
 
-  const manifest = isJavaLatest ? meta.javaLatest : meta.java;
+  if (version === 17) {
+    manifest = meta.java17
+  } else if (version === 21) {
+    manifest = meta.java21
+  }
 
   const javaMeta = manifest.find(
     v =>

@@ -64,18 +64,26 @@ export function updateResolution(resolution) {
   };
 }
 
-export function updateJavaPath(path) {
+export function updateJava8Path(path) {
   return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_JAVA_PATH,
+      type: ActionTypes.UPDATE_JAVA_8_PATH,
       path
     });
   };
 }
-export function updateJavaLatestPath(path) {
+export function updateJava17Path(path) {
   return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_JAVA_LATEST_PATH,
+      type: ActionTypes.UPDATE_JAVA_17_PATH,
+      path
+    });
+  };
+}
+export function updateJava21Path(path) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_JAVA_21_PATH,
       path
     });
   };
