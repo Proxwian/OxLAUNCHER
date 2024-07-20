@@ -12,7 +12,7 @@ You need the following software installed:
 
 - [NodeJS](https://nodejs.org/en/download/) (16.17.0 x64)
 - [Rust Nightly](https://www.rust-lang.org/tools/install)
-- [Python2](https://www.python.org/)(Mac and linux)
+- [Python3](https://www.python.org/) (3.6.0)
 - C++ compiler (g++ or windows build tools)
 
 ### ▶️ Steps
@@ -21,7 +21,7 @@ Install the dependencies and devDependencies.
 
 ```sh
 $ cd GDLauncher
-$ npm i
+$ npm i --legacy-peer-deps
 ```
 
 Start the development environment
