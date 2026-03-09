@@ -512,7 +512,7 @@ export const getCurseForgeSearch = async (
 
   const params = {
     gameId: 432,
-    categoryId: categoryId || 0,
+    categoryId: categoryId || '',
     pageSize,
     index,
     sortField,
