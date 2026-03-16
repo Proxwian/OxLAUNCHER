@@ -25,11 +25,21 @@ function releaseChannel(state = 0, action) {
   }
 }
 
-// 0 is Alphabetical, 1 is last played, 2 is most played
+// 0 is Alphabetical, 1 is last played, 2 is most played, 3 is custom
 function instanceSortOrder(state = 0, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_INSTANCE_SORT_METHOD:
       return action.value;
+    default:
+      return state;
+  }
+}
+
+// Custom instance order for drag-and-drop
+function customInstanceOrder(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_INSTANCE_ORDER:
+      return action.order;
     default:
       return state;
   }
@@ -137,7 +147,7 @@ function java(
       return { ...state, path17: action.path };
     }
     case ActionTypes.UPDATE_JAVA_21_PATH: {
-      return{ ...state, path21: action.path}
+      return { ...state, path21: action.path };
     }
     default:
       return state;
@@ -148,6 +158,7 @@ export default combineReducers({
   sounds,
   releaseChannel,
   instanceSortOrder,
+  customInstanceOrder,
   concurrentDownloads,
   discordRPC,
   hideWindowOnGameLaunch,

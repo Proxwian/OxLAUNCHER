@@ -55,6 +55,15 @@ export function updateInstanceSortType(value) {
   };
 }
 
+export function updateInstanceOrder(order) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_INSTANCE_ORDER,
+      order
+    });
+  };
+}
+
 export function updateResolution(resolution) {
   return dispatch => {
     dispatch({

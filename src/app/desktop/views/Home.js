@@ -40,10 +40,11 @@ const ShowScreenshotsIcon = styled(Button)`
 `;
 
 const SupportIcon = styled(Button)`
-  position: fixed;
-  bottom: 20px;
-  background-color: #f15f2c;
-  left: 140px;
+  position: fixed !important;
+  bottom: 20px !important;
+  background-color: #f15f2c !important;
+  left: 280px !important;
+  z-index: 1000 !important;
 `;
 
 const AccountContainer = styled(Button)`
@@ -129,9 +130,6 @@ const Home = () => {
       <ShowScreenshotsIcon type="primary" onClick={() => dispatch(openModal('ScreenshotManager'))}>
         <FontAwesomeIcon icon={faImages} />
       </ShowScreenshotsIcon>
-      <SupportIcon type="primary" onClick={openBoosty}>
-        Boosty
-      </SupportIcon>
       <AccountContainer
         type="primary"
         onClick={openAccountModal}
@@ -154,6 +152,9 @@ const Home = () => {
         ) : ""}
         {account && account.selectedProfile.name}
       </AccountContainer>
+      {/* <SupportIcon type="primary" onClick={openBoosty}>
+        Boosty
+      </SupportIcon> */}
     </div>
   );
 };
