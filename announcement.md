@@ -1,1 +1,1 @@
-https://t.me/oxmodpack : Наш Telegram
+https://t.me/oxmodpack : Турнир на 5.000 рублей по Factorio: Nuclear в нашем Telegram
