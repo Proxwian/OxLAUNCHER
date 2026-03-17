@@ -253,7 +253,7 @@ const Home = () => {
           <Button
             type="text"
             onClick={toggleAnnouncement}
-            style={{ marginRight: '50px' }}
+            style={{ marginRight: '10px' }}
             title="Скрыть объявление"
           >
             <FontAwesomeIcon icon={faEyeSlash} />
@@ -276,7 +276,7 @@ const Home = () => {
           title="Показать объявление"
           css={`
             position: fixed;
-            top: 70px;
+            top: 20px;
             right: 20px;
             z-index: 100;
             border-radius: 50%;
