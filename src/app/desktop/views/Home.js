@@ -261,13 +261,13 @@ const Home = () => {
         </div>
       )}
       
-      <JokeButton type="default" onClick={fetchJoke}>
+      {/* <JokeButton type="default" onClick={fetchJoke}>
         {jokeLoading ? (
           <FontAwesomeIcon icon={faTimes} size="lg" spin />
         ) : (
           <FontAwesomeIcon icon={faLaugh} size="lg" />
         )}
-      </JokeButton>
+      </JokeButton> */}
       
       {announcementHidden && (
         <Button
