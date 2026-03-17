@@ -90,9 +90,15 @@ const getInstances = (instances, sortOrder, customOrder = []) => {
   // Custom order (drag-and-drop)
   if (sortOrder === 3) {
     if (customOrder.length > 0) {
-      return customOrder
+      const orderedInstances = customOrder
         .map(name => inst.find(i => i.name === name))
         .filter(Boolean);
+      
+      const remainingInstances = inst.filter(
+        i => !customOrder.includes(i.name)
+      );
+      
+      return [...orderedInstances, ...remainingInstances];
     }
     return inst;
   }
@@ -130,12 +136,18 @@ const Instances = () => {
   }, [customInstanceOrder]);
 
   useEffect(() => {
-    if (instanceSortOrder === 3 && localOrder.length === 0 && instances.length > 0) {
-      const initialOrder = instances.map(i => i.name);
-      setLocalOrder(initialOrder);
-      dispatch(updateInstanceOrder(initialOrder));
+    if (instanceSortOrder === 3 && instances.length > 0) {
+      const instanceNames = instances.map(i => i.name);
+      
+      const missingInstances = instanceNames.filter(name => !localOrder.includes(name));
+      
+      if (missingInstances.length > 0) {
+        const newOrder = [...localOrder, ...missingInstances];
+        setLocalOrder(newOrder);
+        dispatch(updateInstanceOrder(newOrder));
+      }
     }
-  }, [instanceSortOrder, instances.length]);
+  }, [instances, instanceSortOrder]);
 
   const memoInstances = useMemo(
     () => getInstances(instances || [], instanceSortOrder, localOrder),
@@ -165,9 +177,13 @@ const Instances = () => {
   const handleDrop = (e, targetInstanceName) => {
     e.preventDefault();
     if (draggedInstance && draggedInstance !== targetInstanceName) {
-      const currentOrder = localOrder.length > 0
-        ? [...localOrder]
-        : [...instances.map(i => i.name)];
+      const allInstanceNames = instances.map(i => i.name);
+      let currentOrder = localOrder.length > 0 ? [...localOrder] : [...allInstanceNames];
+      
+      const missingInstances = allInstanceNames.filter(name => !currentOrder.includes(name));
+      if (missingInstances.length > 0) {
+        currentOrder = [...currentOrder, ...missingInstances];
+      }
 
       const draggedIndex = currentOrder.indexOf(draggedInstance);
       const targetIndex = currentOrder.indexOf(targetInstanceName);
