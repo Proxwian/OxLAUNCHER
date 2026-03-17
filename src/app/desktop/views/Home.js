@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faImages, faPlus, faLaugh, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faImages, faPlus, faLaugh, faTimes, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Button, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
@@ -80,6 +80,8 @@ const Home = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [annoucement, setAnnoucement] = useState(null);
   const [annoucementLink, setAnnoucementLink] = useState(null);
+  const [announcementHidden, setAnnouncementHidden] = useState(false);
+  const [lastAnnouncementHash, setLastAnnouncementHash] = useState('');
   const [jokeModalVisible, setJokeModalVisible] = useState(false);
   const [jokeText, setJokeText] = useState('');
   const [jokeLoading, setJokeLoading] = useState(false);
@@ -200,9 +202,18 @@ const Home = () => {
         );
 
         const [url, text] = data.split(" : ");
-
-        setAnnoucement(text);
-        setAnnoucementLink(url)
+        
+        const hash = data.trim();
+        
+        if (hash !== lastAnnouncementHash) {
+          setAnnouncementHidden(false);
+          setLastAnnouncementHash(hash);
+          setAnnoucement(text);
+          setAnnoucementLink(url);
+        } else if (!announcementHidden) {
+          setAnnoucement(text);
+          setAnnoucementLink(url);
+        }
       } catch (e) {
         console.log('No announcement to show');
       }
@@ -219,21 +230,36 @@ const Home = () => {
     shell.openExternal(BOOSTY_PAGE_URL)
   }
 
+  const toggleAnnouncement = () => {
+    setAnnouncementHidden(!announcementHidden);
+  };
+
   return (
     <div>
       {/* <News news={news} /> */}
-      {annoucement ? (
+      {!announcementHidden && annoucement && (
         <div
           css={`
             padding: 20px;
             font-size: 18px;
             font-weight: bold;
             color: ${props => props.theme.palette.colors.white};
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
           `}
         >
-          <a href={annoucementLink}>{annoucement}</a>
+          <a href={annoucementLink} style={{ flex: 1 }}>{annoucement}</a>
+          <Button
+            type="text"
+            onClick={toggleAnnouncement}
+            style={{ marginRight: '50px' }}
+            title="Скрыть объявление"
+          >
+            <FontAwesomeIcon icon={faEyeSlash} />
+          </Button>
         </div>
-      ) : null}
+      )}
       
       <JokeButton type="default" onClick={fetchJoke}>
         {jokeLoading ? (
@@ -242,6 +268,29 @@ const Home = () => {
           <FontAwesomeIcon icon={faLaugh} size="lg" />
         )}
       </JokeButton>
+      
+      {announcementHidden && (
+        <Button
+          type="default"
+          onClick={toggleAnnouncement}
+          title="Показать объявление"
+          css={`
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 100;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+          `}
+        >
+          <FontAwesomeIcon icon={faEye} size="lg" />
+        </Button>
+      )}
       
       <Modal
         title={
