@@ -411,7 +411,7 @@ const General = () => {
           checked={DiscordRPC}
         />
       </Content>
-      <Title>
+      {/* <Title>
         Новости &nbsp; <FontAwesomeIcon icon={faNewspaper} />
       </Title>
       <Content>
@@ -422,7 +422,7 @@ const General = () => {
           }}
           checked={showNews}
         />
-      </Content>
+      </Content> */}
       <Title>
         Спрятать лаунчер во время игры &nbsp; <FontAwesomeIcon icon={faPlay} />
       </Title>
@@ -567,7 +567,7 @@ const General = () => {
           `}
         >
           <HorizontalLogo
-            size={200}
+            size={120}
             onClick={() => dispatch(openModal('ChangeLogs'))}
           />{' '}
           <div
