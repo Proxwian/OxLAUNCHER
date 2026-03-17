@@ -1,8 +1,8 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faImages, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { Button } from 'antd';
+import { faImages, faPlus, faLaugh, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { Button, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import axios from 'axios';
@@ -57,11 +57,32 @@ const AccountContainer = styled(Button)`
   align-items: center;
 `;
 
+const JokeButton = styled(Button)`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+`;
+
 const Home = () => {
   const dispatch = useDispatch();
   const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
   const lastUpdateVersion = useSelector(state => state.app.lastUpdateVersion);
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [annoucement, setAnnoucement] = useState(null);
+  const [annoucementLink, setAnnoucementLink] = useState(null);
+  const [jokeModalVisible, setJokeModalVisible] = useState(false);
+  const [jokeText, setJokeText] = useState('');
+  const [jokeLoading, setJokeLoading] = useState(false);
 
   const openAddInstanceModal = defaultPage => {
     dispatch(openModal('AddInstance', { defaultPage }));
@@ -71,8 +92,95 @@ const Home = () => {
     dispatch(openModal('AccountsManager'));
   };
 
-  const [profileImage, setProfileImage] = useState(null);
-  const [annoucement, setAnnoucement] = useState(null);
+  const fetchJoke = async () => {
+    setJokeLoading(true);
+    try {
+      const response = await fetch('https://r.jina.ai/http://www.anekdot.ru/random/anekdot.html');
+      const text = await response.text();
+      
+      if (text) {
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const jokeLines = [];
+        let inJoke = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          
+          if (line.includes('http://') || line.includes('https://') ||
+              line.includes('anekdot.ru') || line.includes('RSS') ||
+              line.includes('Telegram') || line.includes('VK') ||
+              line.startsWith('Анекдоты') || line.startsWith('Рубрики') ||
+              line.startsWith('Темы') || line.startsWith('Конкурсы') ||
+              line.startsWith('©') || line.startsWith('Реклама') ||
+              line.match(/^\d{2}\.\d{2}\.\d{4}/) ||
+              line.match(/^[A-Z]+$/) ||
+              line.length < 20) {
+            continue;
+          }
+          
+          if (line.match(/[а-яёa-z]/i) && line.match(/[.,!?]/)) {
+            if (!inJoke) {
+              inJoke = true;
+            }
+            jokeLines.push(line);
+            
+            if (jokeLines.join(' ').length > 300) {
+              break;
+            }
+          } else if (inJoke && line.length > 50) {
+            jokeLines.push(line);
+          } else if (inJoke && line.length < 20) {
+            break;
+          }
+        }
+        
+        let joke = jokeLines.join('\n\n').trim();
+        
+        if (!joke || joke.length < 50) {
+          let currentChunk = [];
+          let bestChunk = [];
+          
+          for (const line of lines) {
+            if (line.length > 40 && !line.includes('http')) {
+              currentChunk.push(line);
+              if (currentChunk.join(' ').length > bestChunk.join(' ').length) {
+                bestChunk = [...currentChunk];
+              }
+            } else {
+              if (currentChunk.length > 0) {
+                currentChunk = [];
+              }
+            }
+          }
+          
+          joke = bestChunk.join('\n\n').trim();
+        }
+        
+        joke = joke.replace(/\s+/g, ' ').replace(/  +/g, ' ').trim();
+        
+        if (joke.length > 600) {
+          joke = joke.substring(0, 600) + '...';
+        }
+        
+        if (joke.length > 30 && joke.length < 1000) {
+          setJokeText(joke);
+          setJokeModalVisible(true);
+        } else {
+          setJokeText('Не удалось загрузить анекдот. Попробуйте ещё раз.');
+          setJokeModalVisible(true);
+        }
+      } else {
+        setJokeText('Не удалось загрузить анекдот. Попробуйте ещё раз.');
+        setJokeModalVisible(true);
+      }
+    } catch (error) {
+      console.error('Error fetching joke:', error);
+      setJokeText('Ошибка при загрузке анекдота. Проверьте подключение к интернету.');
+      setJokeModalVisible(true);
+    } finally {
+      setJokeLoading(false);
+    }
+  };
 
   useEffect(() => {
       sendAnalyticsEvent(account.selectedProfile.name, account.accountType);
@@ -126,6 +234,54 @@ const Home = () => {
           <a href={annoucementLink}>{annoucement}</a>
         </div>
       ) : null}
+      
+      <JokeButton type="default" onClick={fetchJoke}>
+        {jokeLoading ? (
+          <FontAwesomeIcon icon={faTimes} size="lg" spin />
+        ) : (
+          <FontAwesomeIcon icon={faLaugh} size="lg" />
+        )}
+      </JokeButton>
+      
+      <Modal
+        title={
+          <span>
+            <FontAwesomeIcon icon={faLaugh} style={{ marginRight: '8px', color: '#f15f2c' }} />
+            Анекдот дня
+          </span>
+        }
+        open={jokeModalVisible}
+        visible={jokeModalVisible}
+        onCancel={() => setJokeModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setJokeModalVisible(false)}>
+            Закрыть
+          </Button>,
+          <Button key="another" type="primary" onClick={fetchJoke}>
+            {jokeLoading ? (
+              <><FontAwesomeIcon icon={faTimes} spin style={{ marginRight: '8px' }} /> Загрузка...</>
+            ) : (
+              'Ещё один'
+            )}
+          </Button>
+        ]}
+        width={500}
+        getContainer={() => document.body}
+        zIndex={1000}
+      >
+        <div
+          style={{
+            fontSize: '15px',
+            lineHeight: '1.6',
+            whiteSpace: 'pre-wrap',
+            maxHeight: '400px',
+            overflowY: 'auto'
+          }}
+        >
+          {jokeText || 'Загрузка...'}
+        </div>
+      </Modal>
+      
       <Instances
         css={`
           bottom: 20px;
