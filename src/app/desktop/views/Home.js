@@ -23,6 +23,8 @@ import { _getInstances, _getInstancesPath, _getTempPath } from '../../../common/
 import { useDebouncedCallback } from 'use-debounce';
 import { ACCOUNT_ELYBY, BOOSTY_PAGE_URL, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../../../common/utils/constants';
 
+import { sendAnalyticsEvent } from '../utils/analytics';
+
 
 
 const { shell } = require('electron');
@@ -73,10 +75,11 @@ const Home = () => {
   const [annoucement, setAnnoucement] = useState(null);
 
   useEffect(() => {
-    const discordRPCDetails = `На главной`;
+      sendAnalyticsEvent(account.selectedProfile.name, account.accountType);
+		const discordRPCDetails = `На главной`;
     ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     const init = async () => {
-		// setInstalling(false);
+      // setInstalling(false);
 		// setInitinstall(false);
       const appVersion = await ipcRenderer.invoke('getAppVersion');
       if (lastUpdateVersion !== appVersion) {
@@ -87,7 +90,11 @@ const Home = () => {
         const { data } = await axios.get(
           'https://raw.githubusercontent.com/Proxwian/OxLAUNCHER/master/announcement.md'
         );
-        setAnnoucement(null);
+
+        const [url, text] = data.split(" : ");
+
+        setAnnoucement(text);
+        setAnnoucementLink(url)
       } catch (e) {
         console.log('No announcement to show');
       }
@@ -110,13 +117,13 @@ const Home = () => {
       {annoucement ? (
         <div
           css={`
-            padding: 30px;
+            padding: 20px;
             font-size: 18px;
             font-weight: bold;
-            color: ${props => props.theme.palette.colors.yellow};
+            color: ${props => props.theme.palette.colors.white};
           `}
         >
-          {annoucement}
+          <a href={annoucementLink}>{annoucement}</a>
         </div>
       ) : null}
       <Instances
