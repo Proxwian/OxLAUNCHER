@@ -6,6 +6,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import { Portal } from 'react-portal';
+import { message } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlay,
@@ -18,6 +19,7 @@ import {
   faBoxOpen,
   faCopy,
   faServer,
+  faDesktop,
   faHammer,
   faImage
 } from '@fortawesome/free-solid-svg-icons';
@@ -165,6 +167,9 @@ const MenuInstanceName = styled.div`
   font-weight: 700;
 `;
 
+const isMissingIpcHandler = err =>
+  String(err?.message || err).includes('No handler registered');
+
 const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
@@ -259,6 +264,19 @@ const Instance = ({ instanceName }) => {
   };
   const openDuplicateNameDialog = () => {
     dispatch(openModal('InstanceDuplicateName', { instanceName }));
+  };
+  const createDesktopShortcut = async () => {
+    try {
+      await ipcRenderer.invoke('create-instance-shortcut', { instanceName });
+      message.success('Ярлык на рабочем столе создан');
+    } catch (err) {
+      if (isMissingIpcHandler(err)) {
+        message.error('Перезапустите лаунчер, чтобы применить обновление');
+        return;
+      }
+      console.error(err);
+      message.error('Не удалось создать ярлык');
+    }
   };
   const killProcess = () => {
     psTree(isPlaying.pid, (err, children) => {
@@ -472,6 +490,19 @@ const Instance = ({ instanceName }) => {
               `}
             />
             Дублировать
+          </MenuItem>
+          <MenuItem
+            disabled={Boolean(isInQueue)}
+            onClick={createDesktopShortcut}
+          >
+            <FontAwesomeIcon
+              icon={faDesktop}
+              css={`
+                margin-right: 10px;
+                width: 25px !important;
+              `}
+            />
+            Создать ярлык на рабочем столе
           </MenuItem>
           <MenuItem divider />
           <MenuItem

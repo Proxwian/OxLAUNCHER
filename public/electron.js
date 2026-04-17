@@ -34,6 +34,7 @@ let mainWindow;
 let tray;
 let watcher;
 let launcherLanguage = 'ru';
+let pendingProtocolUrl = null;
 
 const discordRPC = require('./discordRPC');
 const { DISCORD_INVITE_URL, BOOSTY_PAGE_URL } = require('../src/common/utils/constants');
@@ -67,6 +68,17 @@ const localeStrings = {
 
 const t = key => localeStrings[launcherLanguage]?.[key] || localeStrings.ru[key];
 
+const extractProtocolUrl = args =>
+  (args || []).find(arg => typeof arg === 'string' && arg.startsWith('oxlauncher://'));
+
+const sendProtocolUrlToRenderer = protocolUrl => {
+  if (!protocolUrl) return;
+  pendingProtocolUrl = protocolUrl;
+  if (mainWindow?.webContents) {
+    mainWindow.webContents.send('custom-protocol-event', protocolUrl);
+  }
+};
+
 // Prevent multiple instances
 if (gotTheLock) {
   app.on('second-instance', (e, argv) => {
@@ -74,12 +86,7 @@ if (gotTheLock) {
       const args = process.argv.slice(1);
       const args1 = argv.slice(1);
       log.log([...args, ...args1]);
-      if (mainWindow) {
-        mainWindow.webContents.send('custom-protocol-event', [
-          ...args,
-          ...args1
-        ]);
-      }
+      sendProtocolUrlToRenderer(extractProtocolUrl([...args, ...args1]));
     }
 
     if (mainWindow) {
@@ -90,6 +97,13 @@ if (gotTheLock) {
 } else {
   app.quit();
 }
+
+pendingProtocolUrl = extractProtocolUrl(process.argv);
+
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  sendProtocolUrlToRenderer(url);
+});
 
 if (!app.isDefaultProtocolClient('oxlauncher')) {
   app.setAsDefaultProtocolClient('oxlauncher');
@@ -678,6 +692,37 @@ ipcMain.handle('set-language', (event, language) => {
     const trayMenu = Menu.buildFromTemplate(buildTrayMenuTemplate());
     tray.setContextMenu(trayMenu);
   }
+});
+
+ipcMain.handle('consume-pending-protocol-url', () => {
+  const value = pendingProtocolUrl;
+  pendingProtocolUrl = null;
+  return value;
+});
+
+ipcMain.handle('create-instance-shortcut', async (event, { instanceName }) => {
+  if (!instanceName) {
+    throw new Error('Instance name is required');
+  }
+
+  const desktopPath = app.getPath('desktop');
+  const safeName = String(instanceName).replace(/[<>:"/\\|?*\x00-\x1F]/g, '_');
+  const shortcutPath = path.join(desktopPath, `${safeName}.url`);
+  const protocolUrl = `oxlauncher://launch-instance?name=${encodeURIComponent(
+    instanceName
+  )}`;
+  const iconPath = isDev
+    ? path.join(__dirname, '../public/logo_32x32.png')
+    : path.join(__dirname, '../build/logo_32x32.png');
+
+  const shortcutContents = `[InternetShortcut]
+URL=${protocolUrl}
+IconFile=${iconPath}
+IconIndex=0
+`;
+
+  await fs.writeFile(shortcutPath, shortcutContents, 'utf8');
+  return shortcutPath;
 });
 
 const removeOriginHeader = (details, callback) => {

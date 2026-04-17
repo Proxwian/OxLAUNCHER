@@ -1,4 +1,4 @@
-export const LANGUAGES = {
+﻿export const LANGUAGES = {
   RU: 'ru',
   EN: 'en'
 };
@@ -13,7 +13,75 @@ const directTranslations = {
     'settings.language.description':
       'Choose the launcher interface language. Changes apply immediately.',
     'settings.language.ru': 'Russian',
-    'settings.language.en': 'English'
+    'settings.language.en': 'English',
+    'common.loading': 'Loading...',
+    'discord.home.short': 'On Home Screen',
+    'home.announcement.hide': 'Hide Announcement',
+    'home.announcement.show': 'Show Announcement',
+    'home.joke.title': 'Joke of the Day',
+    'home.joke.close': 'Close',
+    'home.joke.another': 'One More',
+    'home.joke.error.retry': 'Could not load a joke. Please try again.',
+    'home.joke.error.connection':
+      'Error loading joke. Check your internet connection.',
+    'login.title': 'Authorization',
+    'login.username': 'Username',
+    'login.password': 'Password',
+    'login.submit': 'Login',
+    'login.microsoft': 'Sign In',
+    'login.register': 'Register',
+    'common.add': 'Add',
+    'common.login': 'Login',
+    'account.offline': 'Offline',
+    'accounts.rpc': 'Viewing accounts list',
+    'accounts.title': 'Account Manager',
+    'accounts.invalid': 'Account is invalid.',
+    'accounts.add': 'Add Account',
+    'common.copy': 'Copy',
+    'common.copied': 'Copied',
+    'common.clear': 'Clear',
+    'common.update': 'Update',
+    'common.no_updates': 'No updates',
+    'common.confirmation': 'Confirmation',
+    'common.confirm': 'Confirm',
+    'settings.profile.username': 'Username',
+    'settings.concurrent.title': 'Concurrent Downloads',
+    'settings.concurrent.description':
+      'Choose how many downloads can run at the same time in the launcher. If your connection is slow, keep it at 3 or below.',
+    'settings.sort.title': 'Instance Sorting',
+    'settings.sort.description':
+      'Choose how instances will be sorted on the home screen.',
+    'settings.sort.alphabetical': 'Alphabetical',
+    'settings.sort.recent': 'Last Played',
+    'settings.sort.frequent': 'Most Played',
+    'settings.release.title': 'Preferred Release Channel',
+    'settings.release.description':
+      'Choose preferred download versions for CurseForge modpacks. This also affects mod update versions.',
+    'settings.release.release': 'Release',
+    'settings.release.beta': 'Beta',
+    'settings.release.alpha': 'Alpha',
+    'settings.discord.title': 'Discord Rich Presence',
+    'settings.discord.description':
+      'Enable or disable showing the current instance and launcher info in your Discord profile.',
+    'settings.hide.title': 'Hide Launcher While Playing',
+    'settings.hide.description':
+      'Automatically hide the launcher window while playing. You can still reopen it from the system tray.',
+    'settings.potato.title': 'Potato Mode',
+    'settings.potato.description':
+      'Weak PC? Turn this on and heavy animations will be disabled.',
+    'settings.clear_data.title': 'Clear Instance Data',
+    'settings.clear_data.description':
+      'Delete all saved instance data. Warning: this button removes ALL saved settings.',
+    'settings.clear_data.confirm_message':
+      'Are you sure you want to delete the saved data?',
+    'settings.user_data.title': 'User Data Folder',
+    'settings.user_data.reset': 'Reset Path',
+    'settings.user_data.apply_restart': 'Apply and Restart',
+    'settings.user_data.copy_current': 'Copy current data into the new folder',
+    'settings.launcher.update_available':
+      'A launcher update is available. Click Update to download the latest version.',
+    'settings.launcher.up_to_date':
+      'You are using the latest launcher version.'
   },
   ru: {
     'settings.sidebar.parameters': 'Параметры',
@@ -24,7 +92,28 @@ const directTranslations = {
     'settings.language.description':
       'Выберите язык интерфейса лаунчера. Изменения применяются сразу.',
     'settings.language.ru': 'Русский',
-    'settings.language.en': 'English'
+    'settings.language.en': 'English',
+    'common.loading': 'Загрузка...',
+    'discord.home.short': 'На главной',
+    'home.announcement.hide': 'Скрыть объявление',
+    'home.announcement.show': 'Показать объявление',
+    'home.joke.title': 'Анекдот дня',
+    'home.joke.close': 'Закрыть',
+    'home.joke.another': 'Ещё один',
+    'home.joke.error.retry':
+      'Не удалось загрузить анекдот. Попробуйте ещё раз.',
+    'home.joke.error.connection':
+      'Ошибка при загрузке анекдота. Проверьте подключение к интернету.',
+    'login.title': 'Авторизация',
+    'login.username': 'Никнейм',
+    'login.password': 'Пароль',
+    'login.submit': 'Войти',
+    'login.microsoft': 'Авторизоваться',
+    'login.register': 'Регистрация',
+    'accounts.rpc': 'Смотрит список профилей',
+    'accounts.title': 'Менеджер аккаунтов',
+    'accounts.invalid': 'Аккаунт недействителен.',
+    'accounts.add': 'Добавить аккаунт'
   }
 };
 
@@ -232,9 +321,34 @@ export const legacyRuToEn = {
   '1 мин.': '1 min.',
   'На главном экране': 'On Home Screen',
   'OxLAUNCHER - Лучший Minecraft лаунчер для установки сборок с модификациями и не только':
-    'OxLAUNCHER - The best Minecraft launcher for installing modpacks and more'
-};
+    'OxLAUNCHER - The best Minecraft launcher for installing modpacks and more',
+  'Выберите количество одновременных загрузок в лаунчере. Если у вас медленное подключение, выберите не больше 3-х.':
+    'Choose how many downloads can run at the same time in the launcher. If your connection is slow, keep it at 3 or below.',
+  'Выберите, каким образом будут отсортированы сборки на главном экране.':
+    'Choose how instances will be sorted on the home screen.',
+  'Выберите предпочитаемые версии загрузок для модпаков CurseForge. Это также касается и обновлений модификаций.':
+    'Choose preferred download versions for CurseForge modpacks. This also affects mod update versions.',
+  'Включить / выключить отображение текущей сборки и информации о лаунчере в профиле Discord.':
+    'Enable or disable showing the current instance and launcher info in your Discord profile.',
+  'Автоматически скрывать окно лаунчера во время игры. Вы всё ещё сможете его открыть из системного трея.':
+    'Automatically hide the launcher window while playing. You can still reopen it from the system tray.',
+  'Слабый пк? Включите эту настройку, и я уберу все тяжелые анимации для Вас.':
+    'Weak PC? Turn this on and heavy animations will be disabled.',
+  'Удалить все сохранённые данные сборок. Внимание! Эта кнопка удалит ВСЕ сохранённые параметры.':
+    'Delete all saved instance data. Warning: this button removes ALL saved settings.',
+  'Вы уверены, что хотите удалить сохранённые?':
+    'Are you sure you want to delete the saved data?',
+  'Подтверждение': 'Confirmation',
+  'Подтвердить': 'Confirm',
+  'Применить и перезапустить': 'Apply and Restart',
+  'Копировать текущие данные в новую папку': 'Copy current data into the new folder',
+  'Доступно обновление лаунчера. Нажмите на кнопку Обновить, чтобы загрузить актуальную версию лаунчера':
+    'A launcher update is available. Click Update to download the latest version.',
+  'Никнейм': 'Username',
+  'Скопировано': 'Copied',
+  'Копировать': 'Copy'
 
+};
 const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const legacyRuToEnEntries = Object.entries(legacyRuToEn).sort(
   ([a], [b]) => b.length - a.length

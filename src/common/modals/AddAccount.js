@@ -7,22 +7,35 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../components/Modal';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
-import { login, loginElyBy, loginOAuth, loginOffline, loginOx } from '../reducers/actions';
+import {
+  login,
+  loginElyBy,
+  loginOAuth,
+  loginOffline,
+  loginOx
+} from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
 import { shell } from 'electron';
-import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH, OXAUTH_REGISTER_URL, ELYBY_REGISTER_URL } from '../utils/constants';
+import {
+  ACCOUNT_ELYBY,
+  ACCOUNT_MICROSOFT,
+  ACCOUNT_OFFLINE,
+  ACCOUNT_OXAUTH,
+  OXAUTH_REGISTER_URL,
+  ELYBY_REGISTER_URL
+} from '../utils/constants';
+import { useTranslation } from '../localization/useTranslation';
 
 const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [email, setEmail] = useState(username || '');
   const [password, setPassword] = useState('');
   const [accountType, setAccountType] = useState(ACCOUNT_OXAUTH);
   const [loginFailed, setloginFailed] = useState();
 
   const addOfflineAccount = () => {
-    dispatch(
-      load(features.mcAuthentication, dispatch(loginOffline(email, false)))
-    )
+    dispatch(load(features.mcAuthentication, dispatch(loginOffline(email, false))))
       .then(() => dispatch(closeModal()))
       .catch(console.error);
   };
@@ -53,12 +66,12 @@ const AddAccount = ({ username }) => {
   };
 
   const registerElyByAccount = () => {
-    shell.openExternal(ELYBY_REGISTER_URL)
-  }
+    shell.openExternal(ELYBY_REGISTER_URL);
+  };
 
   const registerOxAccount = () => {
-    shell.openExternal(OXAUTH_REGISTER_URL)
-  }
+    shell.openExternal(OXAUTH_REGISTER_URL);
+  };
 
   const renderAddOfflineAccount = () => (
     <Container>
@@ -68,17 +81,19 @@ const AddAccount = ({ username }) => {
             height: 80px;
           `}
         >
-          Без пароля
+          {t('account.offline', 'Без пароля')}
         </h1>
         <StyledInput
           disabled={!!username}
-          placeholder="Никнейм"
+          placeholder={t('login.username', 'Никнейм')}
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
       </FormContainer>
       <FormContainer>
-        <StyledButton onClick={addOfflineAccount}>Добавить</StyledButton>
+        <StyledButton onClick={addOfflineAccount}>
+          {t('common.add', 'Добавить')}
+        </StyledButton>
       </FormContainer>
     </Container>
   );
@@ -95,21 +110,25 @@ const AddAccount = ({ username }) => {
         </h1>
         <StyledInput
           disabled={!!username}
-          placeholder="Логин"
+          placeholder={t('common.login', 'Логин')}
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
         <StyledInput
           disabled={!!username}
           type="password"
-          placeholder="Пароль"
+          placeholder={t('login.password', 'Пароль')}
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
       </FormContainer>
       <FormContainer>
-        <StyledButton onClick={addElyByAccount}>Добавить</StyledButton>
-        <StyledButton onClick={registerElyByAccount}>Регистрация</StyledButton>
+        <StyledButton onClick={addElyByAccount}>
+          {t('common.add', 'Добавить')}
+        </StyledButton>
+        <StyledButton onClick={registerElyByAccount}>
+          {t('login.register', 'Регистрация')}
+        </StyledButton>
       </FormContainer>
     </Container>
   );
@@ -126,21 +145,25 @@ const AddAccount = ({ username }) => {
         </h1>
         <StyledInput
           disabled={!!username}
-          placeholder="Логин"
+          placeholder={t('common.login', 'Логин')}
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
         <StyledInput
           disabled={!!username}
           type="password"
-          placeholder="Пароль"
+          placeholder={t('login.password', 'Пароль')}
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
       </FormContainer>
       <FormContainer>
-        <StyledButton onClick={addOxAccount}>Добавить</StyledButton>
-        <StyledButton onClick={registerOxAccount}>Регистрация</StyledButton>
+        <StyledButton onClick={addOxAccount}>
+          {t('common.add', 'Добавить')}
+        </StyledButton>
+        <StyledButton onClick={registerOxAccount}>
+          {t('login.register', 'Регистрация')}
+        </StyledButton>
       </FormContainer>
     </Container>
   );
@@ -203,7 +226,7 @@ const AddAccount = ({ username }) => {
           >
             Ely.by
           </StyledAccountMenuItem>
-          
+
           <StyledAccountMenuItem
             key={ACCOUNT_MICROSOFT}
             onClick={() => {
@@ -217,7 +240,7 @@ const AddAccount = ({ username }) => {
             key={ACCOUNT_OFFLINE}
             onClick={() => setAccountType(ACCOUNT_OFFLINE)}
           >
-            Без пароля
+            {t('account.offline', 'Без пароля')}
           </StyledAccountMenuItem>
         </Menu>
         {accountType === ACCOUNT_OXAUTH ? renderAddOxAccount() : null}
@@ -263,6 +286,6 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-content: space-between;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
 `;

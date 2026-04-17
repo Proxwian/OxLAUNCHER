@@ -12,6 +12,7 @@ import { _getCurrentAccount } from '../../../common/utils/selectors';
 import BisectHosting from '../../../ui/BisectHosting';
 import KoFiButton from '../../../common/assets/ko-fi.png';
 import { openModal } from '../../../common/reducers/modals/actions';
+import { useTranslation } from '../../../common/localization/useTranslation';
 
 const Background = styled.div`
   position: absolute;
@@ -26,6 +27,7 @@ const scrollToRef = ref =>
 
 const Home = () => {
   const dispatch = useDispatch();
+  const { language } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [initScrolled, setInitScrolled] = useState(false);
   const account = useSelector(_getCurrentAccount);
@@ -83,8 +85,9 @@ const Home = () => {
             padding: 0 120px;
           `}
         >
-          {account.selectedProfile.name}, Добро Пожаловать!
-          Спасибо за загрузку OxLAUNCHER :3
+          {language === 'en'
+            ? `${account.selectedProfile.name}, welcome! Thanks for downloading OxLAUNCHER :3`
+            : `${account.selectedProfile.name}, Добро пожаловать! Спасибо за загрузку OxLAUNCHER :3`}
         </div>
       </div>
       <div
@@ -101,22 +104,26 @@ const Home = () => {
       >
         <div
           css={`
-				font-size: 24px;
-				font-weight: 600;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				text-align: center;
-				margin: 20%;
-			  `}
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin: 20%;
+          `}
         >
-          <a href="https://discord.gg/Yy4y7tjKfY">Наш Discord сервер</a> 
-          Вся  информация о сборках и лаунчере, а также новости проекта
+          <a href="https://discord.gg/Yy4y7tjKfY">
+            {language === 'en' ? 'Our Discord server' : 'Наш Discord сервер'}
+          </a>{' '}
+          {language === 'en'
+            ? 'All information about modpacks and the launcher, plus project news.'
+            : 'Вся информация о сборках и лаунчере, а также новости проекта'}
           <iframe
             css={`
-				  margin-top: 40px;
-				`}
+              margin-top: 40px;
+            `}
             src="https://discord.com/widget?id=1043933263565160498&theme=dark"
             width="350"
             height="320"
@@ -125,7 +132,6 @@ const Home = () => {
             title="discordFrame"
           />
         </div>
-
       </div>
       <div
         ref={thirdSlideRef}
@@ -147,8 +153,17 @@ const Home = () => {
             padding: 0 120px;
           `}
         >
-          Чтобы начать, скачай сборку OxMODPACK (или любую другую),
-          нажав кнопку <b>+</b> в левом нижнем углу. Приятной игры!
+          {language === 'en' ? (
+            <>
+              To get started, download an OxMODPACK instance (or any other one) by
+              pressing <b>+</b> in the bottom-left corner. Have fun!
+            </>
+          ) : (
+            <>
+              Чтобы начать, скачай сборку OxMODPACK (или любую другую), нажав
+              кнопку <b>+</b> в левом нижнем углу. Приятной игры!
+            </>
+          )}
         </div>
       </div>
       {currentSlide !== 0 && currentSlide !== 1 && initScrolled && (

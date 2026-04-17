@@ -8,6 +8,7 @@ import { push } from 'connected-react-router';
 import { message } from 'antd';
 import RouteWithSubRoutes from '../../common/components/RouteWithSubRoutes';
 import {
+  addStartedInstance,
   loginWithAccessToken,
   initManifests,
   initNews,
@@ -38,6 +39,9 @@ import {
   ACCOUNT_MICROSOFT
 } from '../../common/utils/constants';
 
+const isMissingIpcHandler = err =>
+  String(err?.message || err).includes('No handler registered');
+
 const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
@@ -65,7 +69,23 @@ function DesktopRoot({ store }) {
   const location = useSelector(state => state.router.location);
   // const modals = useSelector(state => state.modals);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
+  const [pendingProtocolInstance, setPendingProtocolInstance] = React.useState(null);
   // const [contentStyle, setContentStyle] = useState({ transform: 'scale(1)' });
+
+  const queueProtocolLaunch = protocolUrl => {
+    if (!protocolUrl) return;
+
+    try {
+      const parsed = new URL(protocolUrl);
+      if (parsed.hostname !== 'launch-instance') return;
+      const instanceName = parsed.searchParams.get('name');
+      if (instanceName) {
+        setPendingProtocolInstance(instanceName);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   message.config({
     top: 45,
@@ -162,8 +182,17 @@ function DesktopRoot({ store }) {
       ipcRenderer.invoke('init-discord-rpc');
     }
 
+    ipcRenderer
+      .invoke('consume-pending-protocol-url')
+      .then(queueProtocolLaunch)
+      .catch(err => {
+        if (!isMissingIpcHandler(err)) {
+          console.error(err);
+        }
+      });
+
     ipcRenderer.on('custom-protocol-event', (e, data) => {
-      console.log(data);
+      queueProtocolLaunch(data);
     });
   };
 
@@ -182,6 +211,15 @@ function DesktopRoot({ store }) {
       ga.trackPage(location.pathname);
     }
   }, [location.pathname, clientToken]);
+
+  useEffect(() => {
+    if (!currentAccount || !pendingProtocolInstance) return;
+
+    dispatch(push('/home'));
+    dispatch(addStartedInstance({ instanceName: pendingProtocolInstance }));
+    dispatch(launchInstance(pendingProtocolInstance));
+    setPendingProtocolInstance(null);
+  }, [currentAccount, pendingProtocolInstance]);
 
   useTrackIdle(location.pathname);
 

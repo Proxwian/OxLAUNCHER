@@ -17,25 +17,33 @@ import {
 } from '../reducers/actions';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
-import { ACCOUNT_ELYBY, ACCOUNT_MICROSOFT, ACCOUNT_MOJANG, ACCOUNT_OFFLINE, ACCOUNT_OXAUTH } from '../utils/constants';
+import {
+  ACCOUNT_ELYBY,
+  ACCOUNT_MICROSOFT,
+  ACCOUNT_MOJANG,
+  ACCOUNT_OFFLINE,
+  ACCOUNT_OXAUTH
+} from '../utils/constants';
 import { extractFace } from '../../app/desktop/utils';
+import { useTranslation } from '../localization/useTranslation';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const accounts = useSelector(_getAccounts);
   const currentAccount = useSelector(_getCurrentAccount);
   const isLoading = useSelector(state => state.loading.accountAuthentication);
 
   useEffect(() => {
-    const discordRPCDetails = `Смотрит список профилей`;
+    const discordRPCDetails = t('accounts.rpc', 'Смотрит список профилей');
     ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     accounts.map(async account => {
-      if (account.skin == "" || account.skin == undefined) { 
-        account.skinFace = ""; 
-        return; 
+      if (account.skin == '' || account.skin == undefined) {
+        account.skinFace = '';
+        return;
       }
       account.skinFace = await extractFace(account.skin);
-    })
+    });
   }, [accounts]);
 
   return (
@@ -45,7 +53,7 @@ const ProfileSettings = () => {
         width: 400px;
         max-height: 700px;
       `}
-      title="Менеджер аккаунтов"
+      title={t('accounts.title', 'Менеджер аккаунтов')}
     >
       <Container>
         <AccountsContainer>
@@ -53,11 +61,9 @@ const ProfileSettings = () => {
             if (!account || !currentAccount) return;
             return (
               <AccountContainer key={account.selectedProfile.id}>
-
                 <AccountItem
                   active={
-                    account.selectedProfile.id ===
-                    currentAccount.selectedProfile.id
+                    account.selectedProfile.id === currentAccount.selectedProfile.id
                   }
                   onClick={() => {
                     if (
@@ -68,9 +74,7 @@ const ProfileSettings = () => {
                       return;
                     }
                     const currentId = currentAccount.selectedProfile.id;
-                    dispatch(
-                      updateCurrentAccountId(account.selectedProfile.id)
-                    );
+                    dispatch(updateCurrentAccountId(account.selectedProfile.id));
                     if (account.accountType != ACCOUNT_OFFLINE) {
                       dispatch(
                         load(
@@ -89,27 +93,29 @@ const ProfileSettings = () => {
                             accessToken: null
                           })
                         );
-                        message.error('Аккаунт недействителен.');
+                        message.error(
+                          t('accounts.invalid', 'Аккаунт недействителен.')
+                        );
                       });
                     }
                   }}
                 >
                   <div>
-                   {(account.accountType != ACCOUNT_OFFLINE) && (
-                    <img
-                      src={`data:image/jpeg;base64,${account.skinFace}`}
-                      css={`
-                        width: 15px;
-                        cursor: pointer;
-                        height: 15px;
-                        margin-right: 10px;
-                      `}
-                      alt="profile"
-                    />
-                   )}
-                    {account.selectedProfile.name}   
+                    {account.accountType != ACCOUNT_OFFLINE && (
+                      <img
+                        src={`data:image/jpeg;base64,${account.skinFace}`}
+                        css={`
+                          width: 15px;
+                          cursor: pointer;
+                          height: 15px;
+                          margin-right: 10px;
+                        `}
+                        alt="profile"
+                      />
+                    )}
+                    {account.selectedProfile.name}
                   </div>
-                  {(account.accountType === ACCOUNT_OXAUTH) && (
+                  {account.accountType === ACCOUNT_OXAUTH && (
                     <div
                       css={`
                         margin-right: 10px;
@@ -120,7 +126,7 @@ const ProfileSettings = () => {
                       OxAUTH
                     </div>
                   )}
-                  {(account.accountType === ACCOUNT_MOJANG) && (
+                  {account.accountType === ACCOUNT_MOJANG && (
                     <div
                       css={`
                         margin-right: 10px;
@@ -131,7 +137,7 @@ const ProfileSettings = () => {
                       Mojang
                     </div>
                   )}
-                  {(account.accountType === ACCOUNT_MICROSOFT) && (
+                  {account.accountType === ACCOUNT_MICROSOFT && (
                     <div
                       css={`
                         margin-right: 10px;
@@ -142,7 +148,7 @@ const ProfileSettings = () => {
                       Microsoft
                     </div>
                   )}
-                  {(account.accountType === ACCOUNT_ELYBY) && (
+                  {account.accountType === ACCOUNT_ELYBY && (
                     <div
                       css={`
                         margin-right: 10px;
@@ -153,8 +159,7 @@ const ProfileSettings = () => {
                       Ely.by
                     </div>
                   )}
-                  {account.selectedProfile.id ===
-                    currentAccount.selectedProfile.id && (
+                  {account.selectedProfile.id === currentAccount.selectedProfile.id && (
                     <Spin spinning={isLoading.isRequesting} />
                   )}
                 </AccountItem>
@@ -187,7 +192,7 @@ const ProfileSettings = () => {
         </AccountsContainer>
         <AccountContainer>
           <AccountItem onClick={() => dispatch(openModal('AddAccount'))}>
-            Добавить аккаунт
+            {t('accounts.add', 'Добавить аккаунт')}
           </AccountItem>
         </AccountContainer>
       </Container>
@@ -258,6 +263,4 @@ const AccountContainer = styled.div`
   display: flex;
   position: relative;
   width: 100%;
-  justify-content: space-between;
-  align-items: center;
 `;
