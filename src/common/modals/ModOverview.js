@@ -31,6 +31,7 @@ import { _getInstancesPath, _getInstance } from '../utils/selectors';
 import {
   FABRIC,
   FORGE,
+  NEOFORGE,
   CURSEFORGE_URL,
   CURSEFORGE,
   MODRINTH
@@ -39,6 +40,7 @@ import { formatNumber, formatDate } from '../utils';
 import {
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
+  filterNeoForgeFilesByVersion,
   getPatchedInstanceType
 } from '../../app/desktop/utils';
 
@@ -94,12 +96,15 @@ const ModOverview = ({
             const isFabric =
               getPatchedInstanceType(instance) === FABRIC &&
               projectID !== 361988;
+            const isNeoForge = getPatchedInstanceType(instance) === NEOFORGE;
             const isForge =
               getPatchedInstanceType(instance) === FORGE ||
               projectID === 361988;
             let filteredFiles = [];
             if (isFabric) {
               filteredFiles = filterFabricFilesByVersion(data, gameVersions);
+            } else if (isNeoForge) {
+              filteredFiles = filterNeoForgeFilesByVersion(data, gameVersions);
             } else if (isForge) {
               filteredFiles = filterForgeFilesByVersion(data, gameVersions);
             }

@@ -13,6 +13,7 @@ import {
   MC_LIBRARIES_URL,
   FABRIC,
   FORGE,
+  NEOFORGE,
   QUILT,
   LATEST_JAVA_VERSION,
   ACCOUNT_OXAUTH,
@@ -233,7 +234,8 @@ export const getFilteredVersions = (
   vanillaManifest,
   forgeManifest,
   fabricManifest,
-  quiltManifest
+  quiltManifest,
+  neoForgeManifest
 ) => {
   const versions = [
     {
@@ -291,6 +293,18 @@ export const getFilteredVersions = (
         children: v.sort(sortByForgeVersionDesc).map(child => ({
           value: child,
           label: child.split('-')[1]
+        }))
+      }))
+    },
+    {
+      value: 'neoforge',
+      label: 'NeoForge',
+      children: Object.entries(neoForgeManifest || {}).map(([k, v]) => ({
+        value: k,
+        label: k,
+        children: v.map(child => ({
+          value: child,
+          label: child
         }))
       }))
     },
@@ -1064,6 +1078,13 @@ export const isFileModQuilt = file => {
   );
 };
 
+export const isFileModNeoForge = file => {
+  return (
+    file.gameVersions.includes('NeoForge') ||
+    file.modules.find(v => v.foldername === 'META-INF/neoforge.mods.toml')
+  );
+};
+
 export const filterFabricFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
@@ -1090,11 +1111,21 @@ export const filterQuiltFilesByVersion = (files, version) => {
   });
 };
 
+export const filterNeoForgeFilesByVersion = (files, version) => {
+  return files.filter(v => {
+    if (Array.isArray(v.gameVersions)) {
+      return v.gameVersions.includes(version) && isFileModNeoForge(v);
+    }
+    return v.gameVersions === version;
+  });
+};
+
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
       return (
         v.gameVersions.includes(version) &&
+        !isFileModNeoForge(v) &&
         !isFileModFabric(v) &&
         !isFileModQuilt(v)
       );
@@ -1159,6 +1190,10 @@ export const extractFabricVersionFromManifest = manifest => {
   return loaderVersion;
 };
 
+export const extractNeoForgeVersionFromManifest = manifest => {
+  return manifest?.minecraft?.modLoaders[0]?.id?.replace(/^neoforge-/, '');
+};
+
 export const convertcurseForgeToCanonical = (
   curseForge,
   mcVersion,
@@ -1176,6 +1211,9 @@ export const getPatchedInstanceType = instance => {
   const hasJumpLoader = (instance.mods || []).find(v => v.projectID === 361988);
   if (isForge && !hasJumpLoader) {
     return FORGE;
+  }
+  if (instance.loader?.loaderType === NEOFORGE) {
+    return NEOFORGE;
   }
   if (instance.loader?.loaderType === FABRIC) {
     return FABRIC;

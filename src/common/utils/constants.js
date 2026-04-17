@@ -1,6 +1,7 @@
 export const MC_RESOURCES_URL = 'https://resources.download.minecraft.net';
 export const FABRIC_APIS = 'https://meta.fabricmc.net/v2';
 export const QUILT_APIS = 'https://meta.quiltmc.org/v3';
+export const NEOFORGE_APIS = 'https://maven.neoforged.net/releases';
 export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';
 export const MOJANG_APIS = 'https://authserver.mojang.com';
@@ -28,6 +29,7 @@ export const IMGUR_CLIENT_ID = '1e024e30d761f27';
 export const FABRIC = 'fabric';
 export const QUILT = 'quilt';
 export const FORGE = 'forge';
+export const NEOFORGE = 'neoforge';
 export const VANILLA = 'vanilla';
 
 export const CURSEFORGE = 'curseforge';

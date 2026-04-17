@@ -44,6 +44,7 @@ import {
   FMLLIBS_FORGE_BASE_URL,
   FMLLIBS_OUR_BASE_URL,
   FORGE,
+  NEOFORGE,
   QUILT,
   FTB,
   GDL_LEGACYJAVAFIXER_MOD_URL,
@@ -63,6 +64,7 @@ import {
   getCFVersionIds,
   getFabricJson,
   getFabricManifest,
+  getNeoForgeManifest,
   getQuiltJson,
   getQuiltManifest,
   getForgeManifest,
@@ -120,9 +122,11 @@ import {
   downloadAddonZip,
   extractAll,
   extractFabricVersionFromManifest,
+  extractNeoForgeVersionFromManifest,
   extractNatives,
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
+  filterNeoForgeFilesByVersion,
   filterQuiltFilesByVersion,
   get7zPath,
   getFileHash,
@@ -193,6 +197,28 @@ export function initManifests() {
       });
       return quilt;
     }
+
+    const getNeoForgeVersions = async () => {
+      const xml = (await getNeoForgeManifest()).data;
+      const parser = new XMLParser();
+      const parsed = parser.parse(xml);
+      const versions = parsed?.metadata?.versioning?.versions?.version || [];
+      const groupedVersions = {};
+
+      for (const version of [].concat(versions)) {
+        const [major, minor] = String(version).split('.');
+        if (!major || !minor) continue;
+        const mcVersion = `1.${major}.${minor}`;
+        groupedVersions[mcVersion] = groupedVersions[mcVersion] || [];
+        groupedVersions[mcVersion].push(String(version));
+      }
+
+      dispatch({
+        type: ActionTypes.UPDATE_NEOFORGE_MANIFEST,
+        data: groupedVersions
+      });
+      return groupedVersions;
+    };
 
     const getJava8ManifestVersions = async () => {
       const java = (await getJava8Manifest()).data;
@@ -283,10 +309,12 @@ export function initManifests() {
     const [
       fabric,
       java,
+      java17,
       javaLatest,
       curseForgeCategories,
       modrinthCategories,
       forge,
+      neoForge,
       quilt,
       CFVersionIds
     ] = await Promise.all([
@@ -297,6 +325,7 @@ export function initManifests() {
       reflect(getCurseForgeCategoriesVersions()),
       reflect(getModrinthCategoriesList()),
       reflect(getForgeVersions()),
+      reflect(getNeoForgeVersions()),
       reflect(getQuiltVersions()),
       reflect(getCurseForgeVersionIds())
     ]);
@@ -304,14 +333,17 @@ export function initManifests() {
     if (
       fabric.e ||
       java.e ||
+      java17.e ||
       curseForgeCategories.e ||
       modrinthCategories.e ||
       forge.e ||
+      neoForge.e ||
       CFVersionIds.e
     ) {
       console.error(
         fabric,
         java,
+        java17,
         curseForgeCategories,
         modrinthCategories.e,
         forge
@@ -330,6 +362,7 @@ export function initManifests() {
         ? modrinthCategories.v
         : app.modrinthCategories,
       forge: forge.status ? forge.v : app.forgeManifest,
+      neoForge: neoForge.status ? neoForge.v : app.neoForgeManifest,
       quilt: quilt.status ? quilt.v : app.quiltManifest,
       curseforgeVersionIds: CFVersionIds.status
         ? CFVersionIds.v
@@ -1594,6 +1627,216 @@ export function downloadQuilt(instanceName) {
   };
 }
 
+export function downloadNeoForge(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { loader } = _getCurrentDownloadItem(state);
+    const neoForgeJson = {};
+
+    const neoForgeJsonPath = path.join(
+      _getLibrariesPath(state),
+      'net',
+      'neoforged',
+      'neoforge',
+      loader?.loaderVersion,
+      `${loader?.loaderVersion}.json`
+    );
+
+    const mcJsonPath = path.join(
+      _getMinecraftVersionsPath(state),
+      `${loader?.mcVersion}.json`
+    );
+
+    const baseUrl = 'https://maven.neoforged.net/releases/net/neoforged/neoforge';
+    const tempInstaller = path.join(
+      _getTempPath(state),
+      `neoforge-${loader?.loaderVersion}-installer.jar`
+    );
+    const expectedInstaller = path.join(
+      _getDataStorePath(state),
+      'forgeInstallers',
+      `neoforge-${loader?.loaderVersion}.jar`
+    );
+
+    const extractSpecificFile = async from => {
+      await extractAll(tempInstaller, _getTempPath(state), {
+        $cherryPick: from
+      });
+    };
+
+    try {
+      await fs.access(expectedInstaller);
+      await fs.access(neoForgeJsonPath);
+      const fileSha1 = await getFileHash(expectedInstaller);
+      const { data: expectedSha1 } = await axios.get(
+        `${baseUrl}/${loader?.loaderVersion}/neoforge-${loader?.loaderVersion}-installer.jar.sha1`
+      );
+
+      if (fileSha1.toString() !== String(expectedSha1).trim()) {
+        throw new Error('Installer hash mismatch');
+      }
+      await fse.copy(expectedInstaller, tempInstaller, { overwrite: true });
+    } catch {
+      dispatch(
+        updateDownloadStatus(instanceName, 'Загружаю установщик NeoForge...')
+      );
+
+      let prev = 0;
+      await downloadFile(
+        tempInstaller,
+        `${baseUrl}/${loader?.loaderVersion}/neoforge-${loader?.loaderVersion}-installer.jar`,
+        p => {
+          const progress = parseInt(p, 10) / 100;
+          if (progress !== prev) {
+            prev = progress;
+            dispatch(updateDownloadProgress(p));
+          }
+        }
+      );
+
+      await new Promise(resolve => setTimeout(resolve, 200));
+      await fse.copy(tempInstaller, expectedInstaller, { overwrite: true });
+    }
+
+    await extractSpecificFile('install_profile.json');
+    const installerJson = await fse.readJson(
+      path.join(_getTempPath(state), 'install_profile.json')
+    );
+
+    if (installerJson.install) {
+      neoForgeJson.install = installerJson.install;
+      neoForgeJson.version = installerJson.versionInfo;
+    } else {
+      neoForgeJson.install = installerJson;
+      await extractSpecificFile(path.basename(installerJson.json));
+      neoForgeJson.version = await fse.readJson(
+        path.join(_getTempPath(state), installerJson.json)
+      );
+      await fse.remove(path.join(_getTempPath(state), installerJson.json));
+    }
+
+    await fse.remove(path.join(_getTempPath(state), 'install_profile.json'));
+    await fse.outputJson(neoForgeJsonPath, neoForgeJson);
+
+    let skipLoaderFilter = true;
+
+    if (neoForgeJson.install.filePath) {
+      await extractSpecificFile(neoForgeJson.install.filePath);
+
+      await fse.move(
+        path.join(_getTempPath(state), neoForgeJson.install.filePath),
+        path.join(
+          _getLibrariesPath(state),
+          ...mavenToArray(neoForgeJson.install.path)
+        ),
+        { overwrite: true }
+      );
+    } else if (neoForgeJson.install.path) {
+      const loaderBinPathInsideZip = path.join(
+        'maven',
+        path.dirname(path.join(...mavenToArray(neoForgeJson.install.path)))
+      );
+      await extractSpecificFile(loaderBinPathInsideZip);
+
+      const filesToMove = await fs.readdir(
+        path.join(_getTempPath(state), loaderBinPathInsideZip)
+      );
+      await Promise.all(
+        filesToMove.map(async f => {
+          await fse.move(
+            path.join(_getTempPath(state), loaderBinPathInsideZip, f),
+            path.join(
+              _getLibrariesPath(state),
+              path.dirname(path.join(...mavenToArray(neoForgeJson.install.path))),
+              path.basename(f)
+            ),
+            { overwrite: true }
+          );
+        })
+      );
+
+      await fse.remove(path.join(_getTempPath(state), 'maven'));
+    } else {
+      skipLoaderFilter = false;
+    }
+
+    dispatch(
+      updateDownloadStatus(instanceName, 'Загружаю библиотеки NeoForge...')
+    );
+
+    let { libraries } = neoForgeJson.version;
+
+    if (neoForgeJson.install.libraries) {
+      libraries = libraries.concat(neoForgeJson.install.libraries);
+    }
+
+    libraries = librariesMapper(
+      libraries.filter(
+        v =>
+          !skipLoaderFilter ||
+          !v.name.includes('net.neoforged:neoforge:')
+      ),
+      _getLibrariesPath(state)
+    );
+
+    let prev = 0;
+    const updatePercentage = downloaded => {
+      const percentage = (downloaded * 100) / libraries.length;
+      const progress = parseInt(percentage, 10);
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+      }
+    };
+
+    await downloadInstanceFiles(
+      libraries,
+      updatePercentage,
+      state.settings.concurrentDownloads
+    );
+
+    if (neoForgeJson.install?.processors?.length) {
+      dispatch(updateDownloadStatus(instanceName, 'Устанавливаю NeoForge...'));
+
+      await extractSpecificFile(path.join('data', 'client.lzma'));
+
+      const universalPath = neoForgeJson.install.libraries.find(v =>
+        (v.name || '').startsWith('net.neoforged:neoforge')
+      )?.name;
+
+      await fse.move(
+        path.join(_getTempPath(state), 'data', 'client.lzma'),
+        path.join(
+          _getLibrariesPath(state),
+          ...mavenToArray(
+            neoForgeJson.install.path || universalPath,
+            '-clientdata',
+            '.lzma'
+          )
+        ),
+        { overwrite: true }
+      );
+      await fse.remove(path.join(_getTempPath(state), 'data'));
+
+      await patchForge113(
+        neoForgeJson.install,
+        path.join(
+          _getMinecraftVersionsPath(state),
+          `${neoForgeJson.install.minecraft}.jar`
+        ),
+        _getLibrariesPath(state),
+        expectedInstaller,
+        mcJsonPath,
+        universalPath,
+        _getJavaPath(state)(8),
+        (d, t) => dispatch(updateDownloadProgress((d * 100) / t))
+      );
+    }
+
+    await fse.remove(tempInstaller);
+  };
+}
+
 export function downloadForge(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -2748,6 +2991,8 @@ export function downloadInstance(instanceName) {
       }
       if (loader?.loaderType === FABRIC) {
         await dispatch(downloadFabric(instanceName));
+      } else if (loader?.loaderType === NEOFORGE) {
+        await dispatch(downloadNeoForge(instanceName));
       } else if (loader?.loaderType === FORGE) {
         await dispatch(downloadForge(instanceName));
       } else if (loader?.loaderType === QUILT) {
@@ -2894,6 +3139,8 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         let loaderVersion;
         if (instance.loader?.loaderType === FABRIC) {
           loaderVersion = extractFabricVersionFromManifest(newManifest);
+        } else if (instance.loader?.loaderType === NEOFORGE) {
+          loaderVersion = extractNeoForgeVersionFromManifest(newManifest);
         } else {
           loaderVersion = convertcurseForgeToCanonical(
             newManifest.minecraft.modLoaders.find(v => v.primary).id,
@@ -2947,11 +3194,14 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           loaderType: instance.loader?.loaderType,
 
           mcVersion: newModpack.targets[1].version,
-          loaderVersion: convertcurseForgeToCanonical(
-            `forge-${newModpack.targets[0].version}`,
-            newModpack.targets[1].version,
-            state.app.forgeManifest
-          ),
+          loaderVersion:
+            instance.loader?.loaderType === NEOFORGE
+              ? newModpack.targets[0].version
+              : convertcurseForgeToCanonical(
+                  `forge-${newModpack.targets[0].version}`,
+                  newModpack.targets[1].version,
+                  state.app.forgeManifest
+                ),
           fileID: newModpack?.id,
           projectID: instance.loader?.projectID,
           source: instance.loader?.source
@@ -2979,6 +3229,10 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         switch (loaderType) {
           case FORGE: {
             loaderDependencyName = 'forge';
+            break;
+          }
+          case NEOFORGE: {
+            loaderDependencyName = 'neoforge';
             break;
           }
           case FABRIC: {
@@ -3770,6 +4024,51 @@ export function launchInstance(instanceName, forceQuit = false) {
           )
         };
       }
+    } else if (loader && loader?.loaderType === 'neoforge') {
+      const neoForgeJsonPath = path.join(
+        _getLibrariesPath(state),
+        'net',
+        'neoforged',
+        'neoforge',
+        loader?.loaderVersion,
+        `${loader?.loaderVersion}.json`
+      );
+      verified = await verifyResource(neoForgeJsonPath);
+      if (!verified) return;
+
+      const neoForgeJson = await fse.readJson(neoForgeJsonPath);
+      const neoForgeLibraries = librariesMapper(
+        neoForgeJson.version.libraries,
+        librariesPath
+      );
+      libraries = libraries.concat(neoForgeLibraries);
+      mcJson.mainClass = neoForgeJson.version.mainClass;
+      if (neoForgeJson.version.minecraftArguments) {
+        mcJson.minecraftArguments = neoForgeJson.version.minecraftArguments;
+      } else if (neoForgeJson.version.arguments.game) {
+        if (neoForgeJson.version.arguments.jvm) {
+          mcJson.forge = { arguments: {} };
+          mcJson.forge.arguments.jvm = neoForgeJson.version.arguments.jvm.map(
+            arg => {
+              return replaceLibraryDirectory(
+                arg
+                  .replace(/\${version_name}/g, mcJson.id)
+                  .replace(
+                    /=\${library_directory}/g,
+                    `="${_getLibrariesPath(state)}"`
+                  ),
+                _getLibrariesPath(state)
+              ).replace(
+                /\${classpath_separator}/g,
+                process.platform === 'win32' ? '";' : '":'
+              );
+            }
+          );
+        }
+        mcJson.arguments.game = mcJson.arguments.game.concat(
+          neoForgeJson.version.arguments.game
+        );
+      }
     }
     libraries = removeDuplicates(
       libraries.concat(librariesMapper(mcJson.libraries, librariesPath)),
@@ -4368,6 +4667,9 @@ export const initLatestMods = instanceName => {
         v.projectID === 361988
       ) {
         return filterForgeFilesByVersion(v.data, instance.loader?.mcVersion);
+      }
+      if (getPatchedInstanceType(instance) === NEOFORGE) {
+        return filterNeoForgeFilesByVersion(v.data, instance.loader?.mcVersion);
       }
       if (getPatchedInstanceType(instance) === FABRIC) {
         return filterFabricFilesByVersion(v.data, instance.loader?.mcVersion);

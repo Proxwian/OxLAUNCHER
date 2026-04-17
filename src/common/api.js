@@ -20,6 +20,7 @@ import {
   MODRINTH_API_URL,
   MIRROR_API_URL,
   QUILT_APIS,
+  NEOFORGE_APIS,
   JAVA_8_MANIFEST_URL,
   JAVA_17_MANIFEST_URL,
   JAVA_21_MANIFEST_URL
@@ -239,6 +240,11 @@ export const getQuiltManifest = () => {
   const url = `${QUILT_APIS}/versions`;
   return axios.get(url);
 }
+
+export const getNeoForgeManifest = () => {
+  const url = `${NEOFORGE_APIS}/net/neoforged/neoforge/maven-metadata.xml?timestamp=${new Date().getTime()}`;
+  return axios.get(url, { responseType: 'text' });
+};
 
 export const getJava8Manifest = () => {
   const url = JAVA_8_MANIFEST_URL;
@@ -519,6 +525,7 @@ export const getCurseForgeSearch = async (
     sortOrder: isSortDescending ? 'desc' : 'asc',
     gameVersion: gameVersion || '',
     // ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
+    ...(modLoaderType === 'neoforge' && { modLoaderType: 'NeoForge' }),
     ...(modLoaderType === 'quilt' && { modLoaderType: 'Quilt' }),
     classId: type === 'mods' ? 6 : 4471,
     searchFilter

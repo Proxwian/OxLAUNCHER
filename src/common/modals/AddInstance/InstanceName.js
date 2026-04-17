@@ -19,7 +19,8 @@ import {
   downloadAddonZip,
   importAddonZip,
   convertcurseForgeToCanonical,
-  extractFabricVersionFromManifest
+  extractFabricVersionFromManifest,
+  extractNeoForgeVersionFromManifest
 } from '../../../app/desktop/utils';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
@@ -28,6 +29,7 @@ import {
   FABRIC,
   VANILLA,
   FORGE,
+  NEOFORGE,
   FTB,
   QUILT,
   CURSEFORGE,
@@ -158,9 +160,14 @@ const InstanceName = ({
       const isQuiltModpack = (manifest?.minecraft?.modLoaders || []).some(
         v => v.id.includes(QUILT) && v.primary
       );
+      const isNeoForgeModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(NEOFORGE) && v.primary
+      );
 
       if (isForgeModpack) {
         version.loaderType = FORGE;
+      } else if (isNeoForgeModpack) {
+        version.loaderType = NEOFORGE;
       } else if (isFabricModpack) {
         version.loaderType = FABRIC;
       } else if (isQuiltModpack) {
@@ -173,6 +180,7 @@ const InstanceName = ({
     const isVanilla = version?.loaderType === VANILLA;
     const isFabric = version?.loaderType === FABRIC;
     const isForge = version?.loaderType === FORGE;
+    const isNeoForge = version?.loaderType === NEOFORGE;
     const isQuilt = version?.loaderType === QUILT;
 
     if (isCurseForgeModpack) {
@@ -196,6 +204,26 @@ const InstanceName = ({
             manifest.minecraft.version,
             forgeManifest
           ),
+          fileID: version?.fileID,
+          projectID: version?.projectID,
+          source: version?.source,
+          sourceName: manifest.name
+        };
+
+        dispatch(
+          addToQueue(
+            localInstanceName,
+            loader,
+            manifest,
+            imageURL ? `background${path.extname(imageURL)}` : null,
+            version?.backend ? version?.backend : "Mojang"
+          )
+        );
+      } else if (isNeoForge) {
+        const loader = {
+          loaderType: NEOFORGE,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: extractNeoForgeVersionFromManifest(manifest),
           fileID: version?.fileID,
           projectID: version?.projectID,
           source: version?.source,
@@ -279,7 +307,9 @@ const InstanceName = ({
         loaderType: forgeModloader?.name,
         mcVersion,
         loaderVersion:
-          data.targets[0].name === FABRIC
+          forgeModloader?.name === FABRIC
+            ? forgeModloader?.version
+            : forgeModloader?.name === NEOFORGE
             ? forgeModloader?.version
             : convertcurseForgeToCanonical(
                 forgeModloader?.version,
@@ -351,6 +381,9 @@ const InstanceName = ({
       if (dependencies.includes('fabric-loader')) {
         loaderType = FABRIC;
         loaderVersion = manifest.dependencies['fabric-loader'];
+      } else if (dependencies.includes('neoforge')) {
+        loaderType = NEOFORGE;
+        loaderVersion = manifest.dependencies.neoforge;
       } else if (dependencies.includes('forge')) {
         loaderType = FORGE;
         loaderVersion = convertcurseForgeToCanonical(
@@ -420,6 +453,14 @@ const InstanceName = ({
         });
 
         dispatch(addToQueue(localInstanceName, loader, manifest));
+      } else if (version?.loaderType === NEOFORGE) {
+        Object.assign(loader, {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: extractNeoForgeVersionFromManifest(manifest)
+        });
+
+        dispatch(addToQueue(localInstanceName, loader, manifest));
       } else if (version?.loaderType === FABRIC) {
         Object.assign(loader, {
           loaderType: version?.loaderType,
@@ -455,6 +496,14 @@ const InstanceName = ({
       dispatch(
         addToQueue(localInstanceName, {
           loaderType: FABRIC,
+          mcVersion: version?.mcVersion,
+          loaderVersion: version?.loaderVersion
+        })
+      );
+    } else if (isNeoForge) {
+      dispatch(
+        addToQueue(localInstanceName, {
+          loaderType: NEOFORGE,
           mcVersion: version?.mcVersion,
           loaderVersion: version?.loaderVersion
         })

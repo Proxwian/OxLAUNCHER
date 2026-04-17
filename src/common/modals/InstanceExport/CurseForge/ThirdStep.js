@@ -12,7 +12,7 @@ import { Transition } from 'react-transition-group';
 import styled from 'styled-components';
 import pMap from 'p-map';
 import { get7zPath } from '../../../../app/desktop/utils';
-import { FABRIC, VANILLA, FORGE, QUILT } from '../../../utils/constants';
+import { FABRIC, VANILLA, FORGE, NEOFORGE, QUILT } from '../../../utils/constants';
 import { getAddon } from '../../../api';
 
 /**
@@ -85,6 +85,12 @@ export default function ThirdStep({
         loaderObj = {
           id: `${modloaderName}-${loader?.loaderVersion}`,
           loader: loader?.fileID,
+          primary: true
+        };
+        break;
+      case NEOFORGE:
+        loaderObj = {
+          id: `${modloaderName}-${loader?.loaderVersion}`,
           primary: true
         };
         break;

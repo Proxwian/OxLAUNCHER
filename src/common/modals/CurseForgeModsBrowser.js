@@ -28,11 +28,12 @@ import React, {
   import { openModal } from '../reducers/modals/actions';
   import { _getInstance } from '../utils/selectors';
   import { installMod } from '../reducers/actions';
-  import { FABRIC, FORGE, CURSEFORGE } from '../utils/constants';
+  import { FABRIC, FORGE, NEOFORGE, CURSEFORGE } from '../utils/constants';
   import {
     getFirstPreferredCandidate,
     filterFabricFilesByVersion,
     filterForgeFilesByVersion,
+    filterNeoForgeFilesByVersion,
     getPatchedInstanceType
   } from '../../app/desktop/utils';
   
@@ -221,11 +222,18 @@ import React, {
   
                     const isFabric = getPatchedInstanceType(instance) === FABRIC;
                     const isForge = getPatchedInstanceType(instance) === FORGE;
-  
+                    const isNeoForge =
+                      getPatchedInstanceType(instance) === NEOFORGE;
+
                     let filteredFiles = [];
-  
+
                     if (isFabric) {
                       filteredFiles = filterFabricFilesByVersion(
+                        files,
+                        gameVersions
+                      );
+                    } else if (isNeoForge) {
+                      filteredFiles = filterNeoForgeFilesByVersion(
                         files,
                         gameVersions
                       );

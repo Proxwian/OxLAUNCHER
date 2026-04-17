@@ -11,7 +11,7 @@ import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
 import { getAddon } from '../../api';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { CURSEFORGE, FABRIC, FORGE, QUILT, VANILLA } from '../../utils/constants';
+import { CURSEFORGE, FABRIC, FORGE, NEOFORGE, QUILT, VANILLA } from '../../utils/constants';
 import { transparentize } from 'polished';
 
 const Import = ({
@@ -109,11 +109,15 @@ const Import = ({
       v => v.id.includes(QUILT) && v.primary
     )
 
+    const isNeoForge = (manifest?.minecraft?.modLoaders || []).find(
+      v => v.id.includes(NEOFORGE) && v.primary
+    )
+
     const isVanilla = (manifest?.minecraft?.modLoaders || []).find(
       v => v.id.includes(VANILLA) && v.primary
     );
 
-    if (!isForge && !isFabric && !isVanilla && !isQuilt) {
+    if (!isForge && !isFabric && !isVanilla && !isQuilt && !isNeoForge) {
       setError(true);
       setLoading(false);
       return;
@@ -126,6 +130,7 @@ const Import = ({
     }
 
     if (isForge) loader.loaderType = FORGE;
+    else if (isNeoForge) loader.loaderType = NEOFORGE;
     else if (isFabric) loader.loaderType = FABRIC;
     else if (isQuilt) loader.loaderType = QUILT;
 

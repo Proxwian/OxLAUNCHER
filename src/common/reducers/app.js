@@ -56,6 +56,15 @@ function quiltManifest(state = [], action) {
   }
 }
 
+function neoForgeManifest(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_NEOFORGE_MANIFEST:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function forgeManifest(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_FORGE_MANIFEST:
@@ -153,6 +162,7 @@ export default combineReducers({
   forgeManifest,
   fabricManifest,
   quiltManifest,
+  neoForgeManifest,
   java8Manifest,
   java17Manifest,
   java21Manifest,

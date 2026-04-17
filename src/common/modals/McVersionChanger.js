@@ -10,7 +10,7 @@ import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
-import { FABRIC, VANILLA, FORGE, QUILT, CURSEFORGE, FTB } from '../utils/constants';
+import { FABRIC, VANILLA, FORGE, NEOFORGE, QUILT, CURSEFORGE, FTB } from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
 
 const McVersionChanger = ({ instanceName, defaultValue }) => {
@@ -18,21 +18,23 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
   const quiltManifest = useSelector(state => state.app.quiltManifest);
+  const neoForgeManifest = useSelector(state => state.app.neoForgeManifest);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const [selectedVersion, setSelectedVersion] = useState(null);
 
   const dispatch = useDispatch();
 
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, quiltManifest);
-  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest]);
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, quiltManifest, neoForgeManifest);
+  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest, neoForgeManifest]);
 
   const patchedDefaultValue = useMemo(() => {
     const isFabric = defaultValue?.loaderType === FABRIC;
     const isForge = defaultValue?.loaderType === FORGE;
+    const isNeoForge = defaultValue?.loaderType === NEOFORGE;
     const isQuilt = defaultValue?.loaderType === QUILT;
 
-    if (isForge)
+    if (isForge || isNeoForge)
       return [
         defaultValue?.loaderType,
         defaultValue?.mcVersion,
@@ -152,6 +154,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
               const isVanilla = selectedVersion[0] === VANILLA;
               const isFabric = selectedVersion[0] === FABRIC;
               const isForge = selectedVersion[0] === FORGE;
+              const isNeoForge = selectedVersion[0] === NEOFORGE;
               const isQuilt = selectedVersion[0] === QUILT;
 
               if (isVanilla) {
@@ -174,6 +177,20 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                     {
                       ...defaultValue,
                       loaderType: FORGE,
+                      mcVersion: selectedVersion[1],
+                      loaderVersion: selectedVersion[2]
+                    },
+                    null,
+                    background
+                  )
+                );
+              } else if (isNeoForge) {
+                dispatch(
+                  addToQueue(
+                    instanceName,
+                    {
+                      ...defaultValue,
+                      loaderType: NEOFORGE,
                       mcVersion: selectedVersion[1],
                       loaderVersion: selectedVersion[2]
                     },

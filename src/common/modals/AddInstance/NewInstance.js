@@ -4,17 +4,18 @@ import { useSelector } from 'react-redux';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
 import { getFilteredVersions } from '../../../app/desktop/utils';
-import { FABRIC, FORGE, QUILT, VANILLA } from '../../utils/constants';
+import { FABRIC, FORGE, NEOFORGE, QUILT, VANILLA } from '../../utils/constants';
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
   const quiltManifest = useSelector(state => state.app.quiltManifest);
+  const neoForgeManifest = useSelector(state => state.app.neoForgeManifest);
 
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, quiltManifest);
-  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest]);
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, quiltManifest, neoForgeManifest);
+  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest, neoForgeManifest]);
 
   return (
     <Container>
@@ -26,6 +27,12 @@ const NewInstance = ({ setVersion, setModpack }) => {
           } else if (v[0] === VANILLA) {
             setVersion({ loaderType: v[0], mcVersion: v[2] });
           } else if (v[0] === FORGE) {
+            setVersion({
+              loaderType: v[0],
+              mcVersion: v[1],
+              loaderVersion: v[2]
+            });
+          } else if (v[0] === NEOFORGE) {
             setVersion({
               loaderType: v[0],
               mcVersion: v[1],

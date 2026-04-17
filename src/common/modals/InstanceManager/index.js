@@ -17,7 +17,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
-import { FORGE, FABRIC, QUILT, CURSEFORGE } from '../../utils/constants';
+import { FORGE, FABRIC, NEOFORGE, QUILT, CURSEFORGE } from '../../utils/constants';
 import {
   addStartedInstance,
   clearLatestModManifests,
@@ -404,6 +404,7 @@ const InstanceManager = ({ instanceName, openScreenshots }) => {
               if (
                 (tab.name === menuEntries.mods.name &&
                   instance?.loader?.loaderType !== FORGE &&
+                  instance?.loader?.loaderType !== NEOFORGE &&
                   instance?.loader?.loaderType !== FABRIC &&
                   instance?.loader?.loaderType !== QUILT) ||
                 (tab.name === menuEntries.modpack.name &&
