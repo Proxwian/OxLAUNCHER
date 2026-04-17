@@ -1,8 +1,8 @@
 module.exports = {
   new: [
     {
-      header: 'Ручная сортировка',
-      content: 'модпаков'
+      header: 'Поддержка',
+      content: 'NeoForge'
     },
     // {
     //   header: 'Каталог модов и сборок Modrinth'
@@ -15,10 +15,8 @@ module.exports = {
   ],
   improvements: [
     {
-      header: 'Кнопка скрытия объявления'
-    },
-    {
-      header: 'Новый логотип загрузки'
+      header: 'English',
+      content: 'localization'
     },
     // {
     //   header: 'Изменена сортировка вкладок',
@@ -47,9 +45,9 @@ module.exports = {
     // }
   ],
   bugfixes: [
-    {
-      header: 'Автоматический выбор категорий'
-    },
+    // {
+    //   header: 'Автоматический выбор категорий'
+    // },
     // {
     //   header: 'Отображение кнопки Далее в меню Импорта'
     // },

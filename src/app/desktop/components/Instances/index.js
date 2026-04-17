@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState, useEffect } from 'react';
+﻿import React, { memo, useMemo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, Popover } from 'antd';
@@ -12,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { _getInstances } from '../../../../common/utils/selectors';
 import { updateInstanceOrder, updateInstanceSortType } from '../../../../common/reducers/settings/actions';
+import { useTranslation } from '../../../../common/localization/useTranslation';
 import Instance from './Instance';
 
 const Container = styled.div`
@@ -116,10 +117,12 @@ const getInstances = (instances, sortOrder, customOrder = []) => {
 };
 
 const Instances = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const instanceSortOrder = useSelector(
     state => state.settings.instanceSortOrder
   );
+  const normalizedSortOrder = Number(instanceSortOrder);
   const instances = useSelector(_getInstances);
   const customInstanceOrder = useSelector(
     state => state.settings.customInstanceOrder || []
@@ -136,7 +139,7 @@ const Instances = () => {
   }, [customInstanceOrder]);
 
   useEffect(() => {
-    if (instanceSortOrder === 3 && instances.length > 0) {
+    if (normalizedSortOrder === 3 && instances.length > 0) {
       const instanceNames = instances.map(i => i.name);
       
       const missingInstances = instanceNames.filter(name => !localOrder.includes(name));
@@ -147,11 +150,11 @@ const Instances = () => {
         dispatch(updateInstanceOrder(newOrder));
       }
     }
-  }, [instances, instanceSortOrder]);
+  }, [instances, normalizedSortOrder]);
 
   const memoInstances = useMemo(
-    () => getInstances(instances || [], instanceSortOrder, localOrder),
-    [instances, instanceSortOrder, localOrder]
+    () => getInstances(instances || [], normalizedSortOrder, localOrder),
+    [instances, normalizedSortOrder, localOrder]
   );
 
   const [draggedInstance, setDraggedInstance] = useState(null);
@@ -207,13 +210,13 @@ const Instances = () => {
   };
 
   const sortOptions = [
-    { value: 0, label: 'По алфавиту', icon: faSortAlphaDown },
-    { value: 1, label: 'По последним', icon: faSortNumericDown },
-    { value: 2, label: 'По популярным', icon: faSortNumericDownAlt },
-    { value: 3, label: 'Свой порядок', icon: faArrowsAltV }
+    { value: 0, label: t('settings.sort.alphabetical', 'По Алфавиту'), icon: faSortAlphaDown },
+    { value: 1, label: t('settings.sort.recent', 'Последние'), icon: faSortNumericDown },
+    { value: 2, label: t('settings.sort.frequent', 'Часто запускаемые'), icon: faSortNumericDownAlt },
+    { value: 3, label: t('settings.sort.custom', 'Свой порядок'), icon: faArrowsAltV }
   ];
 
-  const currentSort = sortOptions.find(s => s.value === instanceSortOrder);
+  const currentSort = sortOptions.find(s => s.value === normalizedSortOrder);
 
   const sortMenu = (
     <div
@@ -227,7 +230,7 @@ const Instances = () => {
       {sortOptions.map(option => (
         <Button
           key={option.value}
-          type={instanceSortOrder === option.value ? 'primary' : 'text'}
+          type={normalizedSortOrder === option.value ? 'primary' : 'text'}
           onClick={() => {
             dispatch(updateInstanceSortType(option.value));
             if (option.value === 3 && localOrder.length === 0) {
@@ -254,7 +257,7 @@ const Instances = () => {
         <Popover content={sortMenu} trigger="click" placement="topLeft" zIndex={80}>
           <SortButton type="primary">
             <FontAwesomeIcon icon={currentSort?.icon || faSort} />
-            {currentSort?.label || 'Сортировка'}
+            {currentSort?.label || t('common.sorting', 'Сортировка')}
           </SortButton>
         </Popover>
       </SortControls>
@@ -263,7 +266,7 @@ const Instances = () => {
           memoInstances.map(i => (
             <DraggableWrapper
               key={i.name}
-              draggable={instanceSortOrder === 3}
+              draggable={normalizedSortOrder === 3}
               isDragging={draggedInstance === i.name}
               isDragOver={dragOverInstance === i.name && dragOverInstance !== draggedInstance}
               onDragStart={e => handleDragStart(e, i.name)}
@@ -276,9 +279,9 @@ const Instances = () => {
           ))
         ) : (
           <NoInstance>
-            Клиенты не установлены
+            РљР»РёРµРЅС‚С‹ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅС‹
             <SubNoInstance>
-              Нажмите на значок + в нижнем левом углу, чтобы скачать клиент
+              РќР°Р¶РјРёС‚Рµ РЅР° Р·РЅР°С‡РѕРє + РІ РЅРёР¶РЅРµРј Р»РµРІРѕРј СѓРіР»Сѓ, С‡С‚РѕР±С‹ СЃРєР°С‡Р°С‚СЊ РєР»РёРµРЅС‚
             </SubNoInstance>
           </NoInstance>
         )}

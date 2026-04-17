@@ -29,6 +29,7 @@ import React, {
   import { _getInstance } from '../utils/selectors';
   import { installModrinthMod } from '../reducers/actions';
   import { MODRINTH } from '../utils/constants';
+  import { useTranslation } from '../localization/useTranslation';
   
   const RowContainer = styled.div`
     display: flex;
@@ -322,6 +323,7 @@ import React, {
   );
   
   const ModrinthModsBrowser = ({ instanceName, gameVersion }) => {
+    const { t } = useTranslation();
     const [mods, setMods] = useState([]);
     const [areModsLoading, setAreModsLoading] = useState(true);
     const [filterType, setFilterType] = useState('relevance');
@@ -412,21 +414,27 @@ import React, {
               width: 160px !important;
               margin: 0 10px !important;
             `}
-            defaultValue="relevance"
+            value={filterType}
             onChange={setFilterType}
             disabled={areModsLoading}
             virtual={false}
           >
-            {['Relevance', 'Downloads', 'Follows', 'Newest', 'Updated'].map(x => (
-              <Select.Option key={x.toLowerCase()} value={x.toLowerCase()}>
-                {x}
+            {[
+              ['Relevance', t('common.relevance', 'Relevance')],
+              ['Downloads', t('common.downloads', 'Downloads')],
+              ['Follows', t('common.follows', 'Follows')],
+              ['Newest', t('common.newest', 'Newest')],
+              ['Updated', t('common.updated', 'Updated')]
+            ].map(([value, label]) => (
+              <Select.Option key={value.toLowerCase()} value={value.toLowerCase()}>
+                {label}
               </Select.Option>
             ))}
           </Select>
           <Select
-            placeholder="Category"
+            placeholder={t('categories.placeholder', 'Category')}
             onChange={setCategoryId}
-            defaultValue={null}
+            value={categoryId ?? null}
             virtual={false}
             css={`
               width: 500px !important;
@@ -435,7 +443,7 @@ import React, {
             `}
           >
             <Select.Option key={null} value={null}>
-              All Categories
+              {t('categories.all', 'All Categories')}
             </Select.Option>
             {(categories || [])
               .sort((a, b) => a.displayName.localeCompare(b.displayName))
@@ -473,7 +481,7 @@ import React, {
             css={`
               height: 32px !important;
             `}
-            placeholder="Search..."
+            placeholder={t('common.search', 'Search...')}
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
@@ -501,7 +509,10 @@ import React, {
                   margin-top: 70px;
                 `}
               >
-                No mods has been found with the current filters.
+                {t(
+                  'mods.not_found_with_filters',
+                  'No mods have been found with the current filters.'
+                )}
               </div>
             </div>
           ) : (
@@ -541,7 +552,10 @@ import React, {
                 margin-top: 70px;
               `}
             >
-              An error occurred while loading the mods list...
+              {t(
+                'mods.loading_error',
+                'An error occurred while loading the mods list...'
+              )}
             </div>
           </div>
         )}

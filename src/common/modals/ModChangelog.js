@@ -81,6 +81,7 @@ const ModChangelog = ({ projectID, files, type, projectName }) => {
             width: 400px;
             margin: 10px;
           `}
+          value={selectedId || undefined}
           onChange={v => {
             setSelectedId(v);
             loadChangelog(v);

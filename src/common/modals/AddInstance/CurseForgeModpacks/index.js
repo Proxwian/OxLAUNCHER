@@ -1,4 +1,4 @@
-/* eslint-disable no-nested-ternary */
+﻿/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useRef } from 'react';
 import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
@@ -9,12 +9,17 @@ import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { getCurseForgeSearch } from '../../../api';
+import { translateLegacyString } from '../../../localization/translations';
+import { useTranslation } from '../../../localization/useTranslation';
 import ModpacksListWrapper from './ModpacksListWrapper';
 
 let lastRequest;
 const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
+  const { language, t } = useTranslation();
   const mcVersions = useSelector(state => state.app.vanillaManifest?.versions);
   const categories = useSelector(state => state.app.curseforgeCategories);
+  const getCategoryLabel = category =>
+    translateLegacyString(language, category?.name || '');
   const infiniteLoaderRef = useRef(null);
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,10 +43,6 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
     if (!loading) {
       setLoading(true);
     }
-    if (reset && (modpacks.length !== 0 || hasNextPage)) {
-      setModpacks([]);
-      setHasNextPage(false);
-    }
     let data = null;
     try {
       if (error) {
@@ -59,6 +60,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
       );
     } catch (err) {
       setError(err);
+      setLoading(false);
       return;
     }
     const newModpacks = reset ? data : [...modpacks, ...data];
@@ -70,7 +72,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   };
 
   useEffect(() => {
-    const discordRPCDetails = `Смотрит сборки CurseForge`;
+    const discordRPCDetails = t('discord.curseforge.modpacks', 'Смотрит сборки CurseForge');
     ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
     updateModpacks();
   }, [searchText, sortBy, minecraftVersion, categoryId]);
@@ -79,12 +81,12 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
     <Container>
       <HeaderContainer>
         <StyledSelect
-          placeholder="Версия Minecraft"
+          placeholder={t('minecraft.version', 'Версия Minecraft')}
           onChange={setMinecraftVersion}
-          defaultValue={null}
+          value={minecraftVersion}
           virtual={false}
         >
-          <Select.Option value={null}>Все версии</Select.Option>
+          <Select.Option value={null}>{t('common.all_versions', 'Все версии')}</Select.Option>
           {(mcVersions || [])
             .filter(v => v?.type === 'release')
             .map(v => (
@@ -94,13 +96,13 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
             ))}
         </StyledSelect>
         <StyledSelect
-          placeholder="Категория"
+          placeholder={t('categories.placeholder', 'Категория')}
           onChange={setCategoryId}
-          defaultValue={null}
+          value={categoryId}
           virtual={false}
         >
           <Select.Option key="allcategories" value={null}>
-            Все категории
+            {t('categories.all', 'Все категории')}
           </Select.Option>
           {(categories || [])
             .filter(v => v?.classId === 4471)
@@ -124,38 +126,38 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                     `}
                     alt="icon"
                   />
-                  {v?.name}
+                  {getCategoryLabel(v)}
                 </div>
               </Select.Option>
             ))}
         </StyledSelect>
         <StyledSelect
-          placeholder="Сортировать"
-          defaultValue="Популярные"
+          placeholder={t('common.sort', 'Сортировать')}
+          value={sortBy}
           onChange={setSortBy}
           virtual={false}
         >
           <Select.Option key="Featured" value="Featured">
-            Рекомендуемые
+            {t('common.featured', 'Рекомендуемые')}
           </Select.Option>
           <Select.Option key="Popularity" value="Popularity">
-            Популярные
+            {t('common.popularity', 'Популярные')}
           </Select.Option>
           <Select.Option key="LastUpdated" value="LastUpdated">
-            Обновлённые
+            {t('common.updated', 'Обновлённые')}
           </Select.Option>
           <Select.Option key="Name" value="Name">
-            Название
+            {t('common.name', 'Название')}
           </Select.Option>
           <Select.Option key="Author" value="Author">
-            Автор
+            {t('common.author', 'Автор')}
           </Select.Option>
           <Select.Option key="TotalDownloads" value="TotalDownloads">
-            Загрузок
+            {t('common.downloads', 'Загрузок')}
           </Select.Option>
         </StyledSelect>
         <StyledInput
-          placeholder="Поиск..."
+          placeholder={t('common.search', 'Поиск...')}
           onSearch={setSearchText}
           onChange={e => setSearchText(e.target.value)}
           style={{ width: 200 }}
@@ -180,7 +182,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                   margin-top: 70px;
                 `}
               >
-                Я ничего не нашёл по заданным фильтрам...
+                {t('modpacks.not_found_with_filters', 'Я ничего не нашёл по заданным фильтрам...')}
               </div>
             </div>
           ) : (
@@ -218,7 +220,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                 margin-top: 70px;
               `}
             >
-              Произошла ошибка при загрузке списка модификаций...
+              {t('modpacks.loading_error', 'Произошла ошибка при загрузке списка модификаций...')}
             </div>
           </div>
         )}
@@ -251,3 +253,4 @@ const ModpacksContainer = styled.div`
   overflow: hidden;
   padding: 10px 0;
 `;
+

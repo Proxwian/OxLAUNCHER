@@ -180,6 +180,8 @@ const General = () => {
   const instanceSortMethod = useSelector(
     state => state.settings.instanceSortOrder
   );
+  const normalizedInstanceSortMethod = Number(instanceSortMethod);
+  const normalizedCurseReleaseChannel = Number(curseReleaseChannel);
   /* eslint-enable */
 
   const [dataPath, setDataPath] = useState(userData);
@@ -388,7 +390,7 @@ const General = () => {
 
         <Select
           onChange={v => dispatch(updateInstanceSortType(v))}
-          value={instanceSortMethod}
+          value={normalizedInstanceSortMethod}
           css={`
             width: 136px;
             text-align: start;
@@ -413,7 +415,7 @@ const General = () => {
             text-align: start;
           `}
           onChange={e => dispatch(updateCurseReleaseChannel(e))}
-          value={curseReleaseChannel}
+          value={normalizedCurseReleaseChannel}
           virtual={false}
         >
           <Select.Option value={1}>Релиз</Select.Option>

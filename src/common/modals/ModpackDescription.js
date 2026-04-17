@@ -1,4 +1,4 @@
-/* eslint-disable */
+﻿/* eslint-disable */
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
@@ -18,6 +18,7 @@ import {
 } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
+import { useTranslation } from '../localization/useTranslation';
 import {
   FORGE,
   CURSEFORGE_URL,
@@ -35,6 +36,8 @@ const ModpackDescription = ({
   setVersion,
   type
 }) => {
+  const { language, t } = useTranslation();
+  const dateLocale = language === 'en' ? 'en-US' : 'ru-RU';
   const dispatch = useDispatch();
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState(null);
@@ -124,7 +127,7 @@ const ModpackDescription = ({
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            [Релиз]
+            [{t('settings.release.release', 'Релиз')}]
           </span>
         );
       case 2:
@@ -135,7 +138,7 @@ const ModpackDescription = ({
               color: ${props => props.theme.palette.colors.yellow};
             `}
           >
-            [Бета]
+            [{t('settings.release.beta', 'Бета')}]
           </span>
         );
       case 3:
@@ -147,7 +150,7 @@ const ModpackDescription = ({
               color: ${props => props.theme.palette.colors.red};
             `}
           >
-            [Альфа]
+            [{t('settings.release.alpha', 'Альфа')}]
           </span>
         );
     }
@@ -201,19 +204,19 @@ const ModpackDescription = ({
                 {modpack.name}
                 <ParallaxContentInfos>
                   <div>
-                    <label>Автор: </label>
+                    <label>{t('common.author_with_colon', 'Автор: ')}</label>
                     {author}
                   </div>
                   <div>
-                    <label>Загрузки: </label>
+                    <label>{t('common.downloads_with_colon', 'Загрузки: ')}</label>
                     {downloadCount}
                   </div>
                   <div>
-                    <label>Обновлено: </label>
+                    <label>{t('common.updated_with_colon', 'Обновлено: ')}</label>
                     {formatDate(updatedDate)}
                   </div>
                   <div>
-                    <label>Версия Minecraft: </label>
+                    <label>{t('minecraft.version_with_colon', 'Версия Minecraft: ')}</label>
                     {gameVersion}
                   </div>
                 </ParallaxContentInfos>
@@ -277,7 +280,12 @@ const ModpackDescription = ({
             `}
           >
             <StyledSelect
-              placeholder={loading ? 'Загружаю обновления...' : 'Выберите версию'}
+              value={selectedId || undefined}
+              placeholder={
+                loading
+                  ? t('common.loading_updates', 'Загружаю обновления...')
+                  : t('common.select_version', 'Выберите версию')
+              }
               onChange={handleChange}
               listItemHeight={50}
               listHeight={400}
@@ -351,7 +359,7 @@ const ModpackDescription = ({
                           : type === CURSEFORGE
                           ? file.fileDate
                           : file.date_published
-                        ).toLocaleDateString(undefined, {
+                        ).toLocaleDateString(dateLocale, {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
@@ -379,7 +387,7 @@ const ModpackDescription = ({
               dispatch(closeModal());
             }}
           >
-            Установить
+            {t('common.install', 'Установить')}
           </Button>
         </Footer>
       </>

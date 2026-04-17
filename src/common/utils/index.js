@@ -53,7 +53,8 @@ export const formatDate = date => {
   if (typeof date !== 'number') {
     parsedDate = Date.parse(date);
   }
-  return new Date(parsedDate).toLocaleDateString(undefined, {
+  const locale = document?.documentElement?.lang || undefined;
+  return new Date(parsedDate).toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric'

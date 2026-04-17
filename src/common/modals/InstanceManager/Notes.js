@@ -1,4 +1,4 @@
-/* eslint-disable */
+﻿/* eslint-disable */
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Editable, withReact, useSlate, Slate } from 'slate-react';
@@ -19,10 +19,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { updateInstanceConfig } from '../../reducers/actions';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
+import { useTranslation } from '../../localization/useTranslation';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 
 const Notes = ({ instanceName }) => {
+  const { t } = useTranslation();
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -67,7 +69,7 @@ const Notes = ({ instanceName }) => {
             <TextEditor
               renderElement={renderElement}
               renderLeaf={renderLeaf}
-              placeholder="Введите что-нибудь..."
+              placeholder={t('notes.placeholder', 'Введите что-нибудь...')}
               spellCheck
               autoFocus
             />

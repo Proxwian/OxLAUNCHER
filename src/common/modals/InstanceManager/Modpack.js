@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+﻿import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { Select, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,8 +19,10 @@ import { closeModal } from '../../reducers/modals/actions';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import { makeInstanceRestorePoint } from '../../utils';
 import { CURSEFORGE, FTB, MODRINTH } from '../../utils/constants';
+import { useTranslation } from '../../localization/useTranslation';
 
 const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
+  const { language, t } = useTranslation();
   const [files, setFiles] = useState([]);
   const [versionName, setVersionName] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -29,6 +31,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
   const dispatch = useDispatch();
   const tempPath = useSelector(_getTempPath);
   const instancesPath = useSelector(_getInstancesPath);
+  const dateLocale = language === 'en' ? 'en-US' : 'ru-RU';
 
   const convertFtbReleaseType = type => {
     switch (type) {
@@ -151,7 +154,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            [Релиз]
+            [{t('settings.release.release', 'Релиз')}]
           </span>
         );
       case 2:
@@ -161,7 +164,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
               color: ${props => props.theme.palette.colors.yellow};
             `}
           >
-            [Бета]
+            [{t('settings.release.beta', 'Бета')}]
           </span>
         );
       case 3:
@@ -172,7 +175,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
               color: ${props => props.theme.palette.colors.red};
             `}
           >
-            [Альфа]
+            [{t('settings.release.alpha', 'Альфа')}]
           </span>
         );
     }
@@ -183,7 +186,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
 
   return (
     <Container>
-      Текущая версия: {versionName}
+      {t('common.current_version', 'Текущая версия')}: {versionName}
       <br />
       <div
         css={`
@@ -192,7 +195,12 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
         `}
       >
         <StyledSelect
-          placeholder={loading ? 'Загрузка обновлений...' : 'Выберите версию'}
+          value={selectedIndex ?? undefined}
+          placeholder={
+            loading
+              ? t('common.loading_updates', 'Загрузка обновлений...')
+              : t('common.select_version', 'Выберите версию')
+          }
           onChange={handleChange}
           listItemHeight={50}
           listHeight={400}
@@ -236,7 +244,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
                   `}
                 >
                   <div>
-                    {new Date(file.fileDate).toLocaleDateString(undefined, {
+                    {new Date(file.fileDate).toLocaleDateString(dateLocale, {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
@@ -271,7 +279,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
           dispatch(closeModal());
         }}
       >
-        Изменить версию
+        {t('common.change_version', 'Изменить версию')}
       </Button>
     </Container>
   );
@@ -318,26 +326,7 @@ const Changelog = styled.div`
   height: calc(100% - 160px);
   background: ${props => props.theme.palette.grey[900]};
   width: calc(100% - 80px);
-  word-break: break-all;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  margin: 20px 40px;
+  margin-top: 30px;
   padding: 20px;
-  font-size: 20px;
-  * {
-    color: ${props => props.theme.palette.text.primary} !important;
-  }
-  & > div:first-child {
-    font-size: 24px;
-    width: 100%;
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  p {
-    text-align: center;
-  }
-  img {
-    max-width: 100%;
-    height: auto;
-  }
+  overflow-y: auto;
 `;

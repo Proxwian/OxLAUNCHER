@@ -6,7 +6,11 @@ import ReactDOM from 'react-dom';
 // import os from 'os';
 // import { RewriteFrames as RewriteFramesIntegration } from '@sentry/integrations';
 import { Provider } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
+import ruRU from 'antd/lib/locale/ru_RU';
 // import { ipcRenderer } from 'electron';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ConnectedRouter } from 'connected-react-router';
@@ -17,6 +21,7 @@ import RootWeb from './Root-Web';
 import RootElectron from './Root-Electron';
 import ModalsManager from './common/components/ModalsManager';
 import LocalizationProvider from './common/localization/LocalizationProvider';
+import { LANGUAGES } from './common/localization/translations';
 // import { version } from '../package.json';
 
 import 'typeface-roboto';
@@ -33,6 +38,16 @@ const Root =
 
 const ThemeProvider = ({ theme: themeUI, children }) => {
   return <StyledThemeProvider theme={themeUI}>{children}</StyledThemeProvider>;
+};
+
+const AntdLocalizationProvider = ({ children }) => {
+  const language = useSelector(state => state.settings.language || LANGUAGES.RU);
+
+  return (
+    <ConfigProvider locale={language === LANGUAGES.EN ? enUS : ruRU}>
+      {children}
+    </ConfigProvider>
+  );
 };
 
 const { store, persistor } = configureStore();
@@ -96,14 +111,16 @@ ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <ThemeProvider theme={theme}>
-        <LocalizationProvider>
-          <ConnectedRouter history={history}>
-            <ErrorBoundary>
-              <ModalsManager />
-              <Root history={history} store={store} persistor={persistor} />
-            </ErrorBoundary>
-          </ConnectedRouter>
-        </LocalizationProvider>
+        <AntdLocalizationProvider>
+          <LocalizationProvider>
+            <ConnectedRouter history={history}>
+              <ErrorBoundary>
+                <ModalsManager />
+                <Root history={history} store={store} persistor={persistor} />
+              </ErrorBoundary>
+            </ConnectedRouter>
+          </LocalizationProvider>
+        </AntdLocalizationProvider>
       </ThemeProvider>
     </PersistGate>
   </Provider>,

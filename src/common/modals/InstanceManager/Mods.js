@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useMemo } from 'react';
+﻿import React, { memo, useState, useEffect, useMemo } from 'react';
 import { clipboard, ipcRenderer } from 'electron';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
@@ -29,6 +29,7 @@ import {
   _getInstancesPath,
   _getTempPath
 } from '../../utils/selectors';
+import { useTranslation } from '../../localization/useTranslation';
 import {
   updateInstanceConfig,
   deleteMod,
@@ -557,6 +558,7 @@ const getFileType = file => {
 };
 
 const Mods = ({ instanceName }) => {
+  const { t } = useTranslation();
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
   const curseReleaseChannel = useSelector(
@@ -701,7 +703,7 @@ const Mods = ({ instanceName }) => {
           setIsMenuOpen(false);
         }}
       >
-        Обновить все моды
+        {t('mods.update_all', 'Обновить все моды')}
       </Menu.Item>
     </Menu>
   );
@@ -736,7 +738,7 @@ const Mods = ({ instanceName }) => {
                 : setSelectedMods([])
             }
           >
-            Выбрать все
+            {t('common.select_all', 'Выбрать все')}
           </Checkbox>
           <DeleteSelectedMods
             onClick={async () => {
@@ -771,10 +773,10 @@ const Mods = ({ instanceName }) => {
                 }
               }
             }}
-            loading={loadingModUpdates}
           >
-            Проверить обновления
+            {t('common.check_updates', 'Проверить обновления')}
           </Button>
+
           <span
             onClick={e => {
               e.stopPropagation();
@@ -812,7 +814,7 @@ const Mods = ({ instanceName }) => {
             );
           }}
         >
-          Добавить мод
+          {t('mods.add_mod', 'Добавить мод')}
         </Button>
         <Input
           allowClear
@@ -822,7 +824,7 @@ const Mods = ({ instanceName }) => {
           css={`
             width: 200px !important;
           `}
-          placeholder={`Поиск среди ${mods.length} модификаций`}
+          placeholder={`${t('common.search_among', 'Поиск среди')} ${mods.length} ${t('mods.items.mods', 'модификаций')}`}
         />
       </Header>
       <div
@@ -859,7 +861,7 @@ const Mods = ({ instanceName }) => {
                   `}
                   onDragLeave={e => e.stopPropagation()}
                 >
-                  <CopyTitle>Копировать</CopyTitle>
+                  <CopyTitle>{t('common.copy', 'Копировать')}</CopyTitle>
                   <DragArrow icon={faArrowDown} size="3x" />
                 </div>
               )}
@@ -867,7 +869,7 @@ const Mods = ({ instanceName }) => {
           )}
         </Transition>
         {mods.length === 0 && (
-          <NotItemsAvailable>Модификации не найдены :с</NotItemsAvailable>
+          <NotItemsAvailable>{t('mods.not_found', 'Модификации не найдены :с')}</NotItemsAvailable>
         )}
         <AutoSizer>
           {({ height, width }) => (
@@ -888,3 +890,4 @@ const Mods = ({ instanceName }) => {
 };
 
 export default memo(Mods);
+

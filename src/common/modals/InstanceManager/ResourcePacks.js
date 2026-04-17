@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useCallback } from 'react';
+﻿import React, { memo, useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import path from 'path';
@@ -14,6 +14,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import fse from 'fs-extra';
 import curseForgeIcon from '../../assets/curseforgeIcon.webp';
 import { _getInstancesPath } from '../../utils/selectors';
+import { useTranslation } from '../../localization/useTranslation';
 import DragnDropEffect from '../../../ui/DragnDropEffect';
 
 const Header = styled.div`
@@ -185,6 +186,7 @@ const NotItemsAvailable = styled.div`
 `;
 
 const ResourcePacks = ({ instanceName }) => {
+  const { t } = useTranslation();
   const instancesPath = useSelector(_getInstancesPath);
   const [resourcePacks, setResourcePacks] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -360,7 +362,7 @@ const ResourcePacks = ({ instanceName }) => {
                 : setSelectedItems([])
             }
           >
-            Выбрать все
+            {t('common.select_all', 'Выбрать все')}
           </Checkbox>
           <TrashIcon
             selectedMods={selectedItems.length}
@@ -396,7 +398,7 @@ const ResourcePacks = ({ instanceName }) => {
             openFolderDialog();
           }}
         >
-          Добавить ресурспак
+          {t('resourcepacks.add', 'Добавить ресурспак')}
         </Button>
       </Header>
 
@@ -406,7 +408,7 @@ const ResourcePacks = ({ instanceName }) => {
         fileList={resourcePacks}
       >
         {resourcePacks.length === 0 && (
-          <NotItemsAvailable>Ресурспаки не найдены :с</NotItemsAvailable>
+          <NotItemsAvailable>{t('resourcepacks.not_found', 'Ресурспаки не найдены :с')}</NotItemsAvailable>
         )}
         <AutoSizer>
           {({ height, width }) => (
@@ -427,3 +429,4 @@ const ResourcePacks = ({ instanceName }) => {
 };
 
 export default memo(ResourcePacks);
+

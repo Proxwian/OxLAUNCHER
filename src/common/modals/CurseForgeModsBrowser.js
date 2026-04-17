@@ -29,6 +29,8 @@ import React, {
   import { _getInstance } from '../utils/selectors';
   import { installMod } from '../reducers/actions';
   import { FABRIC, FORGE, NEOFORGE, CURSEFORGE } from '../utils/constants';
+  import { translateLegacyString } from '../localization/translations';
+  import { useTranslation } from '../localization/useTranslation';
   import {
     getFirstPreferredCandidate,
     filterFabricFilesByVersion,
@@ -344,6 +346,7 @@ import React, {
   let lastRequest;
   const CurseForgeModsBrowser = ({ instanceName, gameVersions }) => {
     const itemsNumber = 50;
+    const { language, t } = useTranslation();
   
     const [mods, setMods] = useState([]);
     const [areModsLoading, setAreModsLoading] = useState(true);
@@ -418,6 +421,8 @@ import React, {
       instance,
       areModsLoading
     );
+    const getCategoryLabel = category =>
+      translateLegacyString(language, category?.name || '');
   
     return (
       <Container>
@@ -427,22 +432,32 @@ import React, {
               width: 160px !important;
               margin: 0 10px !important;
             `}
-            defaultValue={filterType}
+            value={filterType}
             onChange={setFilterType}
             disabled={areModsLoading}
             virtual={false}
           >
-            <Select.Option value="Featured">Featured</Select.Option>
-            <Select.Option value="Popularity">Popularity</Select.Option>
-            <Select.Option value="LastUpdated">Last Updated</Select.Option>
-            <Select.Option value="Name">Name</Select.Option>
-            <Select.Option value="Author">Author</Select.Option>
-            <Select.Option value="TotalDownloads">Downloads</Select.Option>
+            <Select.Option value="Featured">
+              {t('common.featured', 'Featured')}
+            </Select.Option>
+            <Select.Option value="Popularity">
+              {t('common.popularity', 'Popularity')}
+            </Select.Option>
+            <Select.Option value="LastUpdated">
+              {t('common.last_updated', 'Last Updated')}
+            </Select.Option>
+            <Select.Option value="Name">{t('common.name', 'Name')}</Select.Option>
+            <Select.Option value="Author">
+              {t('common.author', 'Author')}
+            </Select.Option>
+            <Select.Option value="TotalDownloads">
+              {t('common.downloads', 'Downloads')}
+            </Select.Option>
           </Select>
           <Select
-            placeholder="Minecraft Category"
+            placeholder={t('categories.minecraft', 'Minecraft Category')}
             onChange={setCategoryId}
-            defaultValue={null}
+            value={categoryId}
             virtual={false}
             css={`
               width: 500px !important;
@@ -450,7 +465,7 @@ import React, {
             `}
           >
             <Select.Option key="allcategories" value={null}>
-              All Categories
+              {t('categories.all', 'All Categories')}
             </Select.Option>
             {(categories || [])
               .filter(v => v?.classId === 6)
@@ -474,7 +489,7 @@ import React, {
                       `}
                       alt="icon"
                     />
-                    {v?.name}
+                    {getCategoryLabel(v)}
                   </div>
                 </Select.Option>
               ))}
@@ -483,7 +498,7 @@ import React, {
             css={`
               height: 32px !important;
             `}
-            placeholder="Search..."
+            placeholder={t('common.search', 'Search...')}
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
@@ -511,7 +526,10 @@ import React, {
                   margin-top: 70px;
                 `}
               >
-                No mods has been found with the current filters.
+                {t(
+                  'mods.not_found_with_filters',
+                  'No mods have been found with the current filters.'
+                )}
               </div>
             </div>
           ) : (
@@ -550,7 +568,10 @@ import React, {
                 margin-top: 70px;
               `}
             >
-              An error occurred while loading the mods list...
+              {t(
+                'mods.loading_error',
+                'An error occurred while loading the mods list...'
+              )}
             </div>
           </div>
         )}
