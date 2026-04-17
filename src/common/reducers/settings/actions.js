@@ -145,3 +145,12 @@ export function updateCurseReleaseChannel(curseReleaseChannel) {
     });
   };
 }
+
+export function updateLanguage(language) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_LANGUAGE,
+      language
+    });
+  };
+}

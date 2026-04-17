@@ -29,6 +29,7 @@ import {
 import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
+  updateLanguage,
   updatePotatoPcMode,
   updateInstanceSortType,
   updateShowNews,
@@ -36,6 +37,8 @@ import {
 } from '../../../reducers/settings/actions';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
+import { LANGUAGES } from '../../../localization/translations';
+import { useTranslation } from '../../../localization/useTranslation';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { extractFace } from '../../../../app/desktop/utils';
 
@@ -158,6 +161,7 @@ const General = () => {
   const instancesPath = useSelector(_getInstancesPath);
   const currentAccount = useSelector(_getCurrentAccount);
   const userData = useSelector(state => state.userData);
+  const language = useSelector(state => state.settings.language);
   const isPlaying = useSelector(state => state.startedInstances);
   const queuedInstances = useSelector(state => state.downloadQueue);
   const updateAvailable = useSelector(state => state.updateAvailable);
@@ -188,6 +192,7 @@ const General = () => {
   const [releaseChannel, setReleaseChannel] = useState(null);
 
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const disableInstancesActions =
     Object.keys(queuedInstances).length > 0 ||
@@ -270,7 +275,7 @@ const General = () => {
   return (
     <>
       <PersonalData>
-        <MainTitle>Общие</MainTitle>
+        <MainTitle>{t('settings.general.title', 'Общие')}</MainTitle>
         <PersonalDataContainer>
           <ProfileImage
             src={profileImage ? `data:image/jpeg;base64,${profileImage}` : null}
@@ -317,6 +322,31 @@ const General = () => {
           </div>
         </PersonalDataContainer>
       </PersonalData>
+      <Title>{t('settings.language.title', 'Язык')}</Title>
+      <Content>
+        <p>
+          {t(
+            'settings.language.description',
+            'Выберите язык интерфейса лаунчера. Изменения применяются сразу.'
+          )}
+        </p>
+        <Select
+          onChange={v => dispatch(updateLanguage(v))}
+          value={language || LANGUAGES.RU}
+          css={`
+            width: 120px;
+            text-align: start;
+          `}
+          virtual={false}
+        >
+          <Select.Option value={LANGUAGES.RU}>
+            {t('settings.language.ru', 'Русский')}
+          </Select.Option>
+          <Select.Option value={LANGUAGES.EN}>
+            {t('settings.language.en', 'English')}
+          </Select.Option>
+        </Select>
+      </Content>
       <Title>
         Одновременные загрузки &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
       </Title>

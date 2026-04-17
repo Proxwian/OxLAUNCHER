@@ -3,21 +3,25 @@ const log = require('electron-log');
 
 let client;
 let activity;
+let currentLanguage = 'ru';
 
 const initialAppStartup = Math.floor(Date.now() / 1000);
 
-const defaultValue = {
-  details: 'На главном экране',
+const createDefaultValue = language => ({
+  details: language === 'en' ? 'On Home Screen' : 'На главном экране',
   startTimestamp: initialAppStartup,
   largeImageKey: 'default_big',
-  largeImageText: 'OxLAUNCHER - Лучший Minecraft лаунчер для установки сборок с модификациями и не только',
+  largeImageText:
+    language === 'en'
+      ? 'OxLAUNCHER - The best Minecraft launcher for installing modpacks and more'
+      : 'OxLAUNCHER - Лучший Minecraft лаунчер для установки сборок с модификациями и не только',
   instance: false
-};
+});
 
 exports.initRPC = () => {
   client = new Client({ transport: 'ipc' });
 
-  activity = defaultValue;
+  activity = createDefaultValue(currentLanguage);
 
   client.on('ready', () => {
     log.log('Discord RPC Connected');
@@ -45,8 +49,19 @@ exports.update = details => {
 
 exports.reset = () => {
   if (!client) return;
-  activity = defaultValue;
+  activity = createDefaultValue(currentLanguage);
   activity.startTimestamp = initialAppStartup;
+  client.setActivity(activity);
+};
+
+exports.setLanguage = language => {
+  currentLanguage = language || 'ru';
+
+  if (!client) return;
+  activity = {
+    ...createDefaultValue(currentLanguage),
+    ...(activity || {})
+  };
   client.setActivity(activity);
 };
 

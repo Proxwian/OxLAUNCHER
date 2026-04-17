@@ -16,6 +16,7 @@ import RootDev from './Root-Dev';
 import RootWeb from './Root-Web';
 import RootElectron from './Root-Electron';
 import ModalsManager from './common/components/ModalsManager';
+import LocalizationProvider from './common/localization/LocalizationProvider';
 // import { version } from '../package.json';
 
 import 'typeface-roboto';
@@ -95,12 +96,14 @@ ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <ThemeProvider theme={theme}>
-        <ConnectedRouter history={history}>
-          <ErrorBoundary>
-            <ModalsManager />
-            <Root history={history} store={store} persistor={persistor} />
-          </ErrorBoundary>
-        </ConnectedRouter>
+        <LocalizationProvider>
+          <ConnectedRouter history={history}>
+            <ErrorBoundary>
+              <ModalsManager />
+              <Root history={history} store={store} persistor={persistor} />
+            </ErrorBoundary>
+          </ConnectedRouter>
+        </LocalizationProvider>
       </ThemeProvider>
     </PersistGate>
   </Provider>,

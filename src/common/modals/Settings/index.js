@@ -8,6 +8,7 @@ import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
 import SocialButtons from '../../components/SocialButtons';
 import { closeModal } from '../../reducers/modals/actions';
+import { useTranslation } from '../../localization/useTranslation';
 import KoFiButton from '../../assets/ko-fi.png';
 
 const Container = styled.div`
@@ -91,12 +92,10 @@ const SettingsTitle = styled.div`
 const pages = {
   General: {
     name: 'General',
-    display: 'Общие',
     component: AsyncComponent(lazy(() => import('./components/General')))
   },
   Java: {
     name: 'Java',
-    display: 'Настройки Java',
     component: AsyncComponent(lazy(() => import('./components/Java')))
   }
 };
@@ -104,6 +103,7 @@ const pages = {
 export default function Settings() {
   const [page, setPage] = useState('General');
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const ContentComponent = pages[page].component;
 
   const discordRPCDetails = `Настраивает лаунчер`;
@@ -127,14 +127,16 @@ export default function Settings() {
           onClick={() => dispatch(closeModal())}
         />
         <SideMenu>
-          <SettingsTitle>Параметры</SettingsTitle>
+          <SettingsTitle>{t('settings.sidebar.parameters', 'Параметры')}</SettingsTitle>
           {Object.values(pages).map(val => (
             <SettingsButton
               key={val.link}
               active={page === val.name}
               onClick={() => setPage(val.name)}
             >
-              {val.display}
+              {val.name === 'General'
+                ? t('settings.sidebar.general', 'Общие')
+                : t('settings.sidebar.java', 'Настройки Java')}
             </SettingsButton>
           ))}
           {/* <SettingsButton onClick={() => setPage("User Interface")}>

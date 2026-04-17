@@ -125,6 +125,15 @@ function mcStartupMethod(state = MC_STARTUP_METHODS.DEFAULT, action) {
   }
 }
 
+function language(state = 'ru', action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_LANGUAGE:
+      return action.language;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path8: null,
@@ -167,5 +176,6 @@ export default combineReducers({
   curseReleaseChannel,
   java,
   minecraftSettings,
-  mcStartupMethod
+  mcStartupMethod,
+  language
 });

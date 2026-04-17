@@ -33,6 +33,7 @@ const fs = fss.promises;
 let mainWindow;
 let tray;
 let watcher;
+let launcherLanguage = 'ru';
 
 const discordRPC = require('./discordRPC');
 const { DISCORD_INVITE_URL, BOOSTY_PAGE_URL } = require('../src/common/utils/constants');
@@ -40,6 +41,31 @@ const { DISCORD_INVITE_URL, BOOSTY_PAGE_URL } = require('../src/common/utils/con
 const gotTheLock = app.requestSingleInstanceLock();
 
 const isDev = process.env.NODE_ENV === 'development';
+
+const localeStrings = {
+  ru: {
+    about: 'Об OxLAUNCHER',
+    services: 'Сервисы',
+    hide: 'Спрятать OxLAUNCHER',
+    hideOthers: 'Спрятать остальные',
+    showAll: 'Показать все',
+    quit: 'Выйти из OxLAUNCHER',
+    devtools: 'Консоль разработчика',
+    support: 'Поблагодарить :3'
+  },
+  en: {
+    about: 'About OxLAUNCHER',
+    services: 'Services',
+    hide: 'Hide OxLAUNCHER',
+    hideOthers: 'Hide Others',
+    showAll: 'Show All',
+    quit: 'Quit OxLAUNCHER',
+    devtools: 'Developer Console',
+    support: 'Support :3'
+  }
+};
+
+const t = key => localeStrings[launcherLanguage]?.[key] || localeStrings.ru[key];
 
 // Prevent multiple instances
 if (gotTheLock) {
@@ -75,40 +101,40 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
-const edit = [
+const buildEditMenu = () => [
   ...(process.platform === 'darwin'
     ? [
         {
           label: 'OxLAUNCHER',
           submenu: [
             {
-              label: 'Об OxLAUNCHER',
+              label: t('about'),
               role: 'about'
             },
             { type: 'separator' },
             {
-              label: 'Сервисы',
+              label: t('services'),
               role: 'services',
               submenu: []
             },
             { type: 'separator' },
             {
-              label: 'Спрятать OxLAUNCHER',
+              label: t('hide'),
               accelerator: 'Command+H',
               role: 'hide'
             },
             {
-              label: 'Спрятать остальные',
+              label: t('hideOthers'),
               accelerator: 'Command+Alt+H',
               role: 'hideOthers'
             },
             {
-              label: 'Показать все',
+              label: t('showAll'),
               role: 'unhide'
             },
             { type: 'separator' },
             {
-              label: 'Выйти из OxLAUNCHER',
+              label: t('quit'),
               accelerator: 'Command+Q',
               click: () => {
                 app.quit();
@@ -148,6 +174,25 @@ const edit = [
   }
 ];
 
+const buildTrayMenuTemplate = () => [
+  {
+    label: 'OxLAUNCHER',
+    enabled: false
+  },
+  {
+    label: t('devtools'),
+    click: () => mainWindow.webContents.openDevTools()
+  },
+  {
+    label: 'Discord',
+    click: () => shell.openExternal(DISCORD_INVITE_URL)
+  },
+  {
+    label: t('support'),
+    click: () => shell.openExternal(BOOSTY_PAGE_URL)
+  }
+];
+
 let navPlatform = null;
 switch (os.platform()) {
   case 'win32':
@@ -167,7 +212,7 @@ const userAgent = new UserAgent({
 }).toString();
 
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
+Menu.setApplicationMenu(Menu.buildFromTemplate(buildEditMenu()));
 
 app.setPath('userData', path.join(app.getPath('appData'), 'oxlauncher'));
 
@@ -347,26 +392,7 @@ function createWindow() {
   const nimage = nativeImage.createFromPath(iconPath);
 
   tray = new Tray(nimage);
-  const trayMenuTemplate = [
-    {
-      label: 'OxLAUNCHER',
-      enabled: false
-    },
-    {
-      label: 'Консоль разработчика',
-      click: () => mainWindow.webContents.openDevTools()
-    },
-    {
-      label: 'Discord',
-      click: () => shell.openExternal(DISCORD_INVITE_URL)
-    },
-    {
-      label: 'Поблагодарить :3',
-      click: () => shell.openExternal(BOOSTY_PAGE_URL)
-    }
-  ];
-
-  const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+  const trayMenu = Menu.buildFromTemplate(buildTrayMenuTemplate());
   tray.setContextMenu(trayMenu);
   tray.setToolTip('OxLAUNCHER');
   tray.on('double-click', () => mainWindow.show());
@@ -638,6 +664,20 @@ ipcMain.handle('reset-discord-rpc', () => {
 
 ipcMain.handle('shutdown-discord-rpc', () => {
   discordRPC.shutdownRPC();
+});
+
+ipcMain.handle('set-language', (event, language) => {
+  launcherLanguage = language || 'ru';
+  discordRPC.setLanguage(launcherLanguage);
+
+  if (process.platform === 'darwin') {
+    Menu.setApplicationMenu(Menu.buildFromTemplate(buildEditMenu()));
+  }
+
+  if (tray) {
+    const trayMenu = Menu.buildFromTemplate(buildTrayMenuTemplate());
+    tray.setContextMenu(trayMenu);
+  }
 });
 
 const removeOriginHeader = (details, callback) => {
