@@ -341,6 +341,7 @@ export const legacyRuToEn = {
   Управление: 'Manage',
   Экспорт: 'Export',
   Дублировать: 'Duplicate',
+  'Создать ярлык на рабочем столе': 'Create Desktop Shortcut',
   Починить: 'Repair',
   Удалить: 'Delete',
   'ПРОСССССТИТЕ. OxLAUNCHER врезался в крипера и взорвался..':

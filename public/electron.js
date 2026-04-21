@@ -68,8 +68,16 @@ const localeStrings = {
 
 const t = key => localeStrings[launcherLanguage]?.[key] || localeStrings.ru[key];
 
+const normalizeProtocolUrl = value => {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().replace(/^"+|"+$/g, '');
+  if (!trimmed.startsWith('oxlauncher:')) return null;
+  if (trimmed.startsWith('oxlauncher://')) return trimmed;
+  return trimmed.replace(/^oxlauncher:/, 'oxlauncher://');
+};
+
 const extractProtocolUrl = args =>
-  (args || []).find(arg => typeof arg === 'string' && arg.startsWith('oxlauncher://'));
+  (args || []).map(normalizeProtocolUrl).find(Boolean);
 
 const sendProtocolUrlToRenderer = protocolUrl => {
   if (!protocolUrl) return;
@@ -105,9 +113,25 @@ app.on('open-url', (event, url) => {
   sendProtocolUrlToRenderer(url);
 });
 
-if (!app.isDefaultProtocolClient('oxlauncher')) {
-  app.setAsDefaultProtocolClient('oxlauncher');
-}
+const registerProtocolClient = () => {
+  if (process.platform === 'win32' && process.defaultApp) {
+    const appPath = process.argv[1]
+      ? path.resolve(process.argv[1])
+      : path.resolve('.');
+    if (
+      !app.isDefaultProtocolClient('oxlauncher', process.execPath, [appPath])
+    ) {
+      app.setAsDefaultProtocolClient('oxlauncher', process.execPath, [appPath]);
+    }
+    return;
+  }
+
+  if (!app.isDefaultProtocolClient('oxlauncher')) {
+    app.setAsDefaultProtocolClient('oxlauncher');
+  }
+};
+
+registerProtocolClient();
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;

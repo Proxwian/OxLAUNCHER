@@ -257,7 +257,9 @@ const Instances = () => {
         <Popover content={sortMenu} trigger="click" placement="topLeft" zIndex={80}>
           <SortButton type="primary">
             <FontAwesomeIcon icon={currentSort?.icon || faSort} />
-            {currentSort?.label || t('common.sorting', 'Сортировка')}
+            <span key={`sort-label-${normalizedSortOrder}`}>
+              {currentSort?.label || t('common.sorting', 'Сортировка')}
+            </span>
           </SortButton>
         </Popover>
       </SortControls>

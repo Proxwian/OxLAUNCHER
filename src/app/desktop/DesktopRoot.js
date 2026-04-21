@@ -9,6 +9,7 @@ import { message } from 'antd';
 import RouteWithSubRoutes from '../../common/components/RouteWithSubRoutes';
 import {
   addStartedInstance,
+  launchInstance,
   loginWithAccessToken,
   initManifests,
   initNews,
@@ -29,7 +30,10 @@ import GlobalStyles from '../../common/GlobalStyles';
 import RouteBackground from '../../common/components/RouteBackground';
 import ga from '../../common/utils/analytics';
 import routes from './utils/routes';
-import { _getCurrentAccount } from '../../common/utils/selectors';
+import {
+  _getCurrentAccount,
+  _getInstances
+} from '../../common/utils/selectors';
 import { isLatestJavaDownloaded } from './utils';
 import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
@@ -62,6 +66,10 @@ const Container = styled.div`
 function DesktopRoot({ store }) {
   const dispatch = useDispatch();
   const currentAccount = useSelector(_getCurrentAccount);
+  const instances = useSelector(_getInstances);
+  const authenticationState = useSelector(
+    state => state.loading[features.mcAuthentication]
+  );
   const clientToken = useSelector(state => state.app.clientToken);
   const java8Path = useSelector(state => state.settings.java.path8);
   const java17Path = useSelector(state => state.settings.java.path17);
@@ -71,13 +79,28 @@ function DesktopRoot({ store }) {
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
   const [pendingProtocolInstance, setPendingProtocolInstance] = React.useState(null);
   // const [contentStyle, setContentStyle] = useState({ transform: 'scale(1)' });
+  const resolvedPendingProtocolInstance = React.useMemo(() => {
+    if (!pendingProtocolInstance) return null;
+
+    return (
+      instances.find(instance => instance.name === pendingProtocolInstance)?.name ||
+      instances.find(
+        instance =>
+          instance.name?.trim().toLowerCase() ===
+          pendingProtocolInstance.trim().toLowerCase()
+      )?.name ||
+      null
+    );
+  }, [instances, pendingProtocolInstance]);
 
   const queueProtocolLaunch = protocolUrl => {
     if (!protocolUrl) return;
 
     try {
       const parsed = new URL(protocolUrl);
-      if (parsed.hostname !== 'launch-instance') return;
+      const launchTarget = parsed.hostname || parsed.pathname.replace(/^\/+/, '');
+      const normalizedLaunchTarget = launchTarget.replace(/\/+$/, '');
+      if (normalizedLaunchTarget !== 'launch-instance') return;
       const instanceName = parsed.searchParams.get('name');
       if (instanceName) {
         setPendingProtocolInstance(instanceName);
@@ -214,12 +237,22 @@ function DesktopRoot({ store }) {
 
   useEffect(() => {
     if (!currentAccount || !pendingProtocolInstance) return;
+    if (authenticationState?.isRequesting) return;
+    if (!resolvedPendingProtocolInstance) {
+      return;
+    }
 
     dispatch(push('/home'));
-    dispatch(addStartedInstance({ instanceName: pendingProtocolInstance }));
-    dispatch(launchInstance(pendingProtocolInstance));
+    dispatch(addStartedInstance({ instanceName: resolvedPendingProtocolInstance }));
+    dispatch(launchInstance(resolvedPendingProtocolInstance));
     setPendingProtocolInstance(null);
-  }, [currentAccount, pendingProtocolInstance]);
+  }, [
+    authenticationState?.isRequesting,
+    currentAccount,
+    dispatch,
+    pendingProtocolInstance,
+    resolvedPendingProtocolInstance
+  ]);
 
   useTrackIdle(location.pathname);
 

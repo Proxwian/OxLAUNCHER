@@ -81,8 +81,8 @@ const Content = styled.div`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 10px;
   position: relative;
+  overflow: hidden;
 `;
 
 const Overlay = styled.div`
